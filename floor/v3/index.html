@@ -101,6 +101,11 @@ button{font:inherit;color:inherit}
 .rpc.none b{color:#d62828}
 .cnt{display:inline-block;border:2px solid #111;border-radius:10px;background:#fff;padding:0 8px;font-size:12px;font-weight:800;margin-left:6px}
 .cnt.bad{background:#d62828;color:#fff}
+.pimg{position:relative;width:100%;max-width:210px;aspect-ratio:1/1;margin:2px auto 0}
+.pimg>img,.pimg>.ov{position:absolute;inset:0;width:100%;height:100%}
+.pimg img{object-fit:contain}
+.pimg>svg:first-child{position:absolute}
+.pimg .ov{pointer-events:none}
 .foot{font-size:11px;color:var(--muted);text-align:right}
 
 /* ---- 詳細ウインドウ ---- */
@@ -251,6 +256,31 @@ function waitText(s){
 }
 
 /* ===== 人物イラスト ===== */
+function extraOf(state,stale){
+  return stale ? `<g class="a-zz" font-size="11" font-weight="800" fill="#444"><text x="82" y="22">z</text><text x="90" y="13" font-size="9">z</text></g>`
+    : state==="idle" ? `<g stroke="#999" stroke-width="1.5" fill="none" class="a-steam"><path d="M96 54 q-3-4 0-7 q3-3 0-6"/></g><path d="M91 56h12v8a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z" fill="#fff" stroke="#222" stroke-width="2"/>`
+    : (state==="wait_light"||state==="wait_heavy"||state==="wait_member") ? `<g class="a-blink"><circle cx="86" cy="22" r="10" fill="#fff" stroke="#222" stroke-width="2"/><text x="86" y="27" font-size="14" font-weight="800" text-anchor="middle" fill="#222">?</text></g>`
+    : state==="done" ? `<g><circle cx="88" cy="22" r="10" fill="#5ac26a" stroke="#222" stroke-width="2"/><path d="M83 22l4 4 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>` : "";
+}
+/* ガネチ／ガチコ素材：floor/v3/img/ にファイルが置かれた子だけ画像に切り替わる（無ければ従来のイラスト）
+   <id>.png            … 顔メイン＋持ち物（服の部分は透明）
+   clothes-boy.png / clothes-girl.png … 服の形だけ（色は何でもよい。画面側でメンバー色に塗る） */
+const CHAR = {mii:"girl",koukichi:"boy",oyakata:"boy",sekkeikakari:"girl",hptantou:"girl",ganechigamen:"boy",chii:"girl",bucho:"boy",ganechikun:"boy"}; /* 仮の割り振り。みーに確認中 */
+const ASSET_OK = new Set();
+function probeAssets(){
+  const ids=people().map(p=>p.id);
+  Promise.all(ids.map(id=>new Promise(res=>{const i=new Image();i.onload=()=>{ASSET_OK.add(id);res()};i.onerror=res;i.src=`img/${id}.png`})))
+    .then(()=>{if(ASSET_OK.size) draw()});
+}
+function personHTML(id,color,state,stale,opts={}){
+  if(!ASSET_OK.has(id)) return personSVG(id,color,state,stale,opts);
+  const clothes=`img/clothes-${CHAR[id]||"boy"}.png`, working=state==="working"&&!stale;
+  return `<div class="pimg ${working?"":"a-bob"}" role="img" aria-label="${esc(opts.label||"")}">
+    <svg width="0" height="0" style="position:absolute"><filter id="tint-${esc(id)}" color-interpolation-filters="sRGB"><feFlood flood-color="${color}"/><feComposite in2="SourceGraphic" operator="in"/></filter></svg>
+    <img class="pcl" src="${clothes}" alt="" style="filter:url(#tint-${esc(id)})">
+    <img src="img/${esc(id)}.png" alt="">
+    <svg class="ov" viewBox="0 0 120 92">${extraOf(state,stale)}</svg></div>`;
+}
 function personSVG(id,color,state,stale,opts={}){
   const L = opts.look || LOOK[id] || {h:"short",c:"#333"};
   const hair = {
@@ -261,10 +291,7 @@ function personSVG(id,color,state,stale,opts={}){
   }[L.h];
   const glass = L.g?`<g fill="none" stroke="#222" stroke-width="1.5"><circle cx="54" cy="33" r="4.5"/><circle cx="66" cy="33" r="4.5"/><path d="M58.5 33h3"/></g>`:"";
   const working = state==="working"&&!stale;
-  const extra = stale ? `<g class="a-zz" font-size="11" font-weight="800" fill="#444"><text x="82" y="22">z</text><text x="90" y="13" font-size="9">z</text></g>`
-    : state==="idle" ? `<g stroke="#999" stroke-width="1.5" fill="none" class="a-steam"><path d="M96 54 q-3-4 0-7 q3-3 0-6"/></g><path d="M91 56h12v8a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z" fill="#fff" stroke="#222" stroke-width="2"/>`
-    : (state==="wait_light"||state==="wait_heavy"||state==="wait_member") ? `<g class="a-blink"><circle cx="86" cy="22" r="10" fill="#fff" stroke="#222" stroke-width="2"/><text x="86" y="27" font-size="14" font-weight="800" text-anchor="middle" fill="#222">?</text></g>`
-    : state==="done" ? `<g><circle cx="88" cy="22" r="10" fill="#5ac26a" stroke="#222" stroke-width="2"/><path d="M83 22l4 4 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>` : "";
+  const extra = extraOf(state,stale);
   return `<svg class="person" viewBox="0 0 120 92" role="img" aria-label="${esc(opts.label||"")}">
     <g class="${working?"":"a-bob"}">
       <rect x="36" y="44" width="48" height="28" rx="13" fill="${color}" stroke="#222" stroke-width="2"/>
@@ -301,7 +328,7 @@ function memberCell(p){
   return `<button class="cell ${stale?"stale":""} ${lv?"stall":""}" data-id="${esc(p.id)}" style="--c:${c};--tint:${tint(c)}">
     <span class="chip">${esc(s?STATUS_LABEL[s.status]||s.status:"—")}</span>
     <span class="plate">${esc(p.name)}${p.guest?`<span class="guest-tag">ゲスト</span>`:""}<i>${esc(p.role||"")}</i></span>
-    ${personSVG(p.id,c,state,stale||lv>0,{label:p.name})}
+    ${personHTML(p.id,c,state,stale||lv>0,{label:p.name})}
     ${lv?`<span class="ribbon l${lv}">⚠ ${ageText(ageMs(s))} 止まってる</span>`:""}
     <div class="say">${bubble}</div>${memo}</button>`;
 }
@@ -471,7 +498,7 @@ window.renderFloor3=d=>{DATA=d;source="差し替え";draw()};
 renderCal(); buildClock(); buildMega(); draw(); tick();
 setInterval(tick,100);
 setInterval(()=>{draw()},60000);
-tryLive(); setInterval(tryLive,60000);
+probeAssets(); tryLive(); setInterval(tryLive,60000);
 </script>
 </body>
 </html>

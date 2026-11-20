@@ -6,7 +6,11 @@ d = os.path.dirname(os.path.abspath(__file__)); f = os.path.dirname(d)
 members = json.load(open(f+"/members.json", encoding="utf-8"))
 status = [json.load(open(p, encoding="utf-8")) for p in sorted(glob.glob(f+"/status/*.json"))]
 jst = datetime.timezone(datetime.timedelta(hours=9))
-data = {"collected_at": datetime.datetime.now(jst).isoformat(timespec="seconds"), "members": members, "status": status}
+def jl(path):
+    return json.load(open(path, encoding="utf-8")) if os.path.exists(path) else None
+msg = jl(f+"/megaphone/current.json")
+replies = [json.load(open(p, encoding="utf-8")) for p in sorted(glob.glob(f+"/megaphone/replies/*.json"))]
+data = {"megaphone": {"message": msg, "replies": replies}, "collected_at": datetime.datetime.now(jst).isoformat(timespec="seconds"), "members": members, "status": status}
 html = open(d+"/index.html", encoding="utf-8").read()
 blob = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 new = re.sub(r'(<script id="floor-data" type="application/json">).*?(</script>)', lambda m: m.group(1)+blob+m.group(2), html, count=1, flags=re.S)

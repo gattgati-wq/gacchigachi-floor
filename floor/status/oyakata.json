@@ -1,9 +1,9 @@
 {
   "id": "oyakata",
   "name": "親方",
-  "status": "wait_member",
+  "status": "done",
   "task": "T900 BLE確認",
-  "say": "BLE記録中（2回目）。テストLINE待ち",
-  "waiting_for": "mii",
-  "updated": "2026-11-20T17:59:02+09:00"
+  "say": "日本語は正しく届いていた。フォント側と判定",
+  "waiting_for": "",
+  "updated": "2026-11-20T18:02:23+09:00"
 }

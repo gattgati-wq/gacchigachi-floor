@@ -1,9 +1,9 @@
 {
   "id": "sekkeikakari",
   "name": "フロア設計係",
-  "status": "working",
-  "task": "フロア画面v3",
-  "say": "v3の画面を作ってる",
-  "waiting_for": "",
-  "updated": "2026-11-21T05:14:06+09:00"
+  "status": "wait_light",
+  "task": "フロア画面v3（PR #4）",
+  "say": "v3できた。みーの確認待ち",
+  "waiting_for": "mii",
+  "updated": "2026-11-21T05:17:29+09:00"
 }

@@ -6,7 +6,9 @@
     { "id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design" },
     { "id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp" },
     { "id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen" },
-    { "id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch" }
+    { "id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch" },
+    { "id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho" },
+    { "id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun" }
   ],
   "chairman": { "name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false }
 }

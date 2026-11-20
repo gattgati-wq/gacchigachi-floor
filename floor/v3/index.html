@@ -291,8 +291,10 @@ function memberCell(p){
 function renderAlert(){
   const st=people().filter(p=>stallLevel(p.st)).sort((a,b)=>ageMs(b.st)-ageMs(a.st));
   const el=document.getElementById("alert");
-  el.className="alert"+(st.length?" on":"");
-  el.innerHTML=st.length?`⚠ 止まってる仕事 ${st.length}件 `+st.map(p=>`<button data-id="${esc(p.id)}">${esc(p.name)} ${ageText(ageMs(p.st))}</button>`).join(""):"";
+  const miss=people().filter(p=>!p.st&&!p.guest);
+  el.className="alert"+(st.length||miss.length?" on":"");
+  el.innerHTML=(st.length?`⚠ 止まってる仕事 ${st.length}件 `+st.map(p=>`<button data-id="${esc(p.id)}">${esc(p.name)} ${ageText(ageMs(p.st))}</button>`).join(""):"")
+    +(miss.length?` ⚠ 状態ファイルなし `+miss.map(p=>`<button data-id="${esc(p.id)}">${esc(p.name)}</button>`).join(""):"");
 }
 function renderFloor(){
   const ps=people();
@@ -394,15 +396,19 @@ document.addEventListener("click",e=>{
 });
 
 /* ===== ライブ読み込み（サーバー上で開いた時だけ。失敗したら埋め込みデータ） ===== */
+const RAW="https://raw.githubusercontent.com/gattgati-wq/gacchigachi-floor/main/floor";
+async function loadFrom(base){
+  const mem=await (await fetch(base+"/members.json",{cache:"no-store"})).json();
+  const got=await Promise.all(mem.members.map(m=>fetch(`${base}/status/${m.id}.json`,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)));
+  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean)};
+}
+/* 開いた時＋毎分、最新のファイルを読む。サーバー上なら同じ場所、だめならGitHubのmain。全部だめなら埋め込みデータ */
 async function tryLive(){
-  if(location.protocol==="file:") return;
-  try{
-    const mem=await (await fetch("../members.json",{cache:"no-store"})).json();
-    const ids=mem.members.map(m=>m.id);
-    const got=await Promise.all(ids.map(id=>fetch(`../status/${id}.json`,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)));
-    DATA={collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean)};
-    source="ライブ"; draw();
-  }catch(e){}
+  const bases = location.protocol==="file:" ? [RAW] : ["..",RAW];
+  for(const b of bases){
+    try{ DATA=await loadFrom(b); source=b===RAW?"ライブ（GitHub main）":"ライブ"; draw(); return; }catch(e){}
+  }
+  source="埋め込み（古い可能性あり）"; draw();
 }
 function draw(){
   renderBoard(); renderFloor(); renderAlert();

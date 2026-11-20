@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ガっチガチ研究所 AI社員フロア</title>
+<style>
+  :root{
+    --wall:#fdf3e7; --wall-line:#f1dfc9; --floor:#f6e2c4; --floor-line:#ecd2ac;
+    --ink:#4a3a44; --sub:#8a7783; --card:#fffdfa;
+    --c-working:#3fb27f; --c-light:#f0a830; --c-heavy:#e5484d; --c-member:#4a8fe7;
+    --c-idle:#9aa7b8; --c-done:#9b6be0; --c-none:#b9b0b6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#2b2230;overflow:hidden;
+    font-family:"Hiragino Maru Gothic ProN","Zen Maru Gothic","Rounded Mplus 1c","Hiragino Sans","Noto Sans JP",sans-serif;color:var(--ink)}
+  #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;
+    background:
+      repeating-linear-gradient(90deg,transparent 0 158px,var(--floor-line) 158px 160px),
+      linear-gradient(var(--floor),var(--floor));
+    border-radius:18px}
+  .wall{position:absolute;left:0;top:0;width:1600px;height:250px;
+    background:repeating-linear-gradient(90deg,var(--wall) 0 78px,var(--wall-line) 78px 80px);
+    border-bottom:10px solid #e6c9a3}
+  .abs{position:absolute}
+  .title{left:28px;top:20px;background:#ff6f8f;color:#fff;font-weight:800;font-size:30px;
+    padding:10px 26px 10px 22px;border-radius:14px;box-shadow:0 4px 0 #d94f71;letter-spacing:.04em}
+  .title small{font-size:17px;font-weight:700;opacity:.9;margin-left:10px}
+  .collected{left:30px;top:86px;font-size:15px;color:var(--sub)}
+  /* 完了ボード */
+  .board{left:480px;top:16px;width:420px;height:128px;background:#3c5a4a;border:8px solid #b9895a;border-radius:10px;
+    color:#f4fff7;padding:8px 14px;font-size:15px}
+  .board h3{margin:0 0 4px;font-size:16px;color:#ffe78a}
+  .board ul{margin:0;padding-left:1.1em;line-height:1.45}
+  .board .empty{opacity:.7}
+  /* 会長室 */
+  .chair-room{left:1130px;top:0;width:440px;height:262px;background:#efe2f3;border:8px solid #c9a0d6;border-top:none;
+    border-radius:0 0 22px 22px;box-shadow:inset 0 -6px 0 #dcc3e6}
+  .chair-room .plate{position:absolute;left:50%;top:22px;transform:translateX(-50%);
+    background:linear-gradient(#ffe79a,#e8bc45);color:#5a3d06;font-weight:800;font-size:22px;
+    padding:6px 22px;border-radius:8px;box-shadow:0 3px 0 #b88a1c;white-space:nowrap}
+  .chair-room .plate small{display:block;font-size:12px;font-weight:700;text-align:center;opacity:.8}
+  .chair-room .door{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:130px;height:150px;
+    background:linear-gradient(#a8724a,#8a5a37);border-radius:12px 12px 0 0;border:5px solid #6d4426;border-bottom:none}
+  .chair-room .door::after{content:"";position:absolute;right:16px;top:74px;width:14px;height:14px;border-radius:50%;background:#ffd76a}
+  .chair-room .win{position:absolute;top:96px;width:70px;height:58px;background:#cfe9ff;border:5px solid #fff;border-radius:8px}
+  .chair-room .redtag{position:absolute;left:50%;top:-14px;transform:translateX(-50%) rotate(-4deg);
+    background:var(--c-heavy);color:#fff;font-weight:800;font-size:15px;padding:5px 12px;border-radius:8px;white-space:nowrap;
+    box-shadow:0 3px 0 #a92a2e;display:none}
+  .chair-room .door .redtag{top:30px}
+  /* 休憩スペース */
+  .lounge{left:24px;top:600px;width:680px;height:284px;background:#e9f4ec;border:6px dashed #b7d8c1;border-radius:24px}
+  .lounge .lbl,.queue-lbl{position:absolute;left:16px;top:8px;font-weight:800;color:#5f8f6e;font-size:17px}
+  .queue-lbl{color:#b07a12}
+  .rug{left:730px;top:580px;width:380px;height:130px;background:#fff1cf;border:4px dashed #f0c96a;border-radius:20px}
+  .rug.heavy{left:1150px;top:268px;width:420px;height:100px;background:#ffe3e1;border-color:#f19a9c}
+  .rug.heavy .queue-lbl{color:#c03b3f}
+  /* 机 */
+  .desk{z-index:4}
+  /* 人 */
+  .person{z-index:2;width:120px;height:170px}
+  .person.front{z-index:6}
+  .person svg{width:120px;height:170px;display:block;overflow:visible}
+  .person.stale svg,.person.none svg{filter:grayscale(1) opacity(.65)}
+  .person.bob svg{animation:bob 3.2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  .zzz{position:absolute;right:-6px;top:-4px;font-weight:800;color:#8c9bb0;font-size:22px;z-index:9}
+  /* 名札 */
+  .tag{z-index:8;transform:translateX(-50%);text-align:center;white-space:nowrap}
+  .tag .nm{display:inline-block;background:#fff;border:3px solid var(--ink);border-radius:999px;padding:2px 14px;font-weight:800;font-size:17px}
+  .tag .nm small{font-size:12px;color:var(--sub);margin-left:6px}
+  .tag .st{display:block;margin:4px auto 0;width:max-content;color:#fff;font-weight:800;font-size:14px;padding:2px 12px;border-radius:999px}
+  .tag .age{display:block;font-size:12px;color:#7b6a74;margin-top:2px}
+  /* 吹き出し */
+  .bubble{z-index:10;transform:translate(-50%,-100%);max-width:210px;width:max-content;background:var(--card);border:3px solid var(--ink);
+    border-radius:16px;padding:7px 12px 6px;font-size:16px;line-height:1.35;box-shadow:0 3px 0 rgba(74,58,68,.25)}
+  .bubble::after{content:"";position:absolute;left:50%;bottom:-11px;transform:translateX(-50%) rotate(45deg);
+    width:16px;height:16px;background:var(--card);border-right:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+  .bubble .tm{display:block;font-size:12px;color:var(--sub);margin-top:2px}
+  .bubble.stale{opacity:.75;border-style:dashed}
+  /* 縦向きスマホ */
+  #rotate{display:none;position:fixed;inset:0;z-index:99;background:#2b2230;color:#fff;
+    align-items:center;justify-content:center;flex-direction:column;text-align:center;font-weight:800;font-size:22px;gap:14px}
+  #rotate .ico{font-size:64px;animation:rot 1.8s ease-in-out infinite}
+  @keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+  @media (orientation:portrait) and (max-width:900px){ #rotate{display:flex} }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage"></div></div>
+<div id="rotate"><div class="ico">📱</div><div>スマホを横にしてね</div></div>
+
+<!--
+  ▼ データ差し込み口（みーが集めた内容をここに入れる）
+  形式は floor/screen/README.md を参照。
+-->
+<script id="floor-data" type="application/json">
+{
+  "collected_at": "2026-11-20T16:20:00+09:00",
+  "members": {
+    "members": [
+      { "id": "mii", "name": "みー", "role": "社長代理", "seat": "center" },
+      { "id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev" },
+      { "id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops" }
+    ],
+    "chairman": { "name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false }
+  },
+  "status": [
+    { "id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。次の指示待ち", "waiting_for": "", "updated": "2026-11-20T16:16:12+09:00" },
+    { "id": "oyakata", "name": "親方", "status": "idle", "task": "", "say": "待機中。次の指示待ち", "waiting_for": "", "updated": "2026-11-20T16:09:04+09:00" }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var STALE_HOURS = 24;          // これより古い更新はグレー＋居眠り
+  var W = 1600, H = 900;
+
+  var STATE = {
+    working:     { label:"作業中",           color:"var(--c-working)" },
+    wait_light:  { label:"社長代理の許可待ち", color:"var(--c-light)" },
+    wait_heavy:  { label:"会長の許可待ち",     color:"var(--c-heavy)" },
+    wait_member: { label:"待ち",             color:"var(--c-member)" },
+    idle:        { label:"待機",             color:"var(--c-idle)" },
+    done:        { label:"完了",             color:"var(--c-done)" },
+    none:        { label:"状態未記入",        color:"var(--c-none)" }
+  };
+
+  // 席（机の左上）。seat名 → 座標
+  var SEATS = {
+    center: { x:690, y:400, kind:"boss" },
+    dev:    { x:120, y:400 },
+    ops:    { x:1340, y:620 }
+  };
+  var EXTRA_SEATS = [ {x:400,y:400}, {x:1120,y:700} ];
+  var LOUNGE = [ {x:240,y:640}, {x:440,y:640}, {x:60,y:640} ];
+  var Q_LIGHT = [ {x:900,y:560}, {x:780,y:560}, {x:1020,y:560} ];
+  var Q_HEAVY = [ {x:1170,y:232}, {x:1290,y:232}, {x:1410,y:232} ];
+
+  // キャラの見た目（全員オリジナル）
+  var LOOKS = {
+    mii:      { hair:"#b98be8", hairDark:"#9466c8", style:"long",  outfit:"#ff7fa8", outfitDark:"#e05d88", skirt:"#5a4a78", acc:"badge",  ribbon:"#ffe066" },
+    koukichi: { hair:"#3d4f7c", hairDark:"#2c3a5e", style:"bob",   outfit:"#7fd1c2", outfitDark:"#5ab3a3", skirt:"#3d4f7c", acc:"hoodie", ribbon:"#ff8fab" },
+    oyakata:  { hair:"#e8874a", hairDark:"#c86a2f", style:"pony",  outfit:"#f6f1e7", outfitDark:"#d8cfbf", skirt:"#4a5a6a", acc:"apron",  ribbon:"#4aa3df" }
+  };
+  var LOOK_POOL = [
+    { hair:"#5b3a2e", hairDark:"#432a20", style:"twin", outfit:"#ffd36e", outfitDark:"#e8b443", skirt:"#5a4636", acc:"none", ribbon:"#ff7aa2" },
+    { hair:"#2f2f38", hairDark:"#1e1e26", style:"long", outfit:"#9cc7ff", outfitDark:"#76a6e6", skirt:"#34405a", acc:"pen",  ribbon:"#ffffff" },
+    { hair:"#f0c35a", hairDark:"#d4a43c", style:"bob",  outfit:"#c7a6ff", outfitDark:"#a786e6", skirt:"#4e3f6e", acc:"none", ribbon:"#ff6f8f" }
+  ];
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+
+  function girl(L, sleeping){
+    var skin="#ffe6d6", line="#5a3f48";
+    var back="", tails="";
+    if(L.style==="long") back='<path d="M20 58 Q14 20 60 12 Q106 20 100 58 L106 128 Q96 136 86 126 L84 82 L36 82 L34 126 Q24 136 14 128 Z" fill="'+L.hair+'"/>';
+    if(L.style==="bob")  back='<path d="M20 60 Q14 16 60 12 Q106 16 100 60 Q102 92 88 96 L32 96 Q18 92 20 60 Z" fill="'+L.hair+'"/>';
+    if(L.style==="pony"){ back='<path d="M22 58 Q16 18 60 12 Q104 18 98 58 Q98 84 86 86 L34 86 Q22 84 22 58 Z" fill="'+L.hair+'"/>';
+      tails='<path d="M92 26 Q122 30 116 70 Q112 96 98 104 Q108 76 98 50 Z" fill="'+L.hair+'"/><circle cx="94" cy="28" r="6" fill="'+L.ribbon+'"/>'; }
+    if(L.style==="twin"){ back='<path d="M22 58 Q16 18 60 12 Q104 18 98 58 Q98 84 86 86 L34 86 Q22 84 22 58 Z" fill="'+L.hair+'"/>';
+      tails='<path d="M20 34 Q-4 50 6 92 Q10 104 18 106 Q12 76 26 50 Z" fill="'+L.hair+'"/><path d="M100 34 Q124 50 114 92 Q110 104 102 106 Q108 76 94 50 Z" fill="'+L.hair+'"/><circle cx="22" cy="34" r="6" fill="'+L.ribbon+'"/><circle cx="98" cy="34" r="6" fill="'+L.ribbon+'"/>'; }
+
+    var hood = L.acc==="hoodie" ? '<path d="M30 96 Q60 80 90 96 L94 108 Q60 96 26 108 Z" fill="'+L.outfitDark+'"/>' : "";
+    var torso = '<path d="M30 102 Q60 92 90 102 L96 146 L24 146 Z" fill="'+L.outfit+'" stroke="'+L.outfitDark+'" stroke-width="2"/>';
+    var shirt = L.acc==="hoodie"
+      ? '<path d="M54 100 L60 112 L66 100" fill="none" stroke="#fff" stroke-width="3"/><line x1="55" y1="104" x2="54" y2="120" stroke="#fff" stroke-width="2"/><line x1="65" y1="104" x2="66" y2="120" stroke="#fff" stroke-width="2"/>'
+      : '<path d="M50 99 L60 118 L70 99 Z" fill="#fff"/><path d="M54 104 L60 100 L66 104 L60 110 Z" fill="'+L.ribbon+'"/>';
+    var apron = L.acc==="apron" ? '<path d="M40 110 L80 110 L84 146 L36 146 Z" fill="#6f9ccf"/><rect x="50" y="122" width="20" height="10" rx="3" fill="#5a86b8"/><path d="M40 110 L46 100 M80 110 L74 100" stroke="#6f9ccf" stroke-width="4"/>' : "";
+    var badge = L.acc==="badge" ? '<rect x="70" y="112" width="20" height="12" rx="2" fill="#fff" stroke="'+L.outfitDark+'" stroke-width="1.5"/><text x="80" y="121.5" font-size="7" text-anchor="middle" fill="'+line+'" font-weight="700">代理</text>' : "";
+    var arms = '<path d="M28 104 Q16 126 24 142" stroke="'+L.outfit+'" stroke-width="12" stroke-linecap="round" fill="none"/><path d="M92 104 Q104 126 96 142" stroke="'+L.outfit+'" stroke-width="12" stroke-linecap="round" fill="none"/><circle cx="24" cy="144" r="6" fill="'+skin+'"/><circle cx="96" cy="144" r="6" fill="'+skin+'"/>';
+    var tool = L.acc==="apron" ? '<path d="M100 138 L112 122" stroke="#9aa4ae" stroke-width="4" stroke-linecap="round"/><circle cx="113" cy="120" r="4" fill="none" stroke="#9aa4ae" stroke-width="3"/>' : "";
+    var skirt = '<path d="M26 144 L94 144 L100 162 L20 162 Z" fill="'+L.skirt+'"/>';
+    var legs = '<rect x="42" y="160" width="10" height="8" rx="3" fill="'+skin+'"/><rect x="68" y="160" width="10" height="8" rx="3" fill="'+skin+'"/><ellipse cx="46" cy="169" rx="8" ry="3.5" fill="#5a3f48"/><ellipse cx="74" cy="169" rx="8" ry="3.5" fill="#5a3f48"/>';
+    var neck = '<rect x="53" y="84" width="14" height="14" rx="4" fill="'+skin+'"/>';
+    var face = '<ellipse cx="60" cy="58" rx="33" ry="31" fill="'+skin+'"/>';
+    var bangs = '<path d="M25 56 Q26 18 60 16 Q94 18 95 56 Q88 40 78 42 Q72 30 62 40 Q54 28 46 42 Q36 36 25 56 Z" fill="'+L.hair+'"/>'
+              + '<path d="M40 24 Q52 18 62 22" stroke="#ffffff" stroke-opacity=".35" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    var hairpin = L.acc==="badge" ? '<path d="M82 28 l3 6 6 1 -4.5 4 1 6 -5.5 -3 -5.5 3 1 -6 -4.5 -4 6 -1z" fill="'+L.ribbon+'"/>' : (L.style==="bob"||L.style==="long" ? '<rect x="28" y="40" width="12" height="5" rx="2.5" fill="'+L.ribbon+'" transform="rotate(-25 34 42)"/>' : "");
+    var eyes = sleeping
+      ? '<path d="M41 62 Q47 67 53 62" stroke="'+line+'" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M67 62 Q73 67 79 62" stroke="'+line+'" stroke-width="3" fill="none" stroke-linecap="round"/>'
+      : '<ellipse cx="47" cy="61" rx="6" ry="8" fill="#3b2a3a"/><ellipse cx="73" cy="61" rx="6" ry="8" fill="#3b2a3a"/>'
+       +'<ellipse cx="47" cy="64" rx="4.5" ry="4" fill="'+L.hairDark+'" opacity=".7"/><ellipse cx="73" cy="64" rx="4.5" ry="4" fill="'+L.hairDark+'" opacity=".7"/>'
+       +'<circle cx="49.5" cy="57.5" r="2.6" fill="#fff"/><circle cx="75.5" cy="57.5" r="2.6" fill="#fff"/><circle cx="45" cy="66" r="1.2" fill="#fff"/><circle cx="71" cy="66" r="1.2" fill="#fff"/>'
+       +'<path d="M40 52 L44 50 M80 52 L76 50" stroke="'+line+'" stroke-width="2" stroke-linecap="round"/>';
+    var blush = '<ellipse cx="38" cy="71" rx="6.5" ry="3.5" fill="#ff9fb2" opacity=".6"/><ellipse cx="82" cy="71" rx="6.5" ry="3.5" fill="#ff9fb2" opacity=".6"/>';
+    var mouth = sleeping ? '<ellipse cx="60" cy="76" rx="2.5" ry="2" fill="#c0566b"/>' : '<path d="M55 74 Q60 79 65 74" stroke="#c0566b" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+    return '<svg viewBox="0 0 120 172" xmlns="http://www.w3.org/2000/svg">'
+      + back + tails + hood + legs + skirt + torso + apron + shirt + badge + arms + tool + neck + face + eyes + blush + mouth + bangs + hairpin + '</svg>';
+  }
+
+  function deskSVG(kind, acc){
+    var w = kind==="boss" ? 260 : 220;
+    var top = kind==="boss" ? "#c98a5a" : "#d9a578", front = kind==="boss" ? "#b0744a" : "#c48e62";
+    var item;
+    if(acc==="hoodie") item = '<rect x="'+(w/2-34)+'" y="-26" width="68" height="40" rx="4" fill="#5b6b8a"/><rect x="'+(w/2-30)+'" y="-22" width="60" height="32" rx="3" fill="#bfe6ff"/><text x="'+(w/2)+'" y="-2" font-size="11" text-anchor="middle" fill="#2f4a6a" font-family="monospace">&lt;/&gt;</text>';
+    else if(acc==="apron") item = '<rect x="'+(w/2-40)+'" y="-8" width="34" height="18" rx="3" fill="#e5484d"/><rect x="'+(w/2+8)+'" y="-30" width="48" height="38" rx="4" fill="#4a5a6a"/><rect x="'+(w/2+12)+'" y="-26" width="40" height="28" rx="2" fill="#a8f0c6"/>';
+    else if(kind==="boss") item = '<rect x="'+(w/2-44)+'" y="-34" width="88" height="46" rx="5" fill="#4a3a44"/><rect x="'+(w/2-40)+'" y="-30" width="80" height="36" rx="3" fill="#ffd6e4"/><text x="'+(w/2)+'" y="-7" font-size="13" text-anchor="middle" fill="#a3365c" font-weight="700">承認</text><rect x="20" y="-10" width="30" height="20" rx="3" fill="#fff" stroke="#d9c7b3"/>';
+    else item = '<rect x="'+(w/2-34)+'" y="-30" width="68" height="40" rx="4" fill="#4a3a44"/><rect x="'+(w/2-30)+'" y="-26" width="60" height="32" rx="3" fill="#dff1ff"/>';
+    var plant = '<circle cx="'+(w-22)+'" cy="-8" r="9" fill="#7cc48f"/><rect x="'+(w-29)+'" y="-2" width="14" height="12" rx="2" fill="#e8b87a"/>';
+    return '<svg width="'+w+'" height="110" viewBox="0 -40 '+w+' 110" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">'
+      + item + plant
+      + '<rect x="0" y="8" width="'+w+'" height="18" rx="6" fill="'+top+'"/>'
+      + '<rect x="8" y="22" width="'+(w-16)+'" height="44" rx="6" fill="'+front+'"/>'
+      + '</svg>';
+  }
+
+  function parseTime(s){ var t = Date.parse(s); return isNaN(t) ? null : t; }
+  function fmtTime(t, nowT){
+    var d = new Date(t), n = new Date(nowT);
+    var hm = ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+    return (d.toDateString()===n.toDateString()) ? hm : (d.getMonth()+1)+"/"+d.getDate()+" "+hm;
+  }
+  function ageText(ms){
+    var h = Math.floor(ms/3600000);
+    if(h >= 24) return "最終更新 "+Math.floor(h/24)+"日前";
+    return "最終更新 "+h+"時間前";
+  }
+
+  function el(cls, x, y, html){
+    var d = document.createElement("div");
+    d.className = "abs " + cls;
+    d.style.left = x+"px"; d.style.top = y+"px";
+    if(html!=null) d.innerHTML = html;
+    return d;
+  }
+
+  function render(data){
+    var stage = document.getElementById("stage");
+    stage.innerHTML = "";
+    var nowT = Date.now();
+    var mem = (data.members && data.members.members) || [];
+    var chairman = (data.members && data.members.chairman) || { name:"すぎちゃん", role:"会長" };
+    var byId = {};
+    (data.status || []).forEach(function(s){ if(s && s.id) byId[s.id] = s; });
+    var nameOf = {}; mem.forEach(function(m){ nameOf[m.id] = m.name; });
+
+    // 壁・タイトル
+    stage.appendChild(el("wall",0,0));
+    stage.appendChild(el("title",28,20,'ガっチガチ研究所<small>AI社員フロア</small>'));
+    var ct = parseTime(data.collected_at);
+    stage.appendChild(el("collected",30,86, ct ? "みーの集計："+esc(fmtTime(ct,nowT)) : ""));
+
+    // 会長室
+    var room = el("chair-room",1130,0,
+      '<div class="plate">会長　'+esc(chairman.name)+'<small>伝説の人</small></div>'
+      +'<div class="win" style="left:40px"></div><div class="win" style="right:40px"></div>'
+      +'<div class="door"><div class="redtag" id="heavyTag"></div></div>');
+    stage.appendChild(room);
+    var rh = el("rug heavy",1150,268,'<div class="queue-lbl">会長の許可待ち</div>'); stage.appendChild(rh);
+
+    // 休憩スペース・許可待ちの列
+    var lounge = el("lounge",24,600,'<div class="lbl">☕ 休憩スペース</div>'
+      +'<svg class="abs" style="left:24px;top:118px" width="620" height="100"><rect x="0" y="10" width="620" height="44" rx="18" fill="#b8e2c5"/><rect x="-6" y="40" width="632" height="50" rx="18" fill="#9fd3b0"/></svg>'
+      +'<svg class="abs" style="left:615px;top:20px" width="50" height="90"><rect x="12" y="50" width="26" height="36" rx="4" fill="#e8b87a"/><circle cx="25" cy="38" r="20" fill="#7cc48f"/></svg>');
+    stage.appendChild(lounge);
+    stage.appendChild(el("rug",730,580,'<div class="queue-lbl">社長代理の許可待ち</div>'));
+
+    // 席の割り当て
+    var seatOf = {}, extra = 0;
+    mem.forEach(function(m){
+      var s = SEATS[m.seat];
+      if(!s){ s = EXTRA_SEATS[extra++ % EXTRA_SEATS.length]; }
+      seatOf[m.id] = s;
+    });
+
+    // 机
+    var looks = {}, pool = 0;
+    mem.forEach(function(m){ looks[m.id] = LOOKS[m.id] || LOOK_POOL[pool++ % LOOK_POOL.length]; });
+    mem.forEach(function(m){
+      var s = seatOf[m.id];
+      stage.appendChild(el("desk", s.x, s.y, deskSVG(s.kind, looks[m.id].acc)));
+    });
+
+    // 完了ボード
+    var doneList = [];
+    var lc=0, qL=0, qH=0, heavyCount=0;
+
+    mem.forEach(function(m){
+      var st = byId[m.id];
+      var code = st && STATE[st.status] ? st.status : "none";
+      var t = st ? parseTime(st.updated) : null;
+      var stale = !st || t==null || (nowT - t) > STALE_HOURS*3600000;
+      if(code==="done" && st.task) doneList.push(m.name+"："+st.task);
+
+      // 位置
+      var seat = seatOf[m.id], cx, top, tagY, front=false;
+      var isBoss = seat.kind==="boss";
+      var w = isBoss ? 260 : 220;
+      if(!isBoss && code==="idle" && !stale){ var p=LOUNGE[lc++ % LOUNGE.length]; cx=p.x+60; top=p.y; tagY=top+176; front=true; }
+      else if(!isBoss && code==="wait_light"){ var p2=Q_LIGHT[qL++ % Q_LIGHT.length]; cx=p2.x+60; top=p2.y; tagY=top+176; front=true; }
+      else if(!isBoss && code==="wait_heavy"){ var p3=Q_HEAVY[qH++ % Q_HEAVY.length]; cx=p3.x+60; top=p3.y; tagY=top+176; front=true; heavyCount++; }
+      else { cx = seat.x + w/2; top = seat.y - 118; tagY = seat.y + 74; }
+      if(code==="wait_heavy" && isBoss) heavyCount++;
+
+      // 人
+      var pclass = "person" + (front?" front":"") + (stale?" stale":(code==="working"?" bob":"")) + (code==="none"?" none":"");
+      var person = el(pclass, cx-60, top, girl(looks[m.id], stale));
+      if(stale) person.insertAdjacentHTML("beforeend",'<div class="zzz">Zzz</div>');
+      stage.appendChild(person);
+
+      // 吹き出し（本人の言葉＋時刻だけ）
+      if(st && st.say){
+        var b = el("bubble"+(stale?" stale":""), cx, top-6,
+          esc(String(st.say).slice(0,30)) + '<span class="tm">'+(t!=null?esc(fmtTime(t,nowT)):"時刻なし")+'</span>');
+        stage.appendChild(b);
+      }
+
+      // 名札
+      var label = STATE[code].label;
+      if(code==="wait_member") label = (nameOf[st.waiting_for] || st.waiting_for || "誰か") + " 待ち";
+      var tagHtml = '<span class="nm">'+esc(m.name)+'<small>'+esc(m.role||"")+'</small></span>'
+        + '<span class="st" style="background:'+STATE[code].color+'">'+esc(label)+(st && st.task ? "｜"+esc(st.task) : "")+'</span>'
+        + (stale && t!=null ? '<span class="age">'+esc(ageText(nowT-t))+'</span>' : "");
+      stage.appendChild(el("tag", cx, tagY, tagHtml));
+    });
+
+    var heavyTag = document.getElementById("heavyTag");
+    if(heavyCount>0){ heavyTag.textContent = "許可待ち "+heavyCount+"件"; heavyTag.style.display="block"; }
+
+    stage.appendChild(el("board",480,16,'<h3>✅ 完了ボード</h3>' + (doneList.length
+      ? '<ul>'+doneList.slice(0,4).map(function(s){return "<li>"+esc(s)+"</li>";}).join("")+'</ul>'
+      : '<div class="empty">まだ完了はなし</div>')));
+  }
+
+  function fit(){
+    var s = Math.min(window.innerWidth/W, window.innerHeight/H);
+    var st = document.getElementById("stage");
+    st.style.transform = "scale("+s+")";
+    st.style.left = ((window.innerWidth - W*s)/2)+"px";
+    st.style.top  = ((window.innerHeight - H*s)/2)+"px";
+  }
+
+  function load(){
+    var data = window.FLOOR_DATA;
+    if(!data){
+      try{ data = JSON.parse(document.getElementById("floor-data").textContent); }
+      catch(e){ data = { members:{members:[]}, status:[] }; }
+    }
+    render(data);
+  }
+
+  window.renderFloor = function(data){ window.FLOOR_DATA = data; render(data); };
+  window.addEventListener("resize", fit);
+  load(); fit();
+})();
+</script>
+</body>
+</html>

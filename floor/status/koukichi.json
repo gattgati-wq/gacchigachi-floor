@@ -1,9 +1,9 @@
 {
   "id": "koukichi",
   "name": "こー吉",
-  "status": "working",
-  "task": "会長ダミーデータ作成",
-  "say": "RULESを読んで状態を試し書き中",
+  "status": "idle",
+  "task": "",
+  "say": "待機中。次の指示待ち",
   "waiting_for": "",
-  "updated": "2026-11-20T16:14:27+09:00"
+  "updated": "2026-11-20T16:16:12+09:00"
 }

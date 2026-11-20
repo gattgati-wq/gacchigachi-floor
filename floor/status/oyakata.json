@@ -3,7 +3,7 @@
   "name": "親方",
   "status": "wait_member",
   "task": "T900 BLE確認",
-  "say": "設計完了。BLEログ道具の導入待ち",
+  "say": "BLE記録中。テストLINE待ち",
   "waiting_for": "mii",
-  "updated": "2026-11-20T16:35:10+09:00"
+  "updated": "2026-11-20T17:35:04+09:00"
 }

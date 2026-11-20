@@ -2,7 +2,9 @@
   "members": [
     { "id": "mii", "name": "みー", "role": "社長代理", "seat": "center" },
     { "id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev" },
-    { "id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops" }
+    { "id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops" },
+    { "id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design" },
+    { "id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp" }
   ],
   "chairman": { "name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false }
 }

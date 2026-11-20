@@ -1,9 +1,9 @@
 {
   "id": "koukichi",
   "name": "こー吉",
-  "status": "working",
-  "task": "フロアv3 実装",
-  "say": "WEBページの土台を先に作ってる",
-  "waiting_for": "",
-  "updated": "2026-11-21T05:17:26+09:00"
+  "status": "wait_light",
+  "task": "フロアv3 実装（PR #5）",
+  "say": "土台できた。どちらを使うか確認待ち",
+  "waiting_for": "mii",
+  "updated": "2026-11-21T05:19:59+09:00"
 }

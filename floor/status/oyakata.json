@@ -1,9 +1,9 @@
 {
   "id": "oyakata",
   "name": "親方",
-  "status": "idle",
-  "task": "",
-  "say": "待機中。次の指示待ち",
+  "status": "working",
+  "task": "T900 BLE確認",
+  "say": "過去資料を読んで確認方法を設計中",
   "waiting_for": "",
-  "updated": "2026-11-20T16:09:04+09:00"
+  "updated": "2026-11-20T16:34:23+09:00"
 }

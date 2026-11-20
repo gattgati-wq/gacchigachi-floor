@@ -5,7 +5,8 @@
     { "id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops" },
     { "id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design" },
     { "id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp" },
-    { "id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen" }
+    { "id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen" },
+    { "id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch" }
   ],
   "chairman": { "name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false }
 }

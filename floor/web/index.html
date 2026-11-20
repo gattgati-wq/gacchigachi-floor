@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ガっチガチ研究所 AI社員フロア</title>
+<style>
+  /* 背景は端末の明るい/暗い設定に関係なく、明るい色に固定（V3-DIRECTION）。 */
+  :root { color-scheme: light; --bg:#fff8ec; --ink:#2b2230; --line:#111; --sub:#6d6070; --stale:#bdb6bf; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink); overflow:hidden;
+    font-family:"Hiragino Maru Gothic ProN","Zen Maru Gothic","Rounded Mplus 1c","Hiragino Sans","Noto Sans JP",sans-serif; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+
+  /* 全画面をマス目（セクション）で埋める。空白のマスは作らない。 */
+  #floor { position:fixed; inset:0; display:grid; gap:6px; padding:6px;
+    grid-template-rows: minmax(0, 34fr) minmax(0, 66fr); }
+  .sec { background:#fff; border:3px solid var(--line); border-radius:10px; min-width:0; min-height:0; overflow:hidden; position:relative; }
+
+  /* 上段：状態ボード＋カレンダー＋時計 */
+  #top { display:grid; gap:6px; grid-template-columns: minmax(0,62fr) minmax(0,24fr) minmax(0,14fr); min-height:0; }
+  /* 下段：メンバー各自のマス＋右の細い列（会長室・取引先） */
+  #bottom { display:grid; gap:6px; grid-template-columns: minmax(0,1fr) minmax(0,19%); min-height:0; }
+  #members { display:grid; gap:6px; min-height:0; }
+  #side { display:grid; gap:6px; grid-template-rows: 1.3fr 1fr 1fr; min-height:0; }
+
+  /* ホワイトボード風の状態ボード：4列、黒の太線、カードは全面色付き */
+  #board { background:#fff; border-width:5px; display:flex; flex-direction:column; }
+  #board .cols { flex:1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); min-height:0; }
+  #board .col { border-left:3px solid var(--line); display:flex; flex-direction:column; min-width:0; min-height:0; }
+  #board .col:first-child { border-left:none; }
+  #board .col h3 { margin:0; padding:3px 6px; font-size:clamp(11px,1.5vw,15px); background:#111; color:#fff; text-align:center; letter-spacing:.08em; }
+  #board .col h3 span { opacity:.75; font-weight:400; margin-left:.4em; }
+  #board .list { flex:1; padding:4px; display:flex; flex-direction:column; gap:4px; overflow:hidden; min-height:0; }
+  .card { border:3px solid var(--line); border-radius:6px; padding:3px 6px; text-align:left; width:100%;
+    font-size:clamp(10px,1.25vw,14px); line-height:1.25; color:#fff; text-shadow:0 1px 0 rgba(0,0,0,.35); font-weight:700; }
+  .card small { display:block; font-weight:400; opacity:.95; font-size:.88em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card.stale { background:var(--stale) !important; }
+  #board .foot { font-size:10px; color:var(--sub); padding:1px 8px; border-top:2px solid var(--line); text-align:right; }
+
+  /* カレンダー */
+  #cal { display:flex; flex-direction:column; padding:4px 6px; }
+  #cal .head { font-weight:800; font-size:clamp(12px,1.6vw,17px); text-align:center; }
+  #cal table { width:100%; flex:1; border-collapse:collapse; table-layout:fixed; font-size:clamp(9px,1.15vw,13px); text-align:center; }
+  #cal th { color:var(--sub); font-weight:600; }
+  #cal th:first-child, #cal td:first-child { color:#d33; }
+  #cal th:last-child, #cal td:last-child { color:#27c; }
+  #cal td span { display:inline-block; min-width:1.7em; line-height:1.7em; border-radius:50%; }
+  #cal td.today span { background:#ff3b6b; color:#fff; font-weight:800; box-shadow:0 0 0 3px #ffd1dd; }
+
+  /* 時計 */
+  #clock { display:flex; align-items:center; justify-content:center; padding:4px; }
+  #clock svg { width:100%; height:100%; max-height:100%; }
+
+  /* メンバー各自のマス：カード色＝服の色＝マスの色 */
+  .cell { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:4px; border-width:4px; width:100%; text-align:center; }
+  .cell .who { font-weight:800; font-size:clamp(11px,1.45vw,16px); line-height:1.2; margin-top:2px; }
+  .cell .role { font-size:clamp(9px,1vw,12px); color:var(--sub); }
+  .cell svg.av { width:min(70%,12vh); flex:1; min-height:0; margin-top:2px; }
+  .cell .chip { font-size:clamp(9px,1.05vw,12px); font-weight:800; color:#fff; border-radius:999px; padding:1px 8px; margin:1px 0; }
+  .cell .say { font-size:clamp(9px,1.05vw,12px); background:#fff; border:2px solid var(--line); border-radius:8px; padding:2px 6px; margin-top:2px;
+    max-width:100%; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .cell.stale { filter:grayscale(1); opacity:.7; }
+  .cell .zz { position:absolute; right:8px; top:4px; font-weight:800; color:#555; }
+  .cell.working svg.av { animation:bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-3px) } }
+  @media (prefers-reduced-motion: reduce) { .cell.working svg.av { animation:none; } }
+
+  /* 会長室・取引先 */
+  #chair { background:#efe2f3; border-color:#7a4a8a; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+  #chair .plate { background:linear-gradient(#ffe79a,#e8bc45); border:2px solid #5a3d06; color:#5a3d06; font-weight:800; font-size:clamp(11px,1.4vw,16px); padding:2px 12px; border-radius:6px; margin-top:6px; }
+  #chair .door { width:46%; flex:1; margin-top:6px; background:linear-gradient(#a8724a,#8a5a37); border:3px solid #6d4426; border-bottom:none; border-radius:10px 10px 0 0; position:relative; }
+  #chair .door::after { content:""; position:absolute; right:10%; top:55%; width:9px; height:9px; border-radius:50%; background:#ffd76a; }
+  .client { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px; padding:4px; background:#eef7ff; border-color:#3a6ea5; }
+  .client svg { height:78%; max-width:40%; }
+  .client .who { font-weight:800; font-size:clamp(11px,1.4vw,16px); }
+  .client .role { font-size:clamp(9px,1vw,12px); color:var(--sub); }
+
+  /* 詳細ウインドウ（カードでも人物でも、同じものが開く） */
+  #modal { position:fixed; inset:0; background:rgba(20,10,30,.45); display:none; align-items:center; justify-content:center; padding:12px; z-index:10; }
+  #modal.open { display:flex; }
+  #win { background:#fff; color:var(--ink); border:4px solid var(--line); border-radius:14px; width:min(560px,100%); max-height:100%; overflow:auto; box-shadow:0 8px 0 rgba(0,0,0,.25); }
+  #win header { display:flex; align-items:center; gap:10px; padding:10px 14px; color:#fff; font-weight:800; font-size:20px; }
+  #win header svg { width:46px; height:46px; background:#fff; border-radius:50%; border:3px solid #111; }
+  #win header .x { margin-left:auto; background:#fff; color:#111; border:3px solid #111; border-radius:8px; padding:2px 12px; font-weight:800; }
+  #win dl { margin:0; padding:10px 14px; display:grid; grid-template-columns:7em 1fr; gap:6px 10px; font-size:16px; }
+  #win dt { color:var(--sub); font-weight:700; }
+  #win dd { margin:0; word-break:break-all; }
+  #win .memo { padding:0 14px 14px; }
+  #win .memo label { display:block; font-weight:800; margin-bottom:4px; }
+  #win .memo textarea { width:100%; min-height:5.5em; border:3px solid #111; border-radius:8px; padding:6px; font:inherit; resize:vertical; }
+  #win .memo small { color:var(--sub); display:block; margin-top:4px; }
+  #win .jobs { padding:0 14px 10px; }
+  #win .jobs h4 { margin:6px 0; }
+  #win .jobs li { margin:2px 0; font-size:14px; }
+
+  /* スマホは横向き前提。縦のときは案内だけ（v2と同じ約束）。 */
+  #rotate { display:none; position:fixed; inset:0; background:var(--bg); z-index:20; align-items:center; justify-content:center; font-size:22px; font-weight:800; }
+  @media (orientation: portrait) and (max-width: 700px) { #rotate { display:flex; } }
+  .err { position:fixed; left:50%; bottom:10px; transform:translateX(-50%); background:#ffe3e3; border:2px solid #d33; color:#900; padding:4px 12px; border-radius:8px; font-size:13px; z-index:5; display:none; }
+</style>
+</head>
+<body>
+<main id="floor">
+  <section id="top">
+    <div class="sec" id="board"><div class="cols" id="cols"></div><div class="foot" id="foot"></div></div>
+    <div class="sec" id="cal"></div>
+    <div class="sec" id="clock"></div>
+  </section>
+  <section id="bottom">
+    <div id="members"></div>
+    <div id="side"></div>
+  </section>
+</main>
+<div id="modal" role="dialog" aria-modal="true"><div id="win"></div></div>
+<div id="rotate">📱 横にしてね</div>
+<div class="err" id="err">読み込めませんでした（次の更新でもう一度試します）</div>
+
+<!-- 任意：データを中に埋め込んで使う時（file:// で開く時など）。無ければ、members.json と status/*.json を読みに行く。 -->
+<script id="floor-data" type="application/json"></script>
+<script>
+(() => {
+  'use strict';
+  const BASE = '../';                 // floor/web/ から見た floor/ の位置
+  const REFRESH_MS = 60 * 1000;
+  const STALE_MS = 24 * 3600 * 1000;  // 24時間以上更新がなければグレー
+  const COLUMNS = [
+    { key: 'idle',    label: '待機中',   match: (s) => s === 'idle' },
+    { key: 'working', label: '作業中',   match: (s) => s === 'working' },
+    { key: 'wait',    label: '承認待ち', match: (s) => s === 'wait_light' || s === 'wait_heavy' || s === 'wait_member' },
+    { key: 'done',    label: '完了',     match: (s) => s === 'done' },
+  ];
+  const STATUS_LABEL = { working:'作業中', wait_light:'許可待ち（軽）', wait_heavy:'許可待ち（重）', wait_member:'他の社員待ち', idle:'待機', done:'完了' };
+  const STATUS_COLOR = { working:'#2e9e6b', wait_light:'#e08a00', wait_heavy:'#d93a40', wait_member:'#3a78d6', idle:'#7a8aa0', done:'#8a55d6' };
+  // 人物ごとの色（カード色＝服の色＝マスの色）。知らないIDは、IDから決める。
+  const PALETTE = { mii:'#e8467c', koukichi:'#2f7fe0', oyakata:'#c76a1c', sekkeikakari:'#2a9d8f', hptantou:'#8a55d6', ganechigamen:'#e0a000', chii:'#d94fb0', bucho:'#5a6b7a', ganechikun:'#3a9a3a' };
+  const FALLBACK = ['#e8467c','#2f7fe0','#c76a1c','#2a9d8f','#8a55d6','#e0a000','#d94fb0','#5a6b7a','#3a9a3a','#d9534f'];
+  const HAIR = ['#3a2a22','#6b4a2f','#222','#8a5a3a','#4a3a5a','#2a2a40'];
+  const CLIENTS = [ { id:'kiki', name:'キキ', role:'取引先' }, { id:'emi', name:'えみ', role:'取引先' } ];  // 取引先窓口（V3-DIRECTION）
+
+  const $ = (id) => document.getElementById(id);
+  const hash = (s) => [...String(s)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const colorOf = (id) => PALETTE[id] || FALLBACK[hash(id) % FALLBACK.length];
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+  let data = { members: [], chairman: null, status: {}, jobs: [], collectedAt: null };
+  const stale = (s) => !s || !s.updated || Date.now() - Date.parse(s.updated) >= STALE_MS;
+  const agoText = (iso) => {
+    if (!iso) return '未登録';
+    const m = Math.floor((Date.now() - Date.parse(iso)) / 60000);
+    if (m < 1) return 'たった今';
+    if (m < 60) return `${m}分前`;
+    if (m < 60 * 24) return `${Math.floor(m / 60)}時間前`;
+    return `${Math.floor(m / 1440)}日前`;
+  };
+  const jst = (iso) => iso ? new Date(iso).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+
+  /* ---- 人物の簡素なフラットイラスト（SVG）。服の色＝その人の色 ---- */
+  function avatar(id, color, sleepy) {
+    const hair = HAIR[hash(id) % HAIR.length];
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('class', 'av');
+    svg.setAttribute('aria-hidden', 'true');
+    const eyes = sleepy ? '<path d="M37 47q4 3 8 0M55 47q4 3 8 0" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+                        : '<circle cx="41" cy="47" r="3.2" fill="#222"/><circle cx="59" cy="47" r="3.2" fill="#222"/>';
+    svg.innerHTML =
+      `<path d="M14 100q0-30 36-30t36 30z" fill="${color}" stroke="#111" stroke-width="3"/>` +
+      `<circle cx="50" cy="46" r="24" fill="#ffd9b8" stroke="#111" stroke-width="3"/>` +
+      `<path d="M26 44q2-24 24-24t24 24q-10-10-24-10t-24 10z" fill="${hair}" stroke="#111" stroke-width="3"/>` +
+      eyes + `<path d="M43 58q7 6 14 0" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    return svg;
+  }
+
+  /* ---- 状態ボード ---- */
+  function renderBoard() {
+    const cols = $('cols'); cols.replaceChildren();
+    for (const c of COLUMNS) {
+      const people = data.members.filter((m) => { const s = data.status[m.id]; return s && c.match(s.status); });
+      const col = el('div', 'col');
+      const h = el('h3', null, c.label); h.append(el('span', null, String(people.length)));
+      const list = el('div', 'list');
+      for (const m of people) {
+        const s = data.status[m.id];
+        const b = el('button', 'card' + (stale(s) ? ' stale' : ''));
+        b.style.background = colorOf(m.id);
+        b.append(document.createTextNode(m.name));
+        const sub = c.key === 'wait' ? waitText(s) : (s.task || s.say || '');
+        if (sub) b.append(el('small', null, sub));
+        b.onclick = () => openDetail(m.id);
+        list.append(b);
+      }
+      col.append(h, list); cols.append(col);
+    }
+    $('foot').textContent = data.collectedAt ? `更新 ${jst(data.collectedAt)}` : '';
+  }
+  // 承認待ちは「何の許可待ちか」が見えるように
+  function waitText(s) {
+    const who = s.status === 'wait_member' ? `${nameOf(s.waiting_for) || '他の社員'}待ち` : (s.status === 'wait_heavy' ? '会長の許可待ち' : 'みーの許可待ち');
+    return s.task ? `${who}：${s.task}` : who;
+  }
+  const nameOf = (id) => (data.members.find((m) => m.id === id) || {}).name || '';
+
+  /* ---- メンバーのマス（人物） ---- */
+  function renderMembers() {
+    const box = $('members'); box.replaceChildren();
+    const n = data.members.length || 1;
+    const cols = Math.ceil(n / 2);
+    box.style.gridTemplateColumns = `repeat(${cols}, minmax(0,1fr))`;
+    box.style.gridTemplateRows = 'repeat(2, minmax(0,1fr))';
+    data.members.forEach((m, i) => {
+      const s = data.status[m.id], old = stale(s);
+      const color = colorOf(m.id);
+      const c = el('button', `sec cell ${old ? 'stale' : (s ? s.status : '')}`);
+      c.style.borderColor = color; c.style.background = color + '22';
+      if (n % 2 === 1 && i === n - 1) c.style.gridColumn = 'span 2';   // 奇数でも空白のマスを作らない
+      if (old) c.append(el('div', 'zz', 'zzZ'));
+      c.append(el('div', 'who', m.name), el('div', 'role', m.role || ''));
+      c.append(avatar(m.id, color, old));
+      const chip = el('div', 'chip', s ? STATUS_LABEL[s.status] || s.status : '未登録');
+      chip.style.background = s ? (STATUS_COLOR[s.status] || '#777') : '#999';
+      c.append(chip);
+      c.append(el('div', 'say', old ? `最終更新 ${agoText(s && s.updated)}` : (s.say || '')));
+      c.onclick = () => openDetail(m.id);
+      box.append(c);
+    });
+  }
+
+  /* ---- 会長室・取引先 ---- */
+  function renderSide() {
+    const side = $('side'); side.replaceChildren();
+    const ch = data.chairman || { name: 'すぎちゃん', role: '会長' };
+    const room = el('div', 'sec'); room.id = 'chair';
+    const plate = el('div', 'plate', `${ch.role || '会長'}室`);
+    const door = el('div', 'door');
+    room.append(plate, door);
+    const heavy = data.members.filter((m) => data.status[m.id] && data.status[m.id].status === 'wait_heavy').length;
+    if (heavy > 0) {                                 // 重い許可待ちの件数を、扉の赤札で
+      const t = el('div', 'chip', String(heavy)); t.style.cssText = 'position:absolute;right:8px;top:8px;background:#d93a40;font-size:16px;padding:2px 10px';
+      t.title = '会長の許可待ち'; room.append(t);
+    }
+    side.append(room);
+    for (const c of CLIENTS) {
+      const d = el('div', 'sec client');
+      d.append(avatar(c.id, '#3a6ea5', false));
+      const t = el('div'); t.append(el('div', 'who', c.name), el('div', 'role', c.role));
+      d.append(t); side.append(d);
+    }
+  }
+
+  /* ---- 詳細ウインドウ ---- */
+  function openDetail(id) {
+    const m = data.members.find((x) => x.id === id); if (!m) return;
+    const s = data.status[id], color = colorOf(id);
+    const win = $('win'); win.replaceChildren();
+    const head = el('header'); head.style.background = color;
+    head.append(avatar(id, color, false), document.createTextNode(`${m.name}`));
+    const x = el('button', 'x', '閉じる'); x.onclick = closeDetail; head.append(x);
+    const dl = el('dl');
+    const row = (k, v) => { dl.append(el('dt', null, k), el('dd', null, v || '—')); };
+    row('役割', m.role);
+    row('状態', s ? STATUS_LABEL[s.status] || s.status : '未登録（状態ファイルがありません）');
+    row('タスク', s && s.task);
+    row('ひとこと', s && s.say);
+    row('何待ちか', s && (s.status.startsWith('wait_') ? waitText(s) : ''));
+    row('最終更新', s && s.updated ? `${jst(s.updated)}（${agoText(s.updated)}）` : '');
+    win.append(head, dl);
+    if (id === 'mii' && data.jobs.length) {          // みーの裏方（定期ジョブ）を、みーの詳細の中で見せる
+      const j = el('div', 'jobs'); j.append(el('h4', null, `裏方（定期ジョブ ${data.jobs.length}件）`));
+      const ul = el('ul'); for (const job of data.jobs) ul.append(el('li', null, typeof job === 'string' ? job : `${job.name || ''}${job.when ? `（${job.when}）` : ''}`));
+      j.append(ul); win.append(j);
+    }
+    // 書き込み：いまは、この端末の中だけに保存するメモ。みんなで共有する書き込みは、保存先（サーバー）が決まったら足す。
+    const memo = el('div', 'memo'); const lab = el('label', null, 'メモ（この端末だけに保存）'); lab.htmlFor = 'memoText';
+    const ta = el('textarea'); ta.id = 'memoText';
+    try { ta.value = localStorage.getItem('floor-memo:' + id) || ''; } catch (e) { /* 保存できない環境では、空のまま */ }
+    ta.oninput = () => { try { localStorage.setItem('floor-memo:' + id, ta.value); } catch (e) { /* 何もしない */ } };
+    memo.append(lab, ta, el('small', null, 'ここに書いても、ほかの端末・ほかの人には見えません。'));
+    win.append(memo);
+    $('modal').classList.add('open');
+  }
+  function closeDetail() { $('modal').classList.remove('open'); }
+  $('modal').addEventListener('click', (e) => { if (e.target === $('modal')) closeDetail(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDetail(); });
+
+  /* ---- カレンダー（月表示、今日を目立たせる） ---- */
+  function renderCal() {
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+    const y = now.getFullYear(), mo = now.getMonth(), today = now.getDate();
+    const first = new Date(y, mo, 1).getDay(), last = new Date(y, mo + 1, 0).getDate();
+    const box = $('cal'); box.replaceChildren(el('div', 'head', `${y}年${mo + 1}月`));
+    const t = el('table'); const hr = el('tr');
+    for (const w of ['日', '月', '火', '水', '木', '金', '土']) hr.append(el('th', null, w));
+    t.append(hr);
+    let d = 1 - first;
+    while (d <= last) {
+      const tr = el('tr');
+      for (let k = 0; k < 7; k++, d++) {
+        const td = el('td'); if (d >= 1 && d <= last) { td.append(el('span', null, String(d))); if (d === today) td.className = 'today'; }
+        tr.append(td);
+      }
+      t.append(tr);
+    }
+    box.append(t);
+  }
+
+  /* ---- アナログ時計（実際に動く。日本時間） ---- */
+  function buildClock() {
+    const ns = 'http://www.w3.org/2000/svg';
+    let ticks = ''; for (let i = 0; i < 12; i++) ticks += `<line x1="50" y1="8" x2="50" y2="${i % 3 === 0 ? 16 : 13}" stroke="#111" stroke-width="${i % 3 === 0 ? 3 : 2}" transform="rotate(${i * 30} 50 50)"/>`;
+    $('clock').innerHTML = `<svg viewBox="0 0 100 100" role="img" aria-label="時計"><circle cx="50" cy="50" r="46" fill="#fff" stroke="#111" stroke-width="4"/>${ticks}` +
+      `<line id="hh" x1="50" y1="50" x2="50" y2="28" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>` +
+      `<line id="mh" x1="50" y1="50" x2="50" y2="17" stroke="#111" stroke-width="3" stroke-linecap="round"/>` +
+      `<line id="sh" x1="50" y1="56" x2="50" y2="14" stroke="#ff3b6b" stroke-width="1.6" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="#ff3b6b"/></svg>`;
+    const rot = (id, deg) => $(id).setAttribute('transform', `rotate(${deg} 50 50)`);
+    const tick = () => {
+      const n = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+      const s = n.getSeconds(), m = n.getMinutes() + s / 60, h = (n.getHours() % 12) + m / 60;
+      rot('sh', s * 6); rot('mh', m * 6); rot('hh', h * 30);
+    };
+    tick(); setInterval(tick, 1000);
+  }
+
+  /* ---- データの読み込み（members.json と status/<id>.json） ---- */
+  async function getJson(path) {
+    const r = await fetch(`${BASE}${path}?t=${Date.now()}`, { cache: 'no-store' });
+    if (!r.ok) throw new Error(path + ' ' + r.status);
+    return r.json();
+  }
+  async function load() {
+    const mem = await getJson('members.json');
+    const status = {};
+    await Promise.all(mem.members.map(async (m) => {
+      try { status[m.id] = await getJson(`status/${m.id}.json`); } catch (e) { /* 状態ファイルが無い人は「未登録」 */ }
+    }));
+    let jobs = []; try { const j = await getJson('jobs.json'); jobs = Array.isArray(j) ? j : (j.jobs || []); } catch (e) { /* 任意のファイル */ }
+    apply({ members: mem.members, chairman: mem.chairman, status, jobs, collectedAt: new Date().toISOString() });
+  }
+  function apply(d) { data = d; renderBoard(); renderMembers(); renderSide(); const o = $('modal'); if (o.classList.contains('open')) { /* 開いている間は、そのまま */ } }
+  // 埋め込みデータ／外から差し替える口：window.renderFloor({ members:{members,chairman}, status:[...], collected_at })
+  window.renderFloor = (d) => {
+    const st = {}; for (const s of d.status || []) st[s.id] = s;
+    apply({ members: (d.members && d.members.members) || [], chairman: d.members && d.members.chairman, status: st, jobs: d.jobs || [], collectedAt: d.collected_at || new Date().toISOString() });
+  };
+
+  buildClock(); renderCal(); setInterval(renderCal, 10 * 60 * 1000);
+  const embedded = $('floor-data').textContent.trim();
+  if (embedded) { try { window.renderFloor(JSON.parse(embedded)); } catch (e) { console.error(e); } }
+  else { load().catch(() => { $('err').style.display = 'block'; }); setInterval(() => load().then(() => { $('err').style.display = 'none'; }).catch(() => { $('err').style.display = 'block'; }), REFRESH_MS); }
+})();
+</script>
+</body>
+</html>

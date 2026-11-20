@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>AI社員フロア</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: 明るいオフィスの朝。見て3秒で「誰が何待ちか」分かる
+   IDEA: 床をマス目に区切ったオフィス。ホワイトボードに付箋
+   PICTURE: 案件ボード（白い面＋黒の太線＋全面色付き付箋）
+   COLOUR/TYPE: 端末設定に関係なく明るい色で固定。M PLUS Rounded 1c
+   LAYOUT: 上段＝ボード／カレンダー／時計／会長室＋取引先、下段＝社員マス（空きマスなし） */
+:root{color-scheme:light;--bg:#f3eee4;--ink:#1d1a1f;--sub:#6b6470;--line:#141214;--paper:#fff;--tile:#fffdf8}
+*{box-sizing:border-box;min-width:0}
+html,body{background:var(--bg);color:var(--ink)}
+body{margin:0;font:15px/1.45 "M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;padding:12px;overflow-x:clip}
+button{font:inherit;color:inherit}
+.head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 2px 10px}
+.head h1{font-size:20px;margin:0;font-weight:800}
+.head .at{font-size:13px;color:var(--sub)}
+/* 上段 */
+.top{display:grid;gap:12px;grid-template-columns:minmax(0,2.3fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,.75fr);align-items:stretch;margin-bottom:12px}
+.box{background:var(--tile);border:3px solid var(--line);border-radius:14px;padding:10px 12px}
+/* ボード */
+.board{background:var(--paper);border:5px solid var(--line);border-radius:12px;padding:0;overflow:hidden;box-shadow:0 4px 0 rgba(0,0,0,.18)}
+.board .bh{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:4px solid var(--line);font-weight:800}
+.board .bh small{font-weight:700;color:var(--sub);font-size:12px}
+.cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.col{border-left:4px solid var(--line);padding:0 6px 8px}
+.col:first-child{border-left:0}
+.col h2{margin:0 -6px 8px;padding:5px 8px;font-size:14px;border-bottom:3px solid var(--line);display:flex;justify-content:space-between}
+.col h2 b{background:var(--line);color:#fff;border-radius:99px;padding:0 8px;font-size:12px;line-height:20px}
+.card{display:block;width:100%;text-align:left;background:var(--c);border:2px solid rgba(0,0,0,.35);border-radius:4px;padding:5px 7px;margin:0 0 6px;cursor:pointer;
+  box-shadow:2px 3px 0 rgba(0,0,0,.18);transform:rotate(var(--r,0deg));transition:transform .15s}
+.card:hover,.card:focus-visible{transform:rotate(0) scale(1.03);outline:3px solid var(--line)}
+.card .n{font-weight:800;font-size:13px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.card .t{display:block;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;font-weight:800;border-radius:99px;padding:0 6px;background:#fff;border:1.5px solid var(--line)}
+.pill.heavy{background:#e5484d;color:#fff;border-color:#e5484d}
+.pill.light{background:#ffb020;border-color:#b47600}
+.none{font-size:12px;color:#9a929c;padding:2px 2px}
+/* カレンダー */
+.cal,.clk{display:flex;flex-direction:column;justify-content:center}
+.cal h3,.clk h3{margin:0;font-size:14px}
+.cal .today{font-size:22px;font-weight:800;line-height:1.15;margin:2px 0 6px}
+.cal table{width:100%;border-collapse:collapse;table-layout:fixed;text-align:center;font-size:14px}
+.cal th{font-size:11px;color:var(--sub);font-weight:700}
+.cal td{padding:3px 0}
+.cal td span{display:inline-block;width:28px;height:28px;line-height:28px;border-radius:50%}
+.cal .su{color:#d0353a}.cal .sa{color:#2f6fd6}
+.cal td.is span{background:#e5484d;color:#fff;font-weight:800;box-shadow:0 0 0 3px #ffd0d2}
+/* 時計 */
+.clk{align-items:center}
+.clk svg{width:100%;max-width:230px;aspect-ratio:1}
+.clk .dg{font-weight:800;font-size:15px;margin-top:2px}
+/* 会長室・取引先 */
+.side{display:grid;gap:12px;grid-template-rows:repeat(3,minmax(0,1fr))}
+.chair{background:#efe4f5;border-color:#7a4f8f;display:flex;gap:10px;align-items:center;cursor:pointer;text-align:left;width:100%}
+.chair svg{width:44px;flex:none}
+.chair .nm{font-weight:800;font-size:14px;line-height:1.2}
+.chair .ab{font-size:12px;color:var(--sub)}
+.chair .pill{margin-top:3px;display:inline-block}
+.pt{border-style:dashed;background:#f5f5f3;display:flex;gap:10px;align-items:center;padding:8px 12px}
+.pt svg{width:34px;flex:none}
+.pt small{display:block;font-size:11px;color:var(--sub);font-weight:700}
+.pt b{font-size:14px}.pt span{font-size:11.5px;color:var(--sub);display:block;line-height:1.2}
+/* 社員マス */
+.floor{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.tile{flex:1 1 calc((100% - (var(--per,5) - 1)*12px)/var(--per,5));background:color-mix(in srgb,var(--c) 30%,#fff);border:3px solid var(--line);border-radius:14px;padding:8px 10px 10px;
+  cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .15s}
+.tile:hover,.tile:focus-visible{transform:translateY(-2px);outline:3px solid var(--c);outline-offset:2px}
+.tile svg{width:110px;height:92px}
+.tile .nm{font-weight:800;font-size:15px}
+.tile .rl{font-size:12px;color:var(--sub);margin-top:-3px}
+.tile .st{font-size:12px;font-weight:800;border-radius:99px;padding:1px 10px;background:#fff;border:2px solid var(--line);margin-top:3px}
+.tile.guest{border-style:dashed}
+.tile .gb{font-size:11px;font-weight:800;background:var(--line);color:#fff;border-radius:99px;padding:0 8px}
+.stale svg{filter:grayscale(1);opacity:.6}
+.stale .age{font-size:11.5px;color:#7a6f78}
+.bob{animation:bob 3.4s ease-in-out infinite;transform-origin:60px 70px}
+@keyframes bob{50%{transform:translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.bob{animation:none}}
+/* 詳細ウインドウ */
+.ov{position:fixed;inset:0;background:rgba(20,18,20,.45);display:none;align-items:center;justify-content:center;padding:14px;z-index:20}
+.ov.on{display:flex}
+.win{background:#fff;border:4px solid var(--line);border-radius:16px;width:min(520px,100%);max-height:92vh;overflow:auto;box-shadow:0 10px 0 rgba(0,0,0,.2)}
+.win .wh{background:var(--c);padding:10px 14px;border-bottom:4px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.win .wh b{font-size:19px}.win .wh small{font-size:13px;margin-left:8px}
+.x{width:44px;height:44px;border-radius:12px;border:3px solid var(--line);background:#fff;font-size:20px;font-weight:800;cursor:pointer;flex:none}
+.wb{padding:12px 14px 14px}
+.wb dl{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:6px 10px;margin:0 0 12px}
+.wb dt{font-weight:800;color:var(--sub);font-size:13px;padding-top:1px}
+.wb dd{margin:0;overflow-wrap:anywhere}
+.wb .alert{background:#fff1d6;border:2px solid #b47600;border-radius:10px;padding:6px 10px;margin:0 0 12px;font-weight:700}
+.wb .alert.heavy{background:#ffe4e4;border-color:#e5484d}
+.wb h4{margin:4px 0 6px;font-size:14px}
+.jobs{list-style:none;margin:0 0 12px;padding:0;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.jobs li{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:8px;padding:5px 10px;border-top:1px solid #ddd;font-size:13.5px}
+.jobs li:first-child{border-top:0}.jobs .w{font-weight:800;white-space:nowrap}
+textarea{width:100%;min-height:96px;font:16px/1.5 inherit;font-family:inherit;border:3px solid var(--line);border-radius:10px;padding:8px;resize:vertical}
+textarea:focus{outline:3px solid var(--c);outline-offset:1px}
+.sv{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+.sv button{min-height:44px;padding:0 22px;border-radius:12px;border:3px solid var(--line);background:var(--c);font-weight:800;cursor:pointer}
+.sv span{font-size:12.5px;color:var(--sub)}
+.wlist{margin:0;padding-left:1.2em}
+@media (max-width:980px){.top{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.board{grid-column:1/-1}.side{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto}}
+@media (max-width:560px){body{padding:8px}.top,.floor{gap:8px}.col{padding:0 3px 6px}.col h2{font-size:12px;padding:4px 5px}.card .t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .tile{flex-basis:calc((100% - (var(--per,2) - 1)*8px)/var(--per,2))}.tile svg{width:92px;height:78px}.side{grid-template-columns:1fr 1fr}.chair{grid-column:1/-1}.cal td span{width:22px;height:22px;line-height:22px}}
+</style>
+</head>
+<body>
+<header class="head"><h1>ガっチガチ研究所 AI社員フロア</h1><span class="at" id="at"></span></header>
+<section class="top">
+  <div class="board"><div class="bh">案件ボード<small>カード・人物をタップで詳細</small></div><div class="cols" id="cols"></div></div>
+  <div class="box cal" id="cal"></div>
+  <div class="box clk"><h3>いまの時刻</h3><svg id="clock" viewBox="0 0 200 200" aria-label="アナログ時計"></svg><div class="dg" id="dg"></div></div>
+  <div class="side">
+    <button class="box chair" id="chair"></button>
+    <div class="box pt" id="pt0"></div><div class="box pt" id="pt1"></div>
+  </div>
+</section>
+<main class="floor" id="floor"></main>
+
+<div class="ov" id="ov" role="dialog" aria-modal="true"><div class="win" id="win"></div></div>
+
+<!-- ▼ データ差し込み口（みーが集めた内容をここに入れる。形は README.md） -->
+<script id="floor-data" type="application/json">
+{"collected_at":"2026-11-21T05:10:00+09:00","members":{"members":[{"id":"mii","name":"みー","role":"社長代理","seat":"center"},{"id":"koukichi","name":"こー吉","role":"開発","seat":"dev"},{"id":"oyakata","name":"親方","role":"実行（Mac側）","seat":"ops"},{"id":"sekkeikakari","name":"フロア設計係","role":"設計","seat":"design"},{"id":"hptantou","name":"HP担当","role":"HP制作アプリ","seat":"hp"},{"id":"ganechigamen","name":"ガネチ画面","role":"店内ディスプレイ","seat":"gamen"},{"id":"chii","name":"ちぃ","role":"文字盤","seat":"watch"},{"id":"bucho","name":"部長","role":"相談役","seat":"bucho"},{"id":"ganechikun","name":"ガネチくん","role":"青色申告","seat":"ganechikun"}],"chairman":{"name":"すぎちゃん","role":"会長","seat":"chairman_room","character":false}},
+"status":[
+{"id":"bucho","name":"部長","status":"idle","task":"","say":"アーカイブで待機中。呼ばれたら起きるで","waiting_for":"","updated":"2026-11-20T21:06:21+09:00"},
+{"id":"chii","name":"ちぃ","status":"idle","task":"","say":"ちぃ着任！文字盤の担当やで","waiting_for":"","updated":"2026-11-20T20:15:13+09:00"},
+{"id":"ganechigamen","name":"ガネチ画面","status":"idle","task":"","say":"ガネチ画面、着任しました！待機中です","waiting_for":"","updated":"2026-11-20T20:08:08+09:00"},
+{"id":"ganechikun","name":"ガネチくん","status":"wait_heavy","task":"青色申告：2026年売上入力","say":"修正版の小遣い帳待ち。届いたら即入力するで","waiting_for":"","updated":"2026-11-20T21:07:26+09:00"},
+{"id":"hptantou","name":"HP担当","status":"idle","task":"","say":"HPアプリ待機中。みーの返事待ち","waiting_for":"","updated":"2026-11-20T19:45:07+09:00"},
+{"id":"koukichi","name":"こー吉","status":"idle","task":"","say":"待機中。次の指示待ち","waiting_for":"","updated":"2026-11-20T16:16:12+09:00"},
+{"id":"mii","name":"みー","status":"done","task":"時計の呼び鈴Gの開通","say":"G開通したよ","waiting_for":"","updated":"2026-11-20T19:37:16+09:00"},
+{"id":"oyakata","name":"親方","status":"working","task":"T900 ファーム取り出し調査","say":"読み出し方法を調査中（書き込みなし）","waiting_for":"","updated":"2026-11-20T18:06:13+09:00"},
+{"id":"sekkeikakari","name":"フロア設計係","status":"working","task":"フロア画面v3","say":"v3の画面を作ってる","waiting_for":"","updated":"2026-11-21T05:10:00+09:00"}],
+"notes":{},
+"mii_jobs":[["毎朝 7:00","公式LINE巡回"],["毎時（7〜22時）","メール警告見張り"],["毎朝 7:48","配達・引落メール確認"],["毎日 13:00","予約リマインド拾い"],["毎晩 21:48","みちゃんねる。・Mehoo!更新"],["土曜 6:00","マンジャロ注射リマインド"],["夜 23〜5時","旧ガネチ見張り"]],
+"partners":[{"id":"kiki","name":"キキ","who":"ChatGPT","job":"絵・素材"},{"id":"emi","name":"えみ","who":"Gemini","job":"動画"}]}
+</script>
+
+<script>
+{
+const STALE_H = 24;
+const COLORS = {mii:"#ff8fb5",koukichi:"#5fd0bd",oyakata:"#ffad5c",sekkeikakari:"#a596ff",hptantou:"#6fbcff",ganechigamen:"#ffd84d",chii:"#9be06e",bucho:"#d7b48c",ganechikun:"#f39be3"};
+const POOL = ["#7fe0e0","#ffc0a0","#c0d860","#b0c4ff"];
+const HAIR = {mii:["#8a5bd1","long"],koukichi:["#33415f","bob"],oyakata:["#d9692a","pony"],sekkeikakari:["#4a3a32","short"],hptantou:["#2b2b33","twin"],ganechigamen:["#e2a93a","bob"],chii:["#6b3b2a","twin"],bucho:["#555","short"],ganechikun:["#3a2a5a","pony"]};
+const COLS = [["idle","待機中"],["working","作業中"],["wait","承認待ち"],["done","完了"]];
+const LABEL = {idle:"待機中",working:"作業中",wait_light:"みーの許可待ち",wait_heavy:"会長の許可待ち",wait_member:"待ち",done:"完了",none:"状態未記入"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const WD = ["日","月","火","水","木","金","土"];
+let D = {}, M = [], S = {}, NAME = {}, COLOR = {}, GUESTS = [];
+
+function fmt(t){ if(t==null) return "時刻なし"; const d=new Date(t), n=new Date();
+  const hm=pad(d.getHours())+":"+pad(d.getMinutes());
+  return d.toDateString()===n.toDateString()? "今日 "+hm : (d.getMonth()+1)+"/"+d.getDate()+"("+WD[d.getDay()]+") "+hm; }
+function ago(t){ const m=Math.floor((Date.now()-t)/60000); if(m<60) return m+"分前"; const h=Math.floor(m/60); return h<24? h+"時間前" : Math.floor(h/24)+"日前"; }
+function info(id){ const s=S[id]; const code=s&&LABEL[s.status]?s.status:"none"; const t=s?Date.parse(s.updated):NaN;
+  return {s, code, t:isNaN(t)?null:t, stale:!s||isNaN(t)||Date.now()-t>STALE_H*3600000}; }
+function waitText(id){ const {s,code}=info(id); if(!s) return "";
+  if(code==="wait_light") return "みー（社長代理）の許可待ち"+(s.task?"：「"+s.task+"」":"");
+  if(code==="wait_heavy") return "会長の許可待ち"+(s.task?"：「"+s.task+"」":"");
+  if(code==="wait_member") return (NAME[s.waiting_for]||s.waiting_for||"誰か")+" 待ち"+(s.task?"：「"+s.task+"」":"");
+  return ""; }
+
+function person(id, code, stale){
+  const c=COLOR[id], [h,st]=HAIR[id]||["#4a3a32",["bob","short","pony","twin","long"][id.length%5]];
+  const back={long:`<path d="M42 34q-2-22 18-22t18 22l3 30h-42z" fill="${h}"/>`,bob:`<path d="M42 36q-2-24 18-24t18 24q1 12-4 14h-28q-5-2-4-14z" fill="${h}"/>`,
+    pony:`<path d="M74 22q16 4 10 30q-3 8-8 10q5-14-4-30z" fill="${h}"/>`,twin:`<circle cx="38" cy="40" r="7" fill="${h}"/><circle cx="82" cy="40" r="7" fill="${h}"/>`,short:""}[st]||"";
+  const eyes = stale ? `<path d="M53 37q2 2 4 0M63 37q2 2 4 0" stroke="#3a2a30" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+    : `<circle cx="55" cy="37" r="2.2" fill="#3a2a30"/><circle cx="65" cy="37" r="2.2" fill="#3a2a30"/>`;
+  const prop = code==="wait_light"||code==="wait_heavy" ? `<rect x="80" y="30" width="16" height="20" rx="2" fill="#fff" stroke="#333" stroke-width="1.5" transform="rotate(10 88 40)"/><path d="M78 54 L86 44" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`
+    : code==="wait_member" ? `<path d="M86 40h10l-10 14h10z" fill="#fff" stroke="#333" stroke-width="1.5"/>`
+    : code==="done" ? `<circle cx="92" cy="44" r="8" fill="#3fb27f"/><path d="M88 44l3 3 5-6" stroke="#fff" stroke-width="2" fill="none"/>` : "";
+  const screen = code==="working" ? "#bfe9ff" : "#d9dde2";
+  return `<svg viewBox="0 0 120 100" aria-hidden="true"><g class="${code==="working"&&!stale?"bob":""}">${back}
+    <rect x="42" y="50" width="36" height="34" rx="12" fill="${c}"/><path d="M54 50l6 7 6-7z" fill="#fff"/>
+    <circle cx="60" cy="36" r="15" fill="#ffe2d2"/>
+    <path d="M45 34q0-18 15-18t15 18q-6-8-15-8t-15 8z" fill="${h}"/>${eyes}
+    <circle cx="51" cy="42" r="2.6" fill="#ff9fb2" opacity=".6"/><circle cx="69" cy="42" r="2.6" fill="#ff9fb2" opacity=".6"/>
+    <path d="M57 44q3 2 6 0" stroke="#c0566b" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>${prop}
+    <rect x="44" y="58" width="32" height="18" rx="2" fill="#555"/><rect x="46" y="60" width="28" height="13" rx="1" fill="${screen}"/>
+    <rect x="8" y="74" width="104" height="9" rx="3" fill="#c98f5d"/><rect x="14" y="83" width="92" height="15" rx="3" fill="#b07a4a"/></svg>`;
+}
+function icon(){ return `<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="14" fill="#e3e3e3" stroke="#555" stroke-width="2"/><circle cx="15" cy="12" r="5" fill="#888"/><path d="M6 25q9-10 18 0" fill="#888"/></svg>`; }
+
+function board(){
+  const groups={idle:[],working:[],wait:[],done:[]};
+  [...M,...GUESTS].forEach(m=>{ const {s,code}=info(m.id); if(!s) return;
+    const g=code.startsWith("wait")?"wait":code; if(groups[g]) groups[g].push(m); });
+  $("#cols").innerHTML = COLS.map(([k,l])=>`<div class="col"><h2>${l}<b>${groups[k].length}</b></h2>${
+    groups[k].length? groups[k].map((m,i)=>{ const s=S[m.id];
+      const badge=s.status==="wait_heavy"?'<span class="pill heavy">会長</span>':s.status==="wait_light"?'<span class="pill light">みー</span>':s.status==="wait_member"?`<span class="pill">${esc(NAME[s.waiting_for]||"相手")}待ち</span>`:"";
+      return `<button class="card" data-id="${esc(m.id)}" style="--c:${COLOR[m.id]};--r:${(i%2?.8:-.8)}deg"><span class="n">${esc(m.name)}${badge}</span><span class="t">${esc(s.task||s.say||"—")}</span></button>`;}).join("")
+    : '<div class="none">なし</div>'}</div>`).join("");
+}
+function floor(){
+  const tile=(m,guest)=>{ const {s,code,t,stale}=info(m.id);
+    const lab=code==="wait_member"?(NAME[s.waiting_for]||s.waiting_for||"誰か")+" 待ち":LABEL[code];
+    return `<button class="tile${guest?" guest":""}${stale?" stale":""}" data-id="${esc(m.id)}" style="--c:${COLOR[m.id]}">${guest?'<span class="gb">ゲスト</span>':""}
+      ${person(m.id,code,stale)}<span class="nm">${esc(m.name)}</span><span class="rl">${esc(m.role||"")}</span>
+      <span class="st">${esc(lab)}</span>${stale&&t!=null?`<span class="age">最終更新 ${ago(t)}</span>`:""}</button>`; };
+  $("#floor").innerHTML = M.map(m=>tile(m,false)).join("") + GUESTS.map(m=>tile(m,true)).join("");
+  balance();
+}
+function balance(){
+  const f=$("#floor"), n=f.children.length; if(!n) return;
+  const max=Math.max(1,Math.floor((f.clientWidth+12)/(innerWidth<=560?148:180))), rows=Math.ceil(n/max);
+  f.style.setProperty("--per", Math.ceil(n/rows));
+}
+addEventListener("resize", ()=>balance());
+function chair(){
+  const ch=(D.members&&D.members.chairman)||{name:"すぎちゃん"}; const n=[...M,...GUESTS].filter(m=>S[m.id]&&S[m.id].status==="wait_heavy").length;
+  $("#chair").innerHTML=`<svg viewBox="0 0 44 60" aria-hidden="true"><rect x="4" y="4" width="36" height="56" rx="4" fill="#9a6640" stroke="#5e3a22" stroke-width="3"/><circle cx="32" cy="34" r="3" fill="#ffd76a"/><rect x="10" y="12" width="24" height="9" rx="2" fill="#f4d27a"/></svg>
+    <span><span class="nm">会長室</span><span class="ab" style="display:block">会長 ${esc(ch.name)}・不在</span>${n?`<span class="pill heavy">許可待ち ${n}件</span>`:""}</span>`;
+  (D.partners||[]).slice(0,2).forEach((p,i)=>{ $("#pt"+i).innerHTML=`${icon()}<div><small>取引先窓口</small><b>${esc(p.name)}</b><span>${esc(p.who)}／${esc(p.job)}</span></div>`; });
+}
+function calendar(){
+  const n=new Date(), y=n.getFullYear(), mo=n.getMonth(), first=new Date(y,mo,1).getDay(), days=new Date(y,mo+1,0).getDate();
+  let cells=Array(first).fill(""), rows="";
+  for(let d=1;d<=days;d++) cells.push(d); while(cells.length%7) cells.push("");
+  for(let i=0;i<cells.length;i+=7) rows+="<tr>"+cells.slice(i,i+7).map((d,j)=>`<td class="${d===n.getDate()?"is ":""}${j===0?"su":j===6?"sa":""}">${d?`<span>${d}</span>`:""}</td>`).join("")+"</tr>";
+  $("#cal").innerHTML=`<h3>${y}年${mo+1}月</h3><div class="today">${mo+1}月${n.getDate()}日（${WD[n.getDay()]}）</div>
+    <table><thead><tr>${WD.map((w,j)=>`<th class="${j===0?"su":j===6?"sa":""}">${w}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+function clockFace(){
+  let t=""; for(let i=0;i<60;i++){ const a=i*6*Math.PI/180, r1=i%5?86:80; t+=`<line x1="${100+r1*Math.sin(a)}" y1="${100-r1*Math.cos(a)}" x2="${100+90*Math.sin(a)}" y2="${100-90*Math.cos(a)}" stroke="#1d1a1f" stroke-width="${i%5?1.5:4}"/>`; }
+  const num=[12,3,6,9].map((v,i)=>{const a=i*Math.PI/2;return `<text x="${100+66*Math.sin(a)}" y="${100-66*Math.cos(a)+7}" text-anchor="middle" font-size="20" font-weight="800" fill="#1d1a1f">${v}</text>`}).join("");
+  $("#clock").innerHTML=`<circle cx="100" cy="100" r="96" fill="#fff" stroke="#141214" stroke-width="6"/>${t}${num}
+   <line id="hh" x1="100" y1="100" x2="100" y2="52" stroke="#1d1a1f" stroke-width="8" stroke-linecap="round"/>
+   <line id="mh" x1="100" y1="100" x2="100" y2="30" stroke="#1d1a1f" stroke-width="5" stroke-linecap="round"/>
+   <line id="sh" x1="100" y1="114" x2="100" y2="24" stroke="#e5484d" stroke-width="2.5" stroke-linecap="round"/><circle cx="100" cy="100" r="6" fill="#e5484d"/>`;
+}
+let lastDay=-1;
+function tick(){
+  const n=new Date(), s=n.getSeconds(), m=n.getMinutes()+s/60, h=(n.getHours()%12)+m/60;
+  $("#sh").setAttribute("transform",`rotate(${s*6} 100 100)`); $("#mh").setAttribute("transform",`rotate(${m*6} 100 100)`); $("#hh").setAttribute("transform",`rotate(${h*30} 100 100)`);
+  $("#dg").textContent=pad(n.getHours())+":"+pad(n.getMinutes())+":"+pad(s);
+  if(n.getDate()!==lastDay){ lastDay=n.getDate(); calendar(); }
+  if(s===0) floor();
+}
+
+// 書き込み欄：①window.FLOOR_STORE ②このページのデータベース（PC・スマホ共有） ③この端末だけ の順で使う
+let DB = null;
+const store = {
+  shared: () => !!((window.FLOOR_STORE && window.FLOOR_STORE.save) || DB),
+  async load(id){
+    try{ if(window.FLOOR_STORE && window.FLOOR_STORE.load) return (await window.FLOOR_STORE.load(id)) ?? ""; }catch(e){}
+    try{ if(DB){ const d=await DB.doc("notes/"+id).get(); return d.exists ? String(d.data().text||"") : ""; } }catch(e){}
+    try{ const v=localStorage.getItem("floorNote:"+id); if(v!=null) return v; }catch(e){}
+    return (D.notes||{})[id]||""; },
+  async save(id,text){
+    if(window.FLOOR_STORE && window.FLOOR_STORE.save){ await window.FLOOR_STORE.save(id,text); return "shared"; }
+    if(DB){ await DB.doc("notes/"+id).set({id, text, updated:new Date().toISOString()}); return "shared"; }
+    localStorage.setItem("floorNote:"+id,text); return "local"; }
+};
+async function open(id){
+  const m=[...M,...GUESTS].find(x=>x.id===id); if(!m) return;
+  const {s,code,t}=info(id), w=waitText(id);
+  const rows=[["状態",LABEL[code]],["タスク",s&&s.task||"なし"],["ひとこと",s&&s.say||"—"]];
+  rows.push(["最終更新",t!=null?fmt(t)+"（"+ago(t)+"）":"記録なし"]);
+  const jobs=id==="mii"&&D.mii_jobs?`<h4>みーの裏方（定期ジョブ ${D.mii_jobs.length}件）</h4><ul class="jobs">${D.mii_jobs.map(([a,b])=>`<li><span class="w">${esc(a)}</span><span>${esc(b)}</span></li>`).join("")}</ul>`:"";
+  $("#win").style.setProperty("--c",COLOR[id]);
+  $("#win").innerHTML=`<div class="wh"><span><b>${esc(m.name)}</b><small>${esc(m.role||"")}</small></span><button class="x" id="x" aria-label="閉じる">×</button></div>
+   <div class="wb">${w?`<div class="alert${code==="wait_heavy"?" heavy":""}">${esc(w)}</div>`:""}
+   <dl>${rows.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join("")}</dl>${jobs}
+   <h4>書き込み</h4><textarea id="note" placeholder="メモや指示を書いて保存"></textarea>
+   <div class="sv"><button id="save">保存</button><span id="svm">${store.shared()?"":"この端末だけに保存されます"}</span></div></div>`;
+  $("#ov").classList.add("on"); $("#x").onclick=close;
+  const ta=$("#note"); ta.value=await store.load(id);
+  $("#save").onclick=async()=>{ try{ const r=await store.save(id,ta.value); const n=new Date();
+      $("#svm").textContent=(r==="shared"?"保存しました（PC・スマホ共通） ":"この端末に保存しました ")+pad(n.getHours())+":"+pad(n.getMinutes()); }
+    catch(e){ $("#svm").textContent="保存できませんでした。もう一度押してください"; } };
+  $("#x").focus();
+}
+function openChair(){
+  const list=[...M,...GUESTS].filter(m=>S[m.id]&&S[m.id].status==="wait_heavy");
+  $("#win").style.setProperty("--c","#e9d8f2");
+  $("#win").innerHTML=`<div class="wh"><span><b>会長室</b><small>会長の許可待ち</small></span><button class="x" id="x" aria-label="閉じる">×</button></div><div class="wb">${
+    list.length?`<ul class="wlist">${list.map(m=>`<li><b>${esc(m.name)}</b>：${esc(S[m.id].task||S[m.id].say||"")}</li>`).join("")}</ul>`:"<p>今は会長の許可待ちはなし。</p>"}</div>`;
+  $("#ov").classList.add("on"); $("#x").onclick=close; $("#x").focus();
+}
+function close(){ $("#ov").classList.remove("on"); }
+
+function render(data){
+  D=data||{}; M=(D.members&&D.members.members)||[]; S={}; NAME={}; COLOR={};
+  (D.status||[]).forEach(s=>{ if(s&&s.id) S[s.id]=s; });
+  let p=0; const ids=new Set(M.map(m=>m.id));
+  GUESTS=[...M.filter(m=>m.guest), ...(D.status||[]).filter(s=>s&&s.id&&!ids.has(s.id)).map(s=>({id:s.id,name:s.name||s.id,role:"ゲスト",guest:true}))].filter(m=>S[m.id]);
+  M=M.filter(m=>!m.guest);
+  [...M,...GUESTS].forEach(m=>{ NAME[m.id]=m.name; COLOR[m.id]=m.color||COLORS[m.id]||POOL[p++%POOL.length]; });
+  const ct=Date.parse(D.collected_at); $("#at").textContent=isNaN(ct)?"":"みーの集計："+fmt(ct);
+  board(); floor(); chair();
+}
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-id]"); if(b&&!$("#ov").contains(b)) open(b.dataset.id);
+  if(e.target.closest("#chair")) openChair(); if(e.target===$("#ov")) close(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
+window.renderFloor = d => render(d);
+let data; try{ data = window.FLOOR_DATA || JSON.parse($("#floor-data").textContent); }catch(e){ data = {}; }
+clockFace(); render(data); tick(); setInterval(tick,1000);
+// みーが集めた最新データがページのデータベースにあれば、そちらを表示（変わったら自動で反映）
+(async()=>{ try{
+  if(!window.claude || window.FLOOR_DATA) { if(window.claude){ DB = await claude.use("db"); } return; }
+  DB = await claude.use("db"); if(!DB) return;
+  DB.doc("floor/snapshot").onSnapshot(snap=>{ if(snap.exists) render(snap.data()); }, ()=>{});
+}catch(e){} })();
+}
+</script>
+</body>
+</html>

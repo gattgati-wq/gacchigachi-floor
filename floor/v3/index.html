@@ -76,6 +76,16 @@ button{font:inherit;color:inherit}
 .mini.vip{border-style:double}
 .redtag{display:inline-block;background:#d62828;color:#fff;border:2px solid #111;border-radius:3px;font-size:11px;font-weight:800;padding:0 5px;margin-left:4px}
 
+.alert{display:none;background:#d62828;color:#fff;border:var(--thick) solid var(--line);border-radius:6px;padding:6px 10px;font-size:14px;font-weight:800}
+.alert.on{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.alert button{border:2px solid #111;background:#fff;color:#111;border-radius:4px;padding:2px 8px;font-weight:700;cursor:pointer}
+.stall{outline:4px solid #d62828;outline-offset:-1px}
+.card.stall{border-color:#d62828;box-shadow:0 0 0 2px #fff,0 0 0 4px #d62828}
+.badge{display:inline-block;background:#d62828;color:#fff;border:1.5px solid #111;border-radius:3px;font-size:10px;font-weight:800;padding:0 4px;margin-top:2px}
+.badge.l1{background:#ff9800;color:#111}
+.cell.stall{border-color:#d62828}
+.ribbon{display:block;background:#d62828;color:#fff;font-weight:800;font-size:12px;text-align:center;border:2px solid #111;border-radius:3px;margin:4px 0 0;padding:1px 4px}
+.ribbon.l1{background:#ff9800;color:#111}
 .foot{font-size:11px;color:var(--muted);text-align:right}
 
 /* ---- 詳細ウインドウ ---- */
@@ -132,6 +142,7 @@ ul.jobs li b{margin-right:6px}
 </head>
 <body>
 <div class="wrap">
+  <div class="alert" id="alert"></div>
   <div class="top">
     <section class="sec boardsec"><h2>状態ボード</h2><div class="board" id="board"></div></section>
     <section class="sec cal" id="cal"></section>
@@ -188,6 +199,13 @@ const colKey = s => s.status==="working"?"working":s.status==="done"?"done":s.st
 const ageMs = s => Date.now()-Date.parse(s.updated);
 const isStale = s => !s || !s.updated || ageMs(s)>STALE_MS;
 
+const STALL_L1=6*3600*1000, STALL_L2=24*3600*1000; /* 注意=6時間／停止=24時間（知らんけど、要調整） */
+function stallLevel(s){
+  if(!s||!s.updated) return 0;
+  if(!["working","wait_light","wait_heavy","wait_member"].includes(s.status)) return 0;
+  const a=ageMs(s); return a>=STALL_L2?2:a>=STALL_L1?1:0;
+}
+function ageText(ms){const h=Math.floor(ms/3600000); return h<1?"1時間以内":h<24?`${h}時間`:`${Math.floor(h/24)}日`}
 function people(){
   const out = DATA.members.members.map(m=>({...m, st:stOf(m.id), guest:false}));
   const known = new Set(out.map(m=>m.id));
@@ -252,22 +270,29 @@ function personSVG(id,color,state,stale,opts={}){
 function renderBoard(){
   const ps = people();
   document.getElementById("board").innerHTML = COLS.map(c=>{
-    const items = ps.filter(p=>p.st && colKey(p.st)===c.k);
+    const items = ps.filter(p=>p.st && colKey(p.st)===c.k).sort((a,b)=>stallLevel(b.st)-stallLevel(a.st)||ageMs(b.st)-ageMs(a.st));
     return `<div class="col"><h3>${c.label} <small>${items.length}</small></h3><div class="cards">${
-      items.map(p=>`<button class="card ${isStale(p.st)?"stale":""}" data-id="${esc(p.id)}" style="background:${colOf(p.id)}"><b>${esc(p.name)}</b><span>${esc(p.st.task||p.st.say||"")}</span></button>`).join("")
+      items.map(p=>`<button class="card ${stallLevel(p.st)?"stall":isStale(p.st)?"stale":""}" data-id="${esc(p.id)}" style="background:${colOf(p.id)}"><b>${esc(p.name)}</b><span>${esc(p.st.task||p.st.say||"")}</span>${stallLevel(p.st)?`<em class="badge l${stallLevel(p.st)}" style="font-style:normal">⚠ ${ageText(ageMs(p.st))}止まり</em>`:""}</button>`).join("")
     }</div></div>`;
   }).join("");
 }
 function memberCell(p){
-  const s=p.st, c=colOf(p.id), stale=isStale(s);
+  const s=p.st, c=colOf(p.id), lv=stallLevel(s), stale=isStale(s)&&!lv;
   const state=s?s.status:"idle";
   const bubble = s ? `${esc(s.say||"")}<small>${fmtTime(s.updated)}</small>` : "状態ファイルなし<small>確認待ち</small>";
   const memo = loadMemo(p.id) ? `<span class="memo-dot">✎</span>`:"";
-  return `<button class="cell ${stale?"stale":""}" data-id="${esc(p.id)}" style="--c:${c};--tint:${tint(c)}">
+  return `<button class="cell ${stale?"stale":""} ${lv?"stall":""}" data-id="${esc(p.id)}" style="--c:${c};--tint:${tint(c)}">
     <span class="chip">${esc(s?STATUS_LABEL[s.status]||s.status:"—")}</span>
     <span class="plate">${esc(p.name)}${p.guest?`<span class="guest-tag">ゲスト</span>`:""}<i>${esc(p.role||"")}</i></span>
-    ${personSVG(p.id,c,state,stale,{label:p.name})}
+    ${personSVG(p.id,c,state,stale||lv>0,{label:p.name})}
+    ${lv?`<span class="ribbon l${lv}">⚠ ${ageText(ageMs(s))} 止まってる</span>`:""}
     <div class="say">${bubble}</div>${memo}</button>`;
+}
+function renderAlert(){
+  const st=people().filter(p=>stallLevel(p.st)).sort((a,b)=>ageMs(b.st)-ageMs(a.st));
+  const el=document.getElementById("alert");
+  el.className="alert"+(st.length?" on":"");
+  el.innerHTML=st.length?`⚠ 止まってる仕事 ${st.length}件 `+st.map(p=>`<button data-id="${esc(p.id)}">${esc(p.name)} ${ageText(ageMs(p.st))}</button>`).join(""):"";
 }
 function renderFloor(){
   const ps=people();
@@ -339,7 +364,7 @@ function openDetail(id){
     <dt>タスク</dt><dd>${esc(s&&s.task||"—")}</dd>
     <dt>ひとこと</dt><dd>${esc(s&&s.say||"—")}</dd>
     <dt>何待ちか</dt><dd>${w?`<span class="wait">${esc(w)}</span>`:"待ちなし"}</dd>
-    <dt>最終更新</dt><dd>${s?fmtTime(s.updated):"—"}</dd>
+    <dt>最終更新</dt><dd>${s?fmtTime(s.updated):"—"}${s&&stallLevel(s)?` <span class="badge l${stallLevel(s)}">⚠ ${ageText(ageMs(s))}止まってる</span>`:""}</dd>
    </dl>
    ${id==="mii"?`<h4>裏方の定期ジョブ（${MII_JOBS.length}件）</h4><ul class="jobs">${MII_JOBS.map(j=>`<li><b>${esc(j[0])}</b>${esc(j[1])}</li>`).join("")}</ul>`:""}
    <h4>書き込み欄</h4>
@@ -380,7 +405,7 @@ async function tryLive(){
   }catch(e){}
 }
 function draw(){
-  renderBoard(); renderFloor();
+  renderBoard(); renderFloor(); renderAlert();
   const c=DATA.collected_at?fmtTime(DATA.collected_at).replace(/（.*）/,""):"—";
   document.getElementById("foot").textContent=`データ：${source}（${c}時点）`;
 }

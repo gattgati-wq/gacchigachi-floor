@@ -93,12 +93,16 @@ textarea{width:100%;min-height:64px;border:2px solid #111;border-radius:4px;padd
 .foot{font-size:10px;color:var(--muted);flex:0 0 auto}
 
 /* ===== オフィス（デスクに座る） ===== */
-.floor{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:6px;border:var(--thick) solid var(--line);border-radius:8px;
+.floor{position:relative;display:flex;flex-wrap:wrap;align-content:space-evenly;justify-content:center;gap:6px;padding:8px;overflow:auto;
+  border:var(--thick) solid var(--line);border-radius:8px;--cs:clamp(120px,min(16vw,21vh),200px);
   background:repeating-linear-gradient(90deg,#f3e6cf 0 70px,#ecdcc0 70px 72px)}
-.floor{position:relative;--cs:clamp(120px,min(16vw,21vh),200px)}
-.desk{position:relative;z-index:1;min-width:0;min-height:0;cursor:pointer;outline:none}
-.plant{position:absolute;z-index:0;width:clamp(30px,4vw,56px);pointer-events:none;transform:translate(-50%,-100%)}
-.plant svg{display:block;width:100%;height:auto}
+/* 仕事ごとのまとまり（ゾーン）：同じ仕事の子が近くに座る */
+.zone{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;align-content:flex-start;padding:26px 10px 8px;border-radius:16px;background:rgba(255,255,255,.30);flex:0 1 auto}
+.zone.nolabel{background:none;padding:6px;flex:1 1 100%}
+.zlabel{position:absolute;left:12px;top:5px;background:#fff;border:2px solid #111;border-radius:10px;padding:0 9px;font-size:clamp(10px,1vw,13px);font-weight:800;line-height:1.5;white-space:nowrap}
+.desk{position:relative;z-index:1;flex:0 0 auto;width:calc(var(--cs)*1.1);height:calc(var(--cs)*1.3);cursor:pointer;outline:none}
+.plantf{flex:0 0 auto;width:clamp(30px,4vw,56px);align-self:flex-end;margin:0 6px 16px;pointer-events:none}
+.plantf svg{display:block;width:100%;height:auto}
 .desk:focus-visible .stage{outline:3px solid #1c63c9;border-radius:8px}
 .stage{position:absolute;left:50%;top:50%;width:var(--cs);height:var(--cs);transform:translate(-50%,-46%)}
 .char{position:absolute;left:0;bottom:5%;width:100%;height:93%;object-fit:contain;object-position:center bottom}
@@ -189,7 +193,9 @@ ul.jobs li b{margin-right:6px}
   .app{display:flex;flex-direction:column;gap:5px;height:auto}
   .side{display:contents}
   .alert{order:1}.board{order:2}.calrow{order:3}.minis{order:4}.mega{order:5}
-  .floor{order:6;flex:none;--cs:clamp(76px,25vw,112px);min-height:calc(var(--rows,3) * 175px)}
+  .floor{order:6;flex:none;overflow:visible;--cs:clamp(76px,25vw,112px)}
+  .desk{width:calc(var(--cs)*1.18)}
+  .zone{padding:24px 4px 6px}
   .foot{order:7}
   :root{--thick:3px;--gap:5px}
   .col h3{font-size:11px}
@@ -212,7 +218,7 @@ ul.jobs li b{margin-right:6px}
 }
 /* 縦が極端に短い横向きスマホ：スクロールを許す */
 @media (max-height:480px){
-  body{height:auto;overflow:auto}.app{height:auto}.floor{min-height:520px}
+  body{height:auto;overflow:auto}.app{height:auto}.floor{overflow:visible}
 }
 </style>
 </head>
@@ -230,7 +236,7 @@ ul.jobs li b{margin-right:6px}
 </div>
 <dialog id="dlg"></dialog>
 
-<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T12:11:30+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho"}, {"id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "idle", "task": "", "say": "v3依頼は取り消し。次の指示待ち", "waiting_for": "", "updated": "2026-11-21T05:25:20+09:00"}]}</script>
+<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T12:16:11+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho"}, {"id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "idle", "task": "", "say": "v3依頼は取り消し。次の指示待ち", "waiting_for": "", "updated": "2026-11-21T05:25:20+09:00"}]}</script>
 <script>
 "use strict";
 /* ===== 設定 ===== */
@@ -285,6 +291,7 @@ function people(){
   DATA.status.filter(s=>!known.has(s.id)).forEach(s=>out.push({id:s.id,name:s.name||s.id,role:"ゲスト",st:s,guest:true}));
   return out;
 }
+const label = p => (p&&(p.title||p.name))||""; /* 名札＝仕事役割（members.json の title）。無ければ名前 */
 const nameOf = id => (people().find(p=>p.id===id)||{}).name || id;
 function jst(d=new Date()){
   const f=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",hourCycle:"h23",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric",weekday:"short"});
@@ -342,32 +349,46 @@ function renderBoard(){
   document.getElementById("board").innerHTML = COLS.map(c=>{
     const items = ps.filter(p=>p.st && colKey(p.st)===c.k).sort((a,b)=>stallLevel(b.st)-stallLevel(a.st)||ageMs(b.st)-ageMs(a.st));
     return `<div class="col"><h3>${c.label} <small>${items.length}</small></h3><div class="cards">${
-      items.map(p=>{const lv=stallLevel(p.st);return `<button class="card ${lv?"stall":""}" data-detail="${esc(p.id)}" style="background:${colOf(p.id)}">${esc(p.name)}${lv?`<i class="l${lv}">⚠${ageText(ageMs(p.st))}</i>`:""}</button>`}).join("")
+      items.map(p=>{const lv=stallLevel(p.st);return `<button class="card ${lv?"stall":""}" data-detail="${esc(p.id)}" style="background:${colOf(p.id)}">${esc(label(p))}${lv?`<i class="l${lv}">⚠${ageText(ageMs(p.st))}</i>`:""}</button>`}).join("")
     }</div></div>`;
   }).join("");
 }
 function deskHTML(p){
   const s=p.st, c=colOf(p.id), lv=stallLevel(s), pose=poseOf(s), art=ART.has(p.id);
   const stage = art
-    ? `${pose==="work"?`<div class="rush"></div>`:""}<img class="char" src="img/${esc(p.id)}-${pose}.webp" alt="${esc(p.name)}">${pose==="work"?`<i class="sweat s1"></i><i class="sweat s2"></i><span class="kata">カタカタ</span><span class="kata k2">カタ！</span>`:""}${s&&s.status==="done"&&pose==="normal"?`<div class="ck">✔</div>`:""}`
+    ? `${pose==="work"?`<div class="rush"></div>`:""}<img class="char" src="img/${esc(p.id)}-${pose}.webp" alt="${esc(label(p))}">${pose==="work"?`<i class="sweat s1"></i><i class="sweat s2"></i><span class="kata">カタカタ</span><span class="kata k2">カタ！</span>`:""}${s&&s.status==="done"&&pose==="normal"?`<div class="ck">✔</div>`:""}`
     : personSVG(p.id,c);
   const say = s ? `${esc(s.say||"")}<small>${fmtTime(s.updated)}</small>` : `状態ファイルなし<small>確認待ち</small>`;
   const w = s?waitText(s):"";
   const dl=-((([...p.id].reduce((a,x)=>a+x.charCodeAt(0),0))%37)/10).toFixed(1)+"s";
-  return `<div class="desk p-${pose} ${pose==="work"?"work":""} ${art?"":"nodesk"}" data-desk="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(p.name)}" style="--c:${c};--dl:${dl}">
+  return `<div class="desk p-${pose} ${pose==="work"?"work":""} ${art?"":"nodesk"}" data-desk="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(label(p))}" style="--c:${c};--dl:${dl}">
     <div class="stage">${stage}
       ${art&&pose==="sleep"?`<div class="zz"><i>z</i><i>Z</i></div>`:""}
-      <div class="deskf"><div class="plate ${lv?"warn":""}">${lv?"⚠ ":""}${esc(p.name)}${p.guest?"（ゲスト）":""}</div></div>${lv?`<div class="pb l${lv}">${ageText(ageMs(s))}止まり</div>`:""}
+      <div class="deskf"><div class="plate ${lv?"warn":""}">${lv?"⚠ ":""}${esc(label(p))}${p.guest?"（ゲスト）":""}</div></div>${lv?`<div class="pb l${lv}">${ageText(ageMs(s))}止まり</div>`:""}
     </div>
     <div class="bubble ${OPEN===p.id?"open":""}">${say}${w?`<br><span class="wt">${esc(w)}</span>`:""}<br><button data-detail="${esc(p.id)}">詳細</button></div>
   </div>`;
 }
 function renderFloor(){
   const ps=people(), el=document.getElementById("floor");
-  el.style.gridTemplateRows=`repeat(${Math.ceil(ps.length/3)},1fr)`;
-  const rows=Math.ceil(ps.length/3); el.style.setProperty("--rows",rows);
-  const plant=(x,y,w)=>`<div class="plant" style="left:${x}%;top:${y}%;${w?`width:${w}`:""}"><svg viewBox="0 0 60 80"><path d="M30 46 C14 40 6 24 12 8 C26 14 32 28 30 46Z" fill="#4caf50" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M30 46 C46 40 54 24 48 8 C34 14 28 28 30 46Z" fill="#66bb6a" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M30 46 C22 30 24 14 30 2 C36 14 38 30 30 46Z" fill="#388e3c" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 46h28l-4 30H20z" fill="#c0623a" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><rect x="14" y="42" width="32" height="7" rx="2" fill="#d4784a" stroke="#111" stroke-width="2.5"/></svg></div>`;
-  el.innerHTML=ps.map(deskHTML).join("")+plant(33.3,27)+plant(66.7,60)+plant(3,98,"clamp(26px,3.6vw,48px)")+plant(97,22,"clamp(26px,3.4vw,46px)");
+  const plantSVG=`<div class="plantf"><svg viewBox="0 0 60 80"><path d="M30 46 C14 40 6 24 12 8 C26 14 32 28 30 46Z" fill="#4caf50" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M30 46 C46 40 54 24 48 8 C34 14 28 28 30 46Z" fill="#66bb6a" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M30 46 C22 30 24 14 30 2 C36 14 38 30 30 46Z" fill="#388e3c" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 46h28l-4 30H20z" fill="#c0623a" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><rect x="14" y="42" width="32" height="7" rx="2" fill="#d4784a" stroke="#111" stroke-width="2.5"/></svg></div>`;
+  /* 仕事（group）ごとにまとめて座らせる。members.json に group が無ければ、全員を1つのまとまりにする */
+  const grouped=ps.some(p=>p.group);
+  let zones;
+  if(!grouped){ zones=[{label:"",items:ps}]; }
+  else{
+    const order=[], by={};
+    ps.forEach(p=>{const g=p.group||(p.guest?"ゲスト":"その他"); if(!(g in by)){by[g]=[];order.push(g)} by[g].push(p)});
+    const gi=g=>{const f=by[g].find(p=>typeof p.group_order==="number"); return f?f.group_order:1e6};
+    order.sort((x,y)=>gi(x)-gi(y)); /* 並びの指定が無ければ、出てきた順 */
+    zones=order.map(g=>({label:g,items:by[g]}));
+  }
+  el.innerHTML=zones.map((z,zi)=>{
+    const ds=z.items.map(deskHTML);
+    if(!grouped) return `<div class="zone nolabel">${ds.map((d,i)=>d+((i===2||i===5)?plantSVG:"")).join("")}${plantSVG}</div>`;
+    return `<div class="zone"><span class="zlabel">${esc(z.label)}</span>${ds.join("")}${zi%2===0?plantSVG:""}</div>`;
+  }).join("");
+
   const heavy = ps.filter(p=>p.st&&p.st.status==="wait_heavy").length;
   const door = `<svg viewBox="0 0 64 80"><rect x="8" y="4" width="48" height="74" rx="3" fill="#8b5e3c" stroke="#111" stroke-width="3"/><rect x="16" y="12" width="32" height="26" fill="#a87650" stroke="#111" stroke-width="2"/><rect x="16" y="44" width="32" height="28" fill="#a87650" stroke="#111" stroke-width="2"/><circle cx="46" cy="46" r="3" fill="#ffd54a" stroke="#111"/></svg>`;
   const ch = DATA.members.chairman||{name:"すぎちゃん",role:"会長"};
@@ -380,8 +401,8 @@ function renderAlert(){
   const miss=people().filter(p=>!p.st&&!p.guest);
   const el=document.getElementById("alert");
   el.className="alert"+(st.length||miss.length?" on":"");
-  el.innerHTML=(st.length?`⚠ 止まってる ${st.length}件 `+st.map(p=>`<button data-detail="${esc(p.id)}">${esc(p.name)} ${ageText(ageMs(p.st))}</button>`).join(""):"")
-    +(miss.length?` ⚠ 状態ファイルなし `+miss.map(p=>`<button data-detail="${esc(p.id)}">${esc(p.name)}</button>`).join(""):"");
+  el.innerHTML=(st.length?`⚠ 止まってる ${st.length}件 `+st.map(p=>`<button data-detail="${esc(p.id)}">${esc(label(p))} ${ageText(ageMs(p.st))}</button>`).join(""):"")
+    +(miss.length?` ⚠ 状態ファイルなし `+miss.map(p=>`<button data-detail="${esc(p.id)}">${esc(label(p))}</button>`).join(""):"");
 }
 
 /* ===== 拡声器 ===== */
@@ -396,8 +417,8 @@ function renderMegaView(){
   const sorted=[...targets].sort((a,b)=>(by[a.id]?1:0)-(by[b.id]?1:0));
   el.innerHTML=`<div class="msg"><small>${esc(m.from_name||m.from)} ・ ${fmtTime(m.sent)}</small>${esc(m.text)}</div>
    <div class="rp">${sorted.map(p=>{const r=by[p.id];return r
-     ?`<button class="rpc" data-detail="${esc(p.id)}" style="--c:${colOf(p.id)}"><b>${esc(p.name)}</b>${esc(r.text)}<small>${fmtTime(r.updated)}</small></button>`
-     :`<button class="rpc none" data-detail="${esc(p.id)}"><b>${esc(p.name)}　未返信</b><small>${ageText(Date.now()-Date.parse(m.sent))}経過</small></button>`}).join("")}</div>`;
+     ?`<button class="rpc" data-detail="${esc(p.id)}" style="--c:${colOf(p.id)}"><b>${esc(label(p))}</b>${esc(r.text)}<small>${fmtTime(r.updated)}</small></button>`
+     :`<button class="rpc none" data-detail="${esc(p.id)}"><b>${esc(label(p))}　未返信</b><small>${ageText(Date.now()-Date.parse(m.sent))}経過</small></button>`}).join("")}</div>`;
 }
 function buildMega(){
   const mega=document.getElementById("mega");
@@ -463,7 +484,7 @@ function openDetail(id){
   const p=people().find(x=>x.id===id); if(!p) return;
   const s=p.st, c=colOf(id), memo=loadMemo(id), w=s?waitText(s):"";
   dlg.style.setProperty("--c",c);
-  dlg.innerHTML=`<div class="dh"><b>${esc(p.name)} <small style="font-weight:500">${esc(p.role||"")}</small></b><button class="x" id="dx" aria-label="閉じる">✕</button></div>
+  dlg.innerHTML=`<div class="dh"><b>${esc(label(p))} <small style="font-weight:500">${p.title?esc(p.name)+"・":""}${esc(p.role||"")}</small></b><button class="x" id="dx" aria-label="閉じる">✕</button></div>
   <div class="db">
    <dl>
     <dt>状態</dt><dd>${esc(s?STATUS_LABEL[s.status]||s.status:"状態ファイルなし（確認待ち）")}</dd>
@@ -474,7 +495,7 @@ function openDetail(id){
    </dl>
    ${id==="mii"?`<h4>裏方の定期ジョブ（${MII_JOBS.length}件）</h4><ul class="jobs">${MII_JOBS.map(j=>`<li><b>${esc(j[0])}</b>${esc(j[1])}</li>`).join("")}</ul>`:""}
    <h4>書き込み欄</h4>
-   <textarea id="memo" placeholder="${esc(p.name)}へのメモ">${esc(memo?memo.text:"")}</textarea>
+   <textarea id="memo" placeholder="${esc(label(p))}へのメモ">${esc(memo?memo.text:"")}</textarea>
    <div class="btns">
      <button class="btn" id="msave">保存</button>
      <button class="btn w" id="mcopy">コピー（みーに渡す用）</button>
@@ -488,7 +509,7 @@ function openDetail(id){
     dlg.querySelector("#mhint").textContent= ok?"保存した ✔（この端末だけ）":"保存できなかった（ブラウザの設定を確認）";
   };
   dlg.querySelector("#mcopy").onclick=async()=>{
-    const txt=`【${p.name}へのメモ】\n${dlg.querySelector("#memo").value}`;
+    const txt=`【${label(p)}へのメモ】\n${dlg.querySelector("#memo").value}`;
     try{await navigator.clipboard.writeText(txt);dlg.querySelector("#mhint").textContent="コピーした ✔"}
     catch(e){const ta=dlg.querySelector("#memo");ta.select();document.execCommand&&document.execCommand("copy");dlg.querySelector("#mhint").textContent="選択したのでコピーしてな"}
   };

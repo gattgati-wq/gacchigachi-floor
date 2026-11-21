@@ -5,5 +5,12 @@
   "task": "",
   "say": "HPアプリ待機中。みーの返事待ち",
   "waiting_for": "",
-  "updated": "2026-11-20T19:45:07+09:00"
+  "updated": "2026-11-20T19:45:07+09:00",
+  "usage": {
+    "context_used_tokens": 115700,
+    "context_max_tokens": 1000000,
+    "output_tokens": 2852,
+    "cost_usd": 0.342012,
+    "measured_at": "2026-11-21T12:50:00+09:00"
+  }
 }

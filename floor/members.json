@@ -1,14 +1,14 @@
 {
   "members": [
-    { "id": "mii", "name": "みー", "role": "社長代理", "seat": "center" },
-    { "id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev" },
-    { "id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops" },
-    { "id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design" },
-    { "id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp" },
-    { "id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen" },
-    { "id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch" },
-    { "id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho" },
-    { "id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun" }
+    {"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"},
+    {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"},
+    {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"},
+    {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"},
+    {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"},
+    {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"},
+    {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"},
+    {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"},
+    {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}
   ],
-  "chairman": { "name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false }
+  "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}
 }

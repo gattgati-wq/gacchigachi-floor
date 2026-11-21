@@ -100,8 +100,9 @@ button{font:inherit;color:inherit}
 .rpc.none{background:#fff;border:3px dashed #d62828}
 .rpc.none b{color:#d62828}
 .cnt{display:inline-block;border:2px solid #111;border-radius:10px;background:#fff;padding:0 8px;font-size:12px;font-weight:800;margin-left:6px}
+.cnt:empty{display:none}
 .cnt.bad{background:#d62828;color:#fff}
-.pimg{position:relative;width:100%;max-width:210px;aspect-ratio:1/1;margin:2px auto 0}
+.pimg{position:relative;width:100%;max-width:190px;aspect-ratio:1/1;margin:2px auto 0}
 .pimg>img,.pimg>.ov{position:absolute;inset:0;width:100%;height:100%}
 .pimg img{object-fit:contain}
 .pimg .ov{pointer-events:none}
@@ -176,12 +177,12 @@ ul.jobs li b{margin-right:6px}
 
 <dialog id="dlg"></dialog>
 
-<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T07:02:16+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho"}, {"id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "wait_heavy", "task": "青色申告：2026年売上入力", "say": "修正版の小遣い帳待ち。届いたら即入力するで", "waiting_for": "", "updated": "2026-11-20T21:07:26+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "idle", "task": "", "say": "v3依頼は取り消し。次の指示待ち", "waiting_for": "", "updated": "2026-11-21T05:25:20+09:00"}]}</script>
+<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T10:10:12+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho"}, {"id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "wait_heavy", "task": "青色申告：2026年売上入力", "say": "修正版の小遣い帳待ち。届いたら即入力するで", "waiting_for": "", "updated": "2026-11-20T21:07:26+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "idle", "task": "", "say": "v3依頼は取り消し。次の指示待ち", "waiting_for": "", "updated": "2026-11-21T05:25:20+09:00"}]}</script>
 <script>
 "use strict";
 /* ===== 設定 ===== */
 const COLORS = {
-  mii:"#ff9ec4", koukichi:"#7cc4ff", oyakata:"#ffb55a", sekkeikakari:"#b9a2ff", hptantou:"#86e08f",
+  mii:"#ff9ec4", koukichi:"#7cc4ff", oyakata:"#e53935", sekkeikakari:"#b9a2ff", hptantou:"#86e08f",
   ganechigamen:"#ffe36b", chii:"#5fd9d0", bucho:"#ff8a80", ganechikun:"#c8a27a"
 };
 const GUEST_COLORS = ["#d9d9d9","#e8c8ff","#c8f0ff","#ffd9c8"];
@@ -261,20 +262,30 @@ function extraOf(state,stale){
     : (state==="wait_light"||state==="wait_heavy"||state==="wait_member") ? `<g class="a-blink"><circle cx="86" cy="22" r="10" fill="#fff" stroke="#222" stroke-width="2"/><text x="86" y="27" font-size="14" font-weight="800" text-anchor="middle" fill="#222">?</text></g>`
     : state==="done" ? `<g><circle cx="88" cy="22" r="10" fill="#5ac26a" stroke="#222" stroke-width="2"/><path d="M83 22l4 4 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>` : "";
 }
-/* ガネチ／ガチコ素材：floor/v3/img/<メンバーID>.png（全身・メンバー色の色違い・透明背景）。
-   置かれた子だけ画像に切り替わる（無ければ従来のイラスト） */
+/* ガネチ／ガチコ素材：floor/v3/img/<メンバーID>-<ポーズ>.webp（normal/work/panic/yawn/sleep）
+   <ID>-normal.webp が置かれた子だけ画像に切り替わる（無ければ従来のイラスト） */
 const ASSET_OK = new Set();
+const YAWN_MS = 24*3600*1000; /* 待機がこれ以上続いたら「あくび」 */
 function probeAssets(){
   const ids=people().map(p=>p.id);
-  Promise.all(ids.map(id=>new Promise(res=>{const i=new Image();i.onload=()=>{ASSET_OK.add(id);res()};i.onerror=res;i.src=`img/${id}.png`})))
+  Promise.all(ids.map(id=>new Promise(res=>{const i=new Image();i.onload=()=>{ASSET_OK.add(id);res()};i.onerror=res;i.src=`img/${id}-normal.webp`})))
     .then(()=>{if(ASSET_OK.size) draw()});
 }
+/* 状態→ポーズ：寝てる＝止まってる／状態ファイルなし、仕事中＝作業中、焦ってる＝許可待ち・人待ち、あくび＝待機が長い、通常＝待機・完了 */
+function poseOf(s){
+  if(!s||!s.updated) return "sleep";
+  if(stallLevel(s)) return "sleep";
+  if(s.status==="working") return "work";
+  if(s.status==="wait_light"||s.status==="wait_heavy"||s.status==="wait_member") return "panic";
+  if(s.status==="idle"&&ageMs(s)>=YAWN_MS) return "yawn";
+  return "normal";
+}
+function hasArt(id){return ASSET_OK.has(id)}
 function personHTML(id,color,state,stale,opts={}){
-  if(!ASSET_OK.has(id)) return personSVG(id,color,state,stale,opts);
-  const working=state==="working"&&!stale;
-  return `<div class="pimg ${working?"":"a-bob"}" role="img" aria-label="${esc(opts.label||"")}">
-    <img src="img/${esc(id)}.png" alt="">
-    <svg class="ov" viewBox="0 0 120 92">${extraOf(state,stale)}</svg></div>`;
+  if(!hasArt(id)) return personSVG(id,color,state,stale,opts);
+  return `<div class="pimg" role="img" aria-label="${esc(opts.label||"")}">
+    <img src="img/${esc(id)}-${opts.pose||"normal"}.webp" alt="">
+    ${state==="done"&&opts.pose!=="sleep"?`<svg class="ov" viewBox="0 0 120 92">${extraOf("done",false)}</svg>`:""}</div>`;
 }
 function personSVG(id,color,state,stale,opts={}){
   const L = opts.look || LOOK[id] || {h:"short",c:"#333"};
@@ -316,14 +327,14 @@ function renderBoard(){
   }).join("");
 }
 function memberCell(p){
-  const s=p.st, c=colOf(p.id), lv=stallLevel(s), stale=isStale(s)&&!lv;
+  const s=p.st, c=colOf(p.id), lv=stallLevel(s), art=hasArt(p.id), stale=isStale(s)&&!lv&&!art;
   const state=s?s.status:"idle";
   const bubble = s ? `${esc(s.say||"")}<small>${fmtTime(s.updated)}</small>` : "状態ファイルなし<small>確認待ち</small>";
   const memo = loadMemo(p.id) ? `<span class="memo-dot">✎</span>`:"";
   return `<button class="cell ${stale?"stale":""} ${lv?"stall":""}" data-id="${esc(p.id)}" style="--c:${c};--tint:${tint(c)}">
     <span class="chip">${esc(s?STATUS_LABEL[s.status]||s.status:"—")}</span>
     <span class="plate">${esc(p.name)}${p.guest?`<span class="guest-tag">ゲスト</span>`:""}<i>${esc(p.role||"")}</i></span>
-    ${personHTML(p.id,c,state,stale||lv>0,{label:p.name})}
+    ${personHTML(p.id,c,state,stale||lv>0,{label:p.name,pose:poseOf(s)})}
     ${lv?`<span class="ribbon l${lv}">⚠ ${ageText(ageMs(s))} 止まってる</span>`:""}
     <div class="say">${bubble}</div>${memo}</button>`;
 }

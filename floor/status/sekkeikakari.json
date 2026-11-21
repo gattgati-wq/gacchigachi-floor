@@ -1,9 +1,16 @@
 {
   "id": "sekkeikakari",
   "name": "フロア設計係",
-  "status": "idle",
-  "task": "",
-  "say": "v3依頼は取り消し。次の指示待ち",
+  "status": "done",
+  "task": "フロアv3 容量表示（自己申告）",
+  "say": "容量表示を実装。使用量は自分で書いたよ",
   "waiting_for": "",
-  "updated": "2026-11-21T05:25:20+09:00"
+  "updated": "2026-11-21T12:43:09+09:00",
+  "usage": {
+    "context_used": 343618,
+    "context_max": 1000000,
+    "output_tokens": 135820,
+    "cost_usd": 5.86,
+    "measured": "2026-11-21T12:43:09+09:00"
+  }
 }

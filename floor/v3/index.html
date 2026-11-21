@@ -107,7 +107,15 @@ textarea{width:100%;min-height:64px;border:2px solid #111;border-radius:4px;padd
 .stage{position:absolute;left:50%;top:50%;width:var(--cs);height:var(--cs);transform:translate(-50%,-46%)}
 .char{position:absolute;left:0;bottom:5%;width:100%;height:93%;object-fit:contain;object-position:center bottom}
 .stage>svg.person{position:absolute;inset:0;width:100%;height:100%;max-width:none;margin:0}
-.stage>.pb{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px}
+.stage>.under{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:3px;white-space:nowrap}
+.cap{display:flex;align-items:center;gap:4px;font-size:clamp(9px,.85vw,11px);font-weight:700;color:#333}
+.cap .bar{width:clamp(54px,6vw,84px);height:9px;border:2px solid #111;border-radius:5px;background:#fff;overflow:hidden}
+.cap .bar i{display:block;height:100%;background:var(--c)}
+.cap.hot .bar i{background:#d62828}.cap.warm .bar i{background:#ff9800}.cap.old .bar i{background:#bbb}
+.usage{display:grid;grid-template-columns:7em 1fr;gap:4px 8px;font-size:13px;margin-top:2px}
+.usage .bar{height:12px;border:2px solid #111;border-radius:6px;background:#fff;overflow:hidden;margin-top:3px}
+.usage .bar i{display:block;height:100%;background:var(--c)}
+.nomeasure{font-size:12px;color:var(--muted)}
 .deskf{z-index:2;position:absolute;left:4%;right:4%;bottom:3%;height:19%;border:3px solid #111;border-radius:10px 10px 4px 4px;
   background:linear-gradient(#e0b987 0 42%,#b88a58 42% 100%);display:flex;justify-content:center;align-items:flex-start;gap:6px;padding-top:2.5%}
 .desk.work .deskf{height:13%}
@@ -236,7 +244,7 @@ ul.jobs li b{margin-right:6px}
 </div>
 <dialog id="dlg"></dialog>
 
-<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T12:22:38+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "idle", "task": "", "say": "v3依頼は取り消し。次の指示待ち", "waiting_for": "", "updated": "2026-11-21T05:25:20+09:00"}]}</script>
+<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T12:43:09+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアv3 容量表示（自己申告）", "say": "容量表示を実装。使用量は自分で書いたよ", "waiting_for": "", "updated": "2026-11-21T12:43:09+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
 <script>
 "use strict";
 /* ===== 設定 ===== */
@@ -285,6 +293,9 @@ function stallLevel(s){
   const a=ageMs(s); return a>=STALL_L2?2:a>=STALL_L1?1:0;
 }
 function ageText(ms){const h=Math.floor(ms/3600000); return h<1?"1時間以内":h<24?`${h}時間`:`${Math.floor(h/24)}日`}
+/* 使用量：各メンバーが自分の状態ファイルに書いた usage（自己申告）。無ければ「未計測」。推測では出さない */
+function usageOf(s){const u=s&&s.usage; return (u&&typeof u.context_used==="number"&&typeof u.context_max==="number"&&u.context_max>0)?u:null}
+const fmtNum=n=>n==null?"—":n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,"")+"億":n>=1e4?(n/1e4).toFixed(1).replace(/\.0$/,"")+"万":String(Math.round(n));
 function people(){
   const out = DATA.members.members.map(m=>({...m, st:stOf(m.id), guest:false}));
   const known = new Set(out.map(m=>m.id));
@@ -353,6 +364,16 @@ function renderBoard(){
     }</div></div>`;
   }).join("");
 }
+function underHTML(p,s,lv){
+  const u=usageOf(s); if(!u&&!lv) return "";
+  let cap="";
+  if(u){
+    const pct=Math.min(100,Math.round(u.context_used/u.context_max*100));
+    const old=u.measured&&(Date.now()-Date.parse(u.measured))>24*3600*1000;
+    cap=`<div class="cap ${old?"old":pct>=80?"hot":pct>=60?"warm":""}" title="容量（コンテキスト使用量）${fmtNum(u.context_used)} / ${fmtNum(u.context_max)}　自己申告 ${u.measured?fmtTime(u.measured):""}"><div class="bar"><i style="width:${pct}%"></i></div>${pct}%</div>`;
+  }
+  return `<div class="under">${cap}${lv?`<div class="pb l${lv}">${ageText(ageMs(s))}止まり</div>`:""}</div>`;
+}
 function deskHTML(p){
   const s=p.st, c=colOf(p.id), lv=stallLevel(s), pose=poseOf(s), art=ART.has(p.id);
   const stage = art
@@ -364,7 +385,7 @@ function deskHTML(p){
   return `<div class="desk p-${pose} ${pose==="work"?"work":""} ${art?"":"nodesk"}" data-desk="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(label(p))}" style="--c:${c};--dl:${dl}">
     <div class="stage">${stage}
       ${art&&pose==="sleep"?`<div class="zz"><i>z</i><i>Z</i></div>`:""}
-      <div class="deskf"><div class="plate ${lv?"warn":""}">${lv?"⚠ ":""}${esc(label(p))}${p.guest?"（ゲスト）":""}</div></div>${lv?`<div class="pb l${lv}">${ageText(ageMs(s))}止まり</div>`:""}
+      <div class="deskf"><div class="plate ${lv?"warn":""}">${lv?"⚠ ":""}${esc(label(p))}${p.guest?"（ゲスト）":""}</div></div>${underHTML(p,s,lv)}
     </div>
     <div class="bubble ${OPEN===p.id?"open":""}">${say}${w?`<br><span class="wt">${esc(w)}</span>`:""}<br><button data-detail="${esc(p.id)}">詳細</button></div>
   </div>`;
@@ -480,6 +501,17 @@ const dlg=document.getElementById("dlg");
 const memoKey=id=>"floor-v3-memo:"+id;
 function loadMemo(id){try{return JSON.parse(localStorage.getItem(memoKey(id))||"null")}catch(e){return null}}
 function saveMemo(id,text){try{ if(text.trim()) localStorage.setItem(memoKey(id),JSON.stringify({text,at:new Date().toISOString()})); else localStorage.removeItem(memoKey(id)); return true}catch(e){return false}}
+function usageBlock(s){
+  const u=usageOf(s);
+  if(!u) return `<h4>使用量</h4><div class="nomeasure">未計測（自己申告がありません）</div>`;
+  const pct=Math.min(100,Math.round(u.context_used/u.context_max*100));
+  return `<h4>使用量（自己申告）</h4><div class="usage">
+    <span>容量</span><span>${fmtNum(u.context_used)} / ${fmtNum(u.context_max)}（${pct}%）<div class="bar"><i style="width:${pct}%"></i></div></span>
+    ${u.output_tokens!=null?`<span>出力トークン</span><span>${fmtNum(u.output_tokens)}</span>`:""}
+    ${u.cost_usd!=null?`<span>概算コスト</span><span>$${Number(u.cost_usd).toFixed(2)}</span>`:""}
+    <span>測った時刻</span><span>${u.measured?fmtTime(u.measured):"—"}</span></div>
+    <div class="nomeasure">自分の状態ファイルに自分で書いた値。コストは公開単価での概算。</div>`;
+}
 function openDetail(id){
   const p=people().find(x=>x.id===id); if(!p) return;
   const s=p.st, c=colOf(id), memo=loadMemo(id), w=s?waitText(s):"";
@@ -493,6 +525,7 @@ function openDetail(id){
     <dt>何待ちか</dt><dd>${w?`<span class="wait">${esc(w)}</span>`:"待ちなし"}</dd>
     <dt>最終更新</dt><dd>${s?fmtTime(s.updated):"—"}${s&&stallLevel(s)?` <span class="badge l${stallLevel(s)}">⚠ ${ageText(ageMs(s))}止まってる</span>`:""}</dd>
    </dl>
+   ${usageBlock(s)}
    ${id==="mii"?`<h4>裏方の定期ジョブ（${MII_JOBS.length}件）</h4><ul class="jobs">${MII_JOBS.map(j=>`<li><b>${esc(j[0])}</b>${esc(j[1])}</li>`).join("")}</ul>`:""}
    <h4>書き込み欄</h4>
    <textarea id="memo" placeholder="${esc(label(p))}へのメモ">${esc(memo?memo.text:"")}</textarea>

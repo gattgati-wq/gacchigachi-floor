@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="only light">
+<title>ガっチガチ研究所 フロア</title>
+<style>
+:root{
+  color-scheme: only light;
+  --bg:#fbf6ea; --ink:#1b1b1b; --line:#111; --paper:#fff; --muted:#6b6b6b;
+  --thick:4px; --gap:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,system-ui,sans-serif}
+body{padding:var(--gap);min-height:100vh}
+button{font:inherit;color:inherit}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:var(--gap)}
+.top{display:grid;grid-template-columns:5fr 4fr 3fr;gap:var(--gap);align-items:stretch}
+.sec{background:var(--paper);border:var(--thick) solid var(--line);border-radius:6px;padding:8px;min-width:0}
+.sec h2{margin:0 0 6px;font-size:13px;letter-spacing:.05em}
+
+/* ---- 状態ボード ---- */
+.board{display:grid;grid-template-columns:repeat(4,1fr);border:var(--thick) solid var(--line);background:#fff;height:calc(100% - 22px)}
+.col{border-left:var(--thick) solid var(--line);display:flex;flex-direction:column;min-width:0}
+.col:first-child{border-left:0}
+.col h3{margin:0;padding:4px 2px;text-align:center;font-size:12px;border-bottom:var(--thick) solid var(--line);background:#f4f4f4}
+.col h3 small{font-weight:400;color:var(--muted)}
+.cards{padding:6px 4px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card{display:block;width:100%;text-align:left;border:2px solid var(--line);border-radius:3px;padding:4px 5px;cursor:pointer;
+  box-shadow:1px 2px 0 rgba(0,0,0,.35);line-height:1.25}
+.card b{display:block;font-size:12px}
+.card span{display:block;font-size:10.5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all}
+.card:active,.cell:active{transform:translateY(1px)}
+.card.stale{filter:grayscale(.9) opacity(.8)}
+
+/* ---- カレンダー ---- */
+.cal h2 b{font-size:15px}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font-size:13px}
+.calgrid .dow{font-size:11px;font-weight:700;padding:2px 0}
+.calgrid .d{padding:6px 0;border-radius:4px;color:#222}
+.calgrid .o{color:#bbb}
+.calgrid .sat{color:#1c63c9}.calgrid .sun{color:#d33}
+.calgrid .o.sat,.calgrid .o.sun{opacity:.45}
+.calgrid .today{background:#d62828;color:#fff;font-weight:800;font-size:15px;outline:3px solid #111;outline-offset:-1px}
+.calbig{font-size:14px;font-weight:700;margin-bottom:6px}
+
+/* ---- 時計 ---- */
+.clk{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.clk svg{width:100%;max-width:230px;height:auto}
+.digi{font-variant-numeric:tabular-nums;font-size:20px;font-weight:800;margin-top:2px}
+.dline{font-size:12px;color:var(--muted)}
+
+/* ---- フロア（マス目） ---- */
+.row{display:flex;flex-wrap:wrap;gap:var(--gap)}
+.row>*{flex:1 1 220px}
+.small{flex:1 1 180px}
+.cell{position:relative;border:var(--thick) solid var(--line);border-radius:6px;padding:6px 8px 8px;cursor:pointer;
+  text-align:left;display:block;background:var(--tint,#eee)}
+.cell.plain{cursor:default}
+.plate{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:3px;background:var(--c);padding:1px 7px;font-weight:800;font-size:13px}
+.plate i{font-style:normal;font-weight:500;font-size:11px}
+.chip{float:right;border:2px solid var(--line);border-radius:10px;background:#fff;padding:0 7px;font-size:11px;font-weight:700}
+.cell svg.person{display:block;width:100%;max-width:210px;height:auto;margin:2px auto 0}
+.say{background:#fff;border:2px solid var(--line);border-radius:8px;padding:4px 7px;font-size:12px;line-height:1.35;margin-top:4px}
+.say small{display:block;color:var(--muted);font-size:10px}
+.cell.stale{filter:grayscale(.85);}
+.cell.stale .plate{background:#cfcfcf}
+.memo-dot{position:absolute;right:8px;bottom:6px;font-size:11px}
+.guest-tag{font-size:10px;border:1px solid #111;background:#fff;border-radius:8px;padding:0 5px;margin-left:4px}
+
+.mini{display:flex;align-items:center;gap:10px;background:var(--tint,#eee);border:var(--thick) solid var(--line);border-radius:6px;padding:6px 10px;min-height:76px}
+.mini svg{flex:0 0 92px;width:92px;height:auto}
+.mini .t b{display:block;font-size:14px}.mini .t span{font-size:12px;color:#333}
+.mini.vip{border-style:double}
+.redtag{display:inline-block;background:#d62828;color:#fff;border:2px solid #111;border-radius:3px;font-size:11px;font-weight:800;padding:0 5px;margin-left:4px}
+
+.alert{display:none;background:#d62828;color:#fff;border:var(--thick) solid var(--line);border-radius:6px;padding:6px 10px;font-size:14px;font-weight:800}
+.alert.on{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.alert button{border:2px solid #111;background:#fff;color:#111;border-radius:4px;padding:2px 8px;font-weight:700;cursor:pointer}
+.stall{outline:4px solid #d62828;outline-offset:-1px}
+.card.stall{border-color:#d62828;box-shadow:0 0 0 2px #fff,0 0 0 4px #d62828}
+.badge{display:inline-block;background:#d62828;color:#fff;border:1.5px solid #111;border-radius:3px;font-size:10px;font-weight:800;padding:0 4px;margin-top:2px}
+.badge.l1{background:#ff9800;color:#111}
+.cell.stall{border-color:#d62828}
+.ribbon{display:block;background:#d62828;color:#fff;font-weight:800;font-size:12px;text-align:center;border:2px solid #111;border-radius:3px;margin:4px 0 0;padding:1px 4px}
+.ribbon.l1{background:#ff9800;color:#111}
+.mega{background:#fff8d6}
+.mega .mg{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2fr);gap:10px}
+.mega h2 b{font-size:15px}
+.mega .write{border:2px solid #111;border-radius:6px;background:#fff;padding:6px}
+.mega select{border:2px solid #111;border-radius:4px;padding:2px 4px;font:inherit;font-size:13px;background:#fff;color:#111}
+.msg{border:3px solid #111;border-radius:6px;background:#fff;padding:6px 8px;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.msg small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}
+.rp{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px;margin-top:6px}
+.rpc{display:block;text-align:left;border:2px solid #111;border-radius:4px;padding:3px 6px;font-size:12px;background:var(--c);cursor:pointer;min-width:0;word-break:break-word}
+.rpc b{display:block;font-size:12px}
+.rpc small{display:block;font-size:10px;color:#333}
+.rpc.none{background:#fff;border:3px dashed #d62828}
+.rpc.none b{color:#d62828}
+.cnt{display:inline-block;border:2px solid #111;border-radius:10px;background:#fff;padding:0 8px;font-size:12px;font-weight:800;margin-left:6px}
+.cnt:empty{display:none}
+.cnt.bad{background:#d62828;color:#fff}
+.pimg{position:relative;width:100%;max-width:190px;aspect-ratio:1/1;margin:2px auto 0}
+.pimg>img,.pimg>.ov{position:absolute;inset:0;width:100%;height:100%}
+.pimg img{object-fit:contain}
+.pimg .ov{pointer-events:none}
+.foot{font-size:11px;color:var(--muted);text-align:right}
+
+/* ---- 詳細ウインドウ ---- */
+dialog{border:var(--thick) solid var(--line);border-radius:8px;padding:0;width:min(520px,94vw);max-height:92vh;background:#fff;color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dh{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:var(--thick) solid var(--line);background:var(--c)}
+.dh b{font-size:17px}
+.x{border:2px solid #111;background:#fff;border-radius:4px;font-size:16px;padding:0 10px;cursor:pointer}
+.db{padding:10px 12px;overflow:auto;max-height:calc(92vh - 60px)}
+dl{margin:0;display:grid;grid-template-columns:7em 1fr;gap:6px 8px;font-size:14px}
+dt{font-weight:700;color:#444}dd{margin:0;word-break:break-word}
+.wait{background:#fff3c4;border:2px solid #111;border-radius:4px;padding:2px 6px;display:inline-block}
+.db h4{margin:12px 0 4px;font-size:13px}
+textarea{width:100%;min-height:80px;border:2px solid #111;border-radius:4px;padding:6px;font:inherit;font-size:14px;background:#fff;color:var(--ink);resize:vertical}
+.btns{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.btn{border:2px solid #111;background:var(--c,#ddd);border-radius:4px;padding:4px 12px;font-weight:700;cursor:pointer}
+.btn.w{background:#fff}
+.hint{font-size:11px;color:var(--muted)}
+ul.jobs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+ul.jobs li{border:2px solid #111;border-radius:4px;padding:3px 7px;font-size:13px;background:#fafafa}
+ul.jobs li b{margin-right:6px}
+
+/* ---- 動き（うるさくない程度） ---- */
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+@keyframes type{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes steam{0%{opacity:0;transform:translateY(2px)}50%{opacity:.9}100%{opacity:0;transform:translateY(-6px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes zz{0%,100%{opacity:.2}50%{opacity:1}}
+.a-bob{animation:bob 3.2s ease-in-out infinite}
+.a-typeL{animation:type .5s ease-in-out infinite}
+.a-typeR{animation:type .5s ease-in-out infinite .25s}
+.a-steam{animation:steam 2.4s ease-in-out infinite}
+.a-blink{animation:blink 1.2s ease-in-out infinite}
+.a-zz{animation:zz 2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+
+/* ---- 画面幅 ---- */
+@media (max-width:980px){
+  .top{grid-template-columns:1fr 1fr}
+  .sec.boardsec{grid-column:1 / -1}
+}
+@media (max-width:760px){.mega .mg{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){
+  body{padding:6px}
+  .top{grid-template-columns:1fr}
+  .row>*{flex-basis:150px}
+  .row>.small{flex-basis:100%}
+  .mini svg{flex-basis:72px;width:72px}
+  .col h3{font-size:11px}
+  .card b{font-size:11px}.card span{font-size:10px}
+  .cards{padding:5px 3px}
+  dl{grid-template-columns:6em 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="alert" id="alert"></div>
+  <div class="top">
+    <section class="sec boardsec"><h2>状態ボード</h2><div class="board" id="board"></div></section>
+    <section class="sec cal" id="cal"></section>
+    <section class="sec clk" id="clk"></section>
+  </div>
+  <section class="sec mega" id="mega"></section>
+  <div class="row" id="rowSmall"></div>
+  <div class="row" id="rowMembers"></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<dialog id="dlg"></dialog>
+
+<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T10:10:12+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho"}, {"id": "ganechikun", "name": "ガネチくん", "role": "青色申告", "seat": "ganechikun"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "wait_heavy", "task": "青色申告：2026年売上入力", "say": "修正版の小遣い帳待ち。届いたら即入力するで", "waiting_for": "", "updated": "2026-11-20T21:07:26+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00"}, {"id": "koukichi", "name": "こー吉", "status": "idle", "task": "", "say": "待機中。予約システム専任", "waiting_for": "", "updated": "2026-11-21T05:24:18+09:00"}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "idle", "task": "", "say": "v3依頼は取り消し。次の指示待ち", "waiting_for": "", "updated": "2026-11-21T05:25:20+09:00"}]}</script>
+<script>
+"use strict";
+/* ===== 設定 ===== */
+const COLORS = {
+  mii:"#ff9ec4", koukichi:"#7cc4ff", oyakata:"#e53935", sekkeikakari:"#b9a2ff", hptantou:"#86e08f",
+  ganechigamen:"#ffe36b", chii:"#5fd9d0", bucho:"#ff8a80", ganechikun:"#c8a27a"
+};
+const GUEST_COLORS = ["#d9d9d9","#e8c8ff","#c8f0ff","#ffd9c8"];
+const LOOK = { /* 髪型 long/short/bun/bald・髪色・メガネ */
+  mii:{h:"long",c:"#5a3a2a"}, koukichi:{h:"short",c:"#222"}, oyakata:{h:"short",c:"#777"},
+  sekkeikakari:{h:"bun",c:"#3b2a20"}, hptantou:{h:"long",c:"#2a2a2a"}, ganechigamen:{h:"short",c:"#6b4a2a"},
+  chii:{h:"long",c:"#b7791f"}, bucho:{h:"bald",c:"#999",g:true}, ganechikun:{h:"short",c:"#3a2f2a",g:true}
+};
+const PARTNERS = [
+  {name:"キキ", ai:"ChatGPT", job:"絵・素材", color:"#ffcf9e", hair:"#4a2f20", style:"long"},
+  {name:"えみ", ai:"Gemini",  job:"動画",     color:"#b8e0ff", hair:"#2a2a2a", style:"bun"}
+];
+const MII_JOBS = [
+  ["朝7:00","公式LINE巡回"],
+  ["毎時（7〜22時）","メール警告見張り"],
+  ["毎朝7:48","配達・引落メール確認"],
+  ["毎日13:00","予約リマインド拾い"],
+  ["毎晩21:48","みちゃんねる。・Mehoo!更新"],
+  ["土曜6:00","マンジャロ注射リマインド"],
+  ["夜23〜5時","旧ガネチ見張り"]
+];
+const COLS = [
+  {k:"idle",label:"待機中"},{k:"working",label:"作業中"},{k:"wait",label:"承認待ち"},{k:"done",label:"完了"}
+];
+const STATUS_LABEL = {working:"作業中",wait_light:"許可待ち(軽)",wait_heavy:"許可待ち(重)",wait_member:"人待ち",idle:"待機",done:"完了"};
+const STALE_MS = 24*3600*1000;
+
+/* ===== データ ===== */
+let DATA = JSON.parse(document.getElementById("floor-data").textContent);
+let source = "埋め込み";
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const colOf = id => COLORS[id] || GUEST_COLORS[[...id].reduce((a,c)=>a+c.charCodeAt(0),0)%GUEST_COLORS.length];
+const tint = c => `color-mix(in srgb, ${c} 38%, #fff)`;
+const stOf = id => DATA.status.find(s=>s.id===id);
+const colKey = s => s.status==="working"?"working":s.status==="done"?"done":s.status==="idle"?"idle":"wait";
+const ageMs = s => Date.now()-Date.parse(s.updated);
+const isStale = s => !s || !s.updated || ageMs(s)>STALE_MS;
+
+const STALL_L1=6*3600*1000, STALL_L2=24*3600*1000; /* 注意=6時間／停止=24時間（知らんけど、要調整） */
+function stallLevel(s){
+  if(!s||!s.updated) return 0;
+  if(!["working","wait_light","wait_heavy","wait_member"].includes(s.status)) return 0;
+  const a=ageMs(s); return a>=STALL_L2?2:a>=STALL_L1?1:0;
+}
+function ageText(ms){const h=Math.floor(ms/3600000); return h<1?"1時間以内":h<24?`${h}時間`:`${Math.floor(h/24)}日`}
+function people(){
+  const out = DATA.members.members.map(m=>({...m, st:stOf(m.id), guest:false}));
+  const known = new Set(out.map(m=>m.id));
+  DATA.status.filter(s=>!known.has(s.id)).forEach(s=>out.push({id:s.id,name:s.name||s.id,role:"ゲスト",st:s,guest:true}));
+  return out;
+}
+const nameOf = id => (people().find(p=>p.id===id)||{}).name || id;
+
+function fmtTime(iso){
+  if(!iso) return "—";
+  const d=new Date(iso), p=jst(d);
+  const ms=Date.now()-d, h=Math.floor(ms/3600000), dd=Math.floor(h/24);
+  const rel = ms<0?"" : h<1?"（1時間以内）" : h<24?`（${h}時間前）` : `（${dd}日前）`;
+  return `${p.mo}/${p.d} ${String(p.h).padStart(2,"0")}:${String(p.mi).padStart(2,"0")}${rel}`;
+}
+function jst(d=new Date()){
+  const f=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",hourCycle:"h23",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric",weekday:"short"});
+  const o={}; f.formatToParts(d).forEach(p=>o[p.type]=p.value);
+  return {y:+o.year,mo:+o.month,d:+o.day,h:+o.hour,mi:+o.minute,s:+o.second,w:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(o.weekday)};
+}
+function waitText(s){
+  if(s.status==="wait_light") return `みーの許可待ち（軽い）：${s.task||"内容未記入"}`;
+  if(s.status==="wait_heavy") return `会長の許可待ち（重い）：${s.task||"内容未記入"}`;
+  if(s.status==="wait_member") return `${nameOf(s.waiting_for)}待ち`;
+  return "";
+}
+
+/* ===== 人物イラスト ===== */
+function extraOf(state,stale){
+  return stale ? `<g class="a-zz" font-size="11" font-weight="800" fill="#444"><text x="82" y="22">z</text><text x="90" y="13" font-size="9">z</text></g>`
+    : state==="idle" ? `<g stroke="#999" stroke-width="1.5" fill="none" class="a-steam"><path d="M96 54 q-3-4 0-7 q3-3 0-6"/></g><path d="M91 56h12v8a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z" fill="#fff" stroke="#222" stroke-width="2"/>`
+    : (state==="wait_light"||state==="wait_heavy"||state==="wait_member") ? `<g class="a-blink"><circle cx="86" cy="22" r="10" fill="#fff" stroke="#222" stroke-width="2"/><text x="86" y="27" font-size="14" font-weight="800" text-anchor="middle" fill="#222">?</text></g>`
+    : state==="done" ? `<g><circle cx="88" cy="22" r="10" fill="#5ac26a" stroke="#222" stroke-width="2"/><path d="M83 22l4 4 7-8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>` : "";
+}
+/* ガネチ／ガチコ素材：floor/v3/img/<メンバーID>-<ポーズ>.webp（normal/work/panic/yawn/sleep）
+   <ID>-normal.webp が置かれた子だけ画像に切り替わる（無ければ従来のイラスト） */
+const ASSET_OK = new Set();
+const YAWN_MS = 24*3600*1000; /* 待機がこれ以上続いたら「あくび」 */
+function probeAssets(){
+  const ids=people().map(p=>p.id);
+  Promise.all(ids.map(id=>new Promise(res=>{const i=new Image();i.onload=()=>{ASSET_OK.add(id);res()};i.onerror=res;i.src=`img/${id}-normal.webp`})))
+    .then(()=>{if(ASSET_OK.size) draw()});
+}
+/* 状態→ポーズ：寝てる＝止まってる／状態ファイルなし、仕事中＝作業中、焦ってる＝許可待ち・人待ち、あくび＝待機が長い、通常＝待機・完了 */
+function poseOf(s){
+  if(!s||!s.updated) return "sleep";
+  if(stallLevel(s)) return "sleep";
+  if(s.status==="working") return "work";
+  if(s.status==="wait_light"||s.status==="wait_heavy"||s.status==="wait_member") return "panic";
+  if(s.status==="idle"&&ageMs(s)>=YAWN_MS) return "yawn";
+  return "normal";
+}
+function hasArt(id){return ASSET_OK.has(id)}
+function personHTML(id,color,state,stale,opts={}){
+  if(!hasArt(id)) return personSVG(id,color,state,stale,opts);
+  return `<div class="pimg" role="img" aria-label="${esc(opts.label||"")}">
+    <img src="img/${esc(id)}-${opts.pose||"normal"}.webp" alt="">
+    ${state==="done"&&opts.pose!=="sleep"?`<svg class="ov" viewBox="0 0 120 92">${extraOf("done",false)}</svg>`:""}</div>`;
+}
+function personSVG(id,color,state,stale,opts={}){
+  const L = opts.look || LOOK[id] || {h:"short",c:"#333"};
+  const hair = {
+    long:`<path d="M44 30 q0-20 16-20 q16 0 16 20 v22 h-6 v-20 h-20 v20 h-6z" fill="${L.c}"/>`,
+    short:`<path d="M45 30 q0-19 15-19 q15 0 15 19 q-7-9-15-9 q-8 0-15 9z" fill="${L.c}"/>`,
+    bun:`<circle cx="60" cy="9" r="6" fill="${L.c}"/><path d="M45 30 q0-19 15-19 q15 0 15 19 q-7-9-15-9 q-8 0-15 9z" fill="${L.c}"/>`,
+    bald:`<path d="M46 26 q2-11 14-11 q12 0 14 11 q-14-6-28 0z" fill="${L.c}" opacity=".6"/>`
+  }[L.h];
+  const glass = L.g?`<g fill="none" stroke="#222" stroke-width="1.5"><circle cx="54" cy="33" r="4.5"/><circle cx="66" cy="33" r="4.5"/><path d="M58.5 33h3"/></g>`:"";
+  const working = state==="working"&&!stale;
+  const extra = extraOf(state,stale);
+  return `<svg class="person" viewBox="0 0 120 92" role="img" aria-label="${esc(opts.label||"")}">
+    <g class="${working?"":"a-bob"}">
+      <rect x="36" y="44" width="48" height="28" rx="13" fill="${color}" stroke="#222" stroke-width="2"/>
+      <circle cx="60" cy="32" r="14" fill="#ffe0c2" stroke="#222" stroke-width="2"/>
+      ${hair}
+      <circle cx="55" cy="33" r="1.7" fill="#222"/><circle cx="65" cy="33" r="1.7" fill="#222"/>
+      <path d="M56 38 q4 3 8 0" stroke="#222" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      ${glass}
+    </g>
+    <rect x="42" y="52" width="36" height="14" rx="2" fill="#e9e9e9" stroke="#222" stroke-width="2"/>
+    <ellipse class="${working?"a-typeL":""}" cx="44" cy="66" rx="6" ry="4" fill="${color}" stroke="#222" stroke-width="2"/>
+    <ellipse class="${working?"a-typeR":""}" cx="76" cy="66" rx="6" ry="4" fill="${color}" stroke="#222" stroke-width="2"/>
+    <rect x="6" y="66" width="108" height="8" rx="2" fill="#a8855c" stroke="#222" stroke-width="2"/>
+    <rect x="12" y="74" width="96" height="16" fill="#c9a77c" stroke="#222" stroke-width="2"/>
+    ${extra}
+  </svg>`;
+}
+
+/* ===== 描画 ===== */
+function renderBoard(){
+  const ps = people();
+  document.getElementById("board").innerHTML = COLS.map(c=>{
+    const items = ps.filter(p=>p.st && colKey(p.st)===c.k).sort((a,b)=>stallLevel(b.st)-stallLevel(a.st)||ageMs(b.st)-ageMs(a.st));
+    return `<div class="col"><h3>${c.label} <small>${items.length}</small></h3><div class="cards">${
+      items.map(p=>`<button class="card ${stallLevel(p.st)?"stall":isStale(p.st)?"stale":""}" data-id="${esc(p.id)}" style="background:${colOf(p.id)}"><b>${esc(p.name)}</b><span>${esc(p.st.task||p.st.say||"")}</span>${stallLevel(p.st)?`<em class="badge l${stallLevel(p.st)}" style="font-style:normal">⚠ ${ageText(ageMs(p.st))}止まり</em>`:""}</button>`).join("")
+    }</div></div>`;
+  }).join("");
+}
+function memberCell(p){
+  const s=p.st, c=colOf(p.id), lv=stallLevel(s), art=hasArt(p.id), stale=isStale(s)&&!lv&&!art;
+  const state=s?s.status:"idle";
+  const bubble = s ? `${esc(s.say||"")}<small>${fmtTime(s.updated)}</small>` : "状態ファイルなし<small>確認待ち</small>";
+  const memo = loadMemo(p.id) ? `<span class="memo-dot">✎</span>`:"";
+  return `<button class="cell ${stale?"stale":""} ${lv?"stall":""}" data-id="${esc(p.id)}" style="--c:${c};--tint:${tint(c)}">
+    <span class="chip">${esc(s?STATUS_LABEL[s.status]||s.status:"—")}</span>
+    <span class="plate">${esc(p.name)}${p.guest?`<span class="guest-tag">ゲスト</span>`:""}<i>${esc(p.role||"")}</i></span>
+    ${personHTML(p.id,c,state,stale||lv>0,{label:p.name,pose:poseOf(s)})}
+    ${lv?`<span class="ribbon l${lv}">⚠ ${ageText(ageMs(s))} 止まってる</span>`:""}
+    <div class="say">${bubble}</div>${memo}</button>`;
+}
+function renderAlert(){
+  const st=people().filter(p=>stallLevel(p.st)).sort((a,b)=>ageMs(b.st)-ageMs(a.st));
+  const el=document.getElementById("alert");
+  const miss=people().filter(p=>!p.st&&!p.guest);
+  el.className="alert"+(st.length||miss.length?" on":"");
+  el.innerHTML=(st.length?`⚠ 止まってる仕事 ${st.length}件 `+st.map(p=>`<button data-id="${esc(p.id)}">${esc(p.name)} ${ageText(ageMs(p.st))}</button>`).join(""):"")
+    +(miss.length?` ⚠ 状態ファイルなし `+miss.map(p=>`<button data-id="${esc(p.id)}">${esc(p.name)}</button>`).join(""):"");
+}
+function renderMegaView(){
+  const m=DATA.megaphone&&DATA.megaphone.message, el=document.getElementById("megaView"); if(!el) return;
+  if(!m){ el.innerHTML=`<div class="msg"><small>いまの連絡</small>連絡はまだ出てへん。左の欄から書いて、みーに渡してな。</div>`; document.getElementById("megaCnt").textContent=""; return; }
+  const targets=people().filter(p=>!p.guest&&p.id!==m.from);
+  const rs=(DATA.megaphone.replies||[]).filter(r=>r&&r.msg_id===m.id);
+  const by=Object.fromEntries(rs.map(r=>[r.id,r]));
+  const done=targets.filter(p=>by[p.id]).length, left=targets.length-done;
+  const cnt=document.getElementById("megaCnt"); cnt.textContent=`返事 ${done}/${targets.length}`; cnt.className="cnt"+(left?" bad":"");
+  const sorted=[...targets].sort((a,b)=>(by[a.id]?1:0)-(by[b.id]?1:0));
+  el.innerHTML=`<div class="msg"><small>${esc(m.from_name||m.from)} ・ ${fmtTime(m.sent)}</small>${esc(m.text)}</div>
+   <div class="rp">${sorted.map(p=>{const r=by[p.id];return r
+     ?`<button class="rpc" data-id="${esc(p.id)}" style="--c:${colOf(p.id)}"><b>${esc(p.name)}</b>${esc(r.text)}<small>${fmtTime(r.updated)}</small></button>`
+     :`<button class="rpc none" data-id="${esc(p.id)}"><b>${esc(p.name)}　未返信</b><small>${ageText(Date.now()-Date.parse(m.sent))}経過</small></button>`}).join("")}</div>`;
+}
+function buildMega(){
+  document.getElementById("mega").innerHTML=`<h2>📣 拡声器（全員への連絡）<span class="cnt" id="megaCnt"></span></h2>
+  <div class="mg"><div class="write">
+   <div class="btns" style="margin:0 0 4px"><label style="font-size:12px;font-weight:700">送る人 <select id="mfrom"><option value="chairman">すぎちゃん</option><option value="mii">みー</option></select></label></div>
+   <textarea id="mtext" placeholder="全員への連絡・質問を書く"></textarea>
+   <div class="btns"><button class="btn" style="--c:#ffe36b" id="mcp">コピー（みーに渡す用）</button><span class="hint" id="mmsg">共有保存はできんので、みーが置く</span></div>
+  </div><div id="megaView"></div></div>`;
+  document.getElementById("mcp").onclick=async()=>{
+    const t=document.getElementById("mtext").value.trim(), f=document.getElementById("mfrom").value;
+    if(!t){document.getElementById("mmsg").textContent="文章が空やで";return}
+    const j=jst(), p=n=>String(n).padStart(2,"0");
+    const obj={id:`${j.y}${p(j.mo)}${p(j.d)}-${p(j.h)}${p(j.mi)}`,from:f,from_name:f==="mii"?"みー":"すぎちゃん",text:t,sent:`${j.y}-${p(j.mo)}-${p(j.d)}T${p(j.h)}:${p(j.mi)}:${p(j.s)}+09:00`};
+    const txt=`【拡声器】floor/megaphone/current.json に置く\n`+JSON.stringify(obj,null,2);
+    try{await navigator.clipboard.writeText(txt);document.getElementById("mmsg").textContent="コピーした ✔ みーに渡してな"}
+    catch(e){document.getElementById("mmsg").textContent="コピーできんかった（ブラウザの設定を確認）"}
+  };
+}
+function renderFloor(){
+  const ps=people();
+  const heavy = ps.filter(p=>p.st&&p.st.status==="wait_heavy").length;
+  const door = `<svg viewBox="0 0 64 80" width="52" height="64"><rect x="8" y="4" width="48" height="74" rx="3" fill="#8b5e3c" stroke="#111" stroke-width="3"/><rect x="16" y="12" width="32" height="26" fill="#a87650" stroke="#111" stroke-width="2"/><rect x="16" y="44" width="32" height="28" fill="#a87650" stroke="#111" stroke-width="2"/><circle cx="46" cy="46" r="3" fill="#ffd54a" stroke="#111"/></svg>`;
+  const ch = DATA.members.chairman||{name:"すぎちゃん",role:"会長"};
+  const room = `<div class="mini vip plain small" style="--tint:#e8e2d6">${door}<div class="t"><b>会長室${heavy?`<span class="redtag">許可待ち ${heavy}</span>`:""}</b><span>${esc(ch.name)}（${esc(ch.role)}）・不在</span></div></div>`;
+  const partners = PARTNERS.map(p=>`<div class="mini small" style="--tint:${p.color}">${personSVG("p",p.color,"none",false,{look:{h:p.style,c:p.hair}})}<div class="t"><b>${p.name}</b><span>${p.ai}／${p.job}<br>取引先窓口</span></div></div>`).join("");
+  document.getElementById("rowSmall").innerHTML = room+partners;
+  document.getElementById("rowMembers").innerHTML = ps.map(memberCell).join("");
+}
+
+/* ===== カレンダー ===== */
+function renderCal(){
+  const t=jst(), first=new Date(Date.UTC(t.y,t.mo-1,1)), dim=new Date(Date.UTC(t.y,t.mo,0)).getUTCDate();
+  const lead=first.getUTCDay(), prevDim=new Date(Date.UTC(t.y,t.mo-1,0)).getUTCDate();
+  const weeks=Math.ceil((lead+dim)/7), cells=[];
+  for(let i=0;i<weeks*7;i++){
+    const dow=i%7, day=i-lead+1; let n=day, o=false;
+    if(day<1){n=prevDim+day;o=true} else if(day>dim){n=day-dim;o=true}
+    const cls=["d",o?"o":"",dow===0?"sun":dow===6?"sat":"",(!o&&day===t.d)?"today":""].join(" ");
+    cells.push(`<div class="${cls}">${n}</div>`);
+  }
+  const wn="日月火水木金土"[t.w];
+  document.getElementById("cal").innerHTML=`<h2>カレンダー</h2><div class="calbig"><b>${t.y}年${t.mo}月</b>　今日は ${t.d}日（${wn}）</div>
+   <div class="calgrid">${[..."日月火水木金土"].map((w,i)=>`<div class="dow ${i==0?"sun":i==6?"sat":""}">${w}</div>`).join("")}${cells.join("")}</div>`;
+}
+
+/* ===== 時計 ===== */
+function buildClock(){
+  let ticks="",nums="";
+  for(let i=0;i<60;i++){const a=i*6*Math.PI/180,big=i%5===0,r1=big?80:86;
+    ticks+=`<line x1="${100+Math.sin(a)*r1}" y1="${100-Math.cos(a)*r1}" x2="${100+Math.sin(a)*92}" y2="${100-Math.cos(a)*92}" stroke="#111" stroke-width="${big?3:1}"/>`}
+  for(let i=1;i<=12;i++){const a=i*30*Math.PI/180;
+    nums+=`<text x="${100+Math.sin(a)*66}" y="${100-Math.cos(a)*66+6}" font-size="17" font-weight="700" text-anchor="middle" fill="#111">${i}</text>`}
+  document.getElementById("clk").innerHTML=`<h2 style="align-self:flex-start">時計</h2>
+  <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="97" fill="#fff" stroke="#111" stroke-width="5"/>${ticks}${nums}
+   <line id="hH" x1="100" y1="100" x2="100" y2="55" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+   <line id="hM" x1="100" y1="100" x2="100" y2="35" stroke="#111" stroke-width="4.5" stroke-linecap="round"/>
+   <line id="hS" x1="100" y1="112" x2="100" y2="28" stroke="#d62828" stroke-width="2"/>
+   <circle cx="100" cy="100" r="5" fill="#d62828" stroke="#111" stroke-width="1.5"/></svg>
+  <div class="digi" id="digi"></div><div class="dline" id="dline"></div>`;
+}
+let lastDay=-1;
+function tick(){
+  const t=jst(), ms=Date.now()%1000, s=t.s+ms/1000, m=t.mi+s/60, h=(t.h%12)+m/60;
+  const set=(id,deg)=>{const e=document.getElementById(id); if(e) e.setAttribute("transform",`rotate(${deg} 100 100)`)};
+  set("hS",s*6); set("hM",m*6); set("hH",h*30);
+  const p=n=>String(n).padStart(2,"0");
+  const dg=document.getElementById("digi"); if(dg) dg.textContent=`${p(t.h)}:${p(t.mi)}:${p(t.s)}`;
+  const dl=document.getElementById("dline"); if(dl) dl.textContent=`${t.y}/${t.mo}/${t.d}（${"日月火水木金土"[t.w]}）`;
+  if(t.d!==lastDay){lastDay=t.d;renderCal()}
+}
+
+/* ===== 詳細ウインドウ ===== */
+const dlg=document.getElementById("dlg");
+const memoKey=id=>"floor-v3-memo:"+id;
+function loadMemo(id){try{return JSON.parse(localStorage.getItem(memoKey(id))||"null")}catch(e){return null}}
+function saveMemo(id,text){try{ if(text.trim()) localStorage.setItem(memoKey(id),JSON.stringify({text,at:new Date().toISOString()})); else localStorage.removeItem(memoKey(id)); return true}catch(e){return false}}
+function openDetail(id){
+  const p=people().find(x=>x.id===id); if(!p) return;
+  const s=p.st, c=colOf(id), memo=loadMemo(id);
+  const w = s?waitText(s):"";
+  dlg.style.setProperty("--c",c);
+  dlg.innerHTML=`<div class="dh"><b>${esc(p.name)} <small style="font-weight:500">${esc(p.role||"")}</small></b><button class="x" id="dx" aria-label="閉じる">✕</button></div>
+  <div class="db">
+   <dl>
+    <dt>状態</dt><dd>${esc(s?STATUS_LABEL[s.status]||s.status:"状態ファイルなし（確認待ち）")}${isStale(s)&&s?"　💤 24時間以上更新なし":""}</dd>
+    <dt>タスク</dt><dd>${esc(s&&s.task||"—")}</dd>
+    <dt>ひとこと</dt><dd>${esc(s&&s.say||"—")}</dd>
+    <dt>何待ちか</dt><dd>${w?`<span class="wait">${esc(w)}</span>`:"待ちなし"}</dd>
+    <dt>最終更新</dt><dd>${s?fmtTime(s.updated):"—"}${s&&stallLevel(s)?` <span class="badge l${stallLevel(s)}">⚠ ${ageText(ageMs(s))}止まってる</span>`:""}</dd>
+   </dl>
+   ${id==="mii"?`<h4>裏方の定期ジョブ（${MII_JOBS.length}件）</h4><ul class="jobs">${MII_JOBS.map(j=>`<li><b>${esc(j[0])}</b>${esc(j[1])}</li>`).join("")}</ul>`:""}
+   <h4>書き込み欄</h4>
+   <textarea id="memo" placeholder="${esc(p.name)}へのメモ">${esc(memo?memo.text:"")}</textarea>
+   <div class="btns">
+     <button class="btn" id="msave">保存</button>
+     <button class="btn w" id="mcopy">コピー（みーに渡す用）</button>
+     <span class="hint" id="mhint">${memo?"保存済み "+fmtTime(memo.at):"この端末のブラウザに保存されます"}</span>
+   </div>
+  </div>`;
+  dlg.showModal();
+  dlg.querySelector("#dx").onclick=()=>dlg.close();
+  dlg.querySelector("#msave").onclick=()=>{
+    const ok=saveMemo(id,dlg.querySelector("#memo").value);
+    dlg.querySelector("#mhint").textContent= ok?"保存した ✔（この端末だけ）":"保存できなかった（ブラウザの設定を確認）";
+    renderFloor();
+  };
+  dlg.querySelector("#mcopy").onclick=async()=>{
+    const txt=`【${p.name}へのメモ】\n${dlg.querySelector("#memo").value}`;
+    try{await navigator.clipboard.writeText(txt);dlg.querySelector("#mhint").textContent="コピーした ✔"}
+    catch(e){const ta=dlg.querySelector("#memo");ta.select();document.execCommand&&document.execCommand("copy");dlg.querySelector("#mhint").textContent="選択したのでコピーしてな"}
+  };
+}
+dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-id]"); if(b) openDetail(b.dataset.id);
+});
+
+/* ===== ライブ読み込み（サーバー上で開いた時だけ。失敗したら埋め込みデータ） ===== */
+const RAW="https://raw.githubusercontent.com/gattgati-wq/gacchigachi-floor/main/floor";
+async function loadFrom(base){
+  const mem=await (await fetch(base+"/members.json",{cache:"no-store"})).json();
+  const got=await Promise.all(mem.members.map(m=>fetch(`${base}/status/${m.id}.json`,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)));
+  const jf=u=>fetch(u,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const message=await jf(base+"/megaphone/current.json");
+  const replies=(await Promise.all(mem.members.map(m=>jf(`${base}/megaphone/replies/${m.id}.json`)))).filter(Boolean);
+  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean),megaphone:{message,replies}};
+}
+/* 開いた時＋毎分、最新のファイルを読む。サーバー上なら同じ場所、だめならGitHubのmain。全部だめなら埋め込みデータ */
+async function tryLive(){
+  const bases = location.protocol==="file:" ? [RAW] : ["..",RAW];
+  for(const b of bases){
+    try{ DATA=await loadFrom(b); source=b===RAW?"ライブ（GitHub main）":"ライブ"; draw(); return; }catch(e){}
+  }
+  source="埋め込み（古い可能性あり）"; draw();
+}
+function draw(){
+  renderBoard(); renderFloor(); renderAlert(); renderMegaView();
+  const c=DATA.collected_at?fmtTime(DATA.collected_at).replace(/（.*）/,""):"—";
+  document.getElementById("foot").textContent=`データ：${source}（${c}時点）`;
+}
+window.renderFloor3=d=>{DATA=d;source="差し替え";draw()};
+
+renderCal(); buildClock(); buildMega(); draw(); tick();
+setInterval(tick,100);
+setInterval(()=>{draw()},60000);
+probeAssets(); tryLive(); setInterval(tryLive,60000);
+</script>
+</body>
+</html>

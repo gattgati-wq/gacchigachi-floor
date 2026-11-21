@@ -116,6 +116,14 @@ textarea{width:100%;min-height:64px;border:2px solid #111;border-radius:4px;padd
 .usage .bar{height:12px;border:2px solid #111;border-radius:6px;background:#fff;overflow:hidden;margin-top:3px}
 .usage .bar i{display:block;height:100%;background:var(--c)}
 .nomeasure{font-size:12px;color:var(--muted)}
+.mail{position:absolute;top:4%;left:8%;z-index:3;width:clamp(18px,2.2vw,28px);aspect-ratio:1;border-radius:50%;background:#d62828;color:#fff;border:2px solid #111;display:flex;align-items:center;justify-content:center;font-size:clamp(10px,1.2vw,15px);pointer-events:none}
+.dm{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.dmb{border:2px solid #111;border-radius:6px;background:#fff;padding:5px 8px;white-space:pre-wrap;word-break:break-word}
+.dmb small{display:block;color:var(--muted);font-size:11px}
+.dmb.reply{background:var(--c)}
+.dmb.none{border:3px dashed #d62828;background:#fff;color:#d62828;font-weight:700}
+.bubble .dmline{margin-top:3px;font-size:11px;border-top:1px dashed #999;padding-top:3px}
+.bubble .dmline b.red{color:#d62828}
 .deskf{z-index:2;position:absolute;left:4%;right:4%;bottom:3%;height:19%;border:3px solid #111;border-radius:10px 10px 4px 4px;
   background:linear-gradient(#e0b987 0 42%,#b88a58 42% 100%);display:flex;justify-content:center;align-items:flex-start;gap:6px;padding-top:2.5%}
 .desk.work .deskf{height:13%}
@@ -125,7 +133,7 @@ textarea{width:100%;min-height:64px;border:2px solid #111;border-radius:4px;padd
 .pb{background:#d62828;color:#fff;border:2px solid #111;border-radius:3px;font-size:clamp(9px,.9vw,12px);font-weight:800;padding:0 5px;line-height:1.35;white-space:nowrap}
 .pb.l1{background:#ff9800;color:#111}
 .ck{position:absolute;top:2%;right:12%;width:clamp(18px,2.4vw,30px);aspect-ratio:1;border-radius:50%;background:#5ac26a;border:2px solid #222;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:clamp(11px,1.6vw,18px)}
-.bubble{display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(50% + var(--cs)/2 - 18px);width:min(94%,270px);background:#fff;border:3px solid #111;border-radius:12px;padding:5px 8px;font-size:12px;line-height:1.4;z-index:20;box-shadow:2px 3px 0 rgba(0,0,0,.3)}
+.bubble{display:none;position:absolute;left:50%;transform:translateX(-50%);top:0;width:min(94%,270px);background:#fff;border:3px solid #111;border-radius:12px;padding:5px 8px;font-size:12px;line-height:1.4;z-index:20;box-shadow:2px 3px 0 rgba(0,0,0,.3)}
 .bubble.open{display:block}
 .bubble::after{content:"";position:absolute;left:50%;bottom:-11px;margin-left:-8px;border:8px solid transparent;border-top:11px solid #111;border-bottom:0}
 .bubble small{display:block;color:var(--muted);font-size:10px}
@@ -248,7 +256,7 @@ ul.jobs li b{margin-right:6px}
 </div>
 <dialog id="dlg"></dialog>
 
-<script id="floor-data" type="application/json">{"megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T13:02:23+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "予定変更の空き調べ", "say": "PR183のマージ待ち", "waiting_for": "", "updated": "2026-11-21T12:49:08+09:00", "usage": {"context_used": 181918, "context_max": 1000000, "output_tokens": 50111, "cost_usd": 1.98418944, "measured": "2026-11-21T12:49:08+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアv3 容量表示（自己申告）", "say": "容量表示を実装。使用量は自分で書いたよ", "waiting_for": "", "updated": "2026-11-21T12:43:09+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script id="floor-data" type="application/json">{"messages": {}, "msgReplies": {}, "megaphone": {"message": null, "replies": []}, "collected_at": "2026-11-21T14:57:54+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "予定変更の空き調べ", "say": "PR183のマージ待ち", "waiting_for": "", "updated": "2026-11-21T12:49:08+09:00", "usage": {"context_used": 181918, "context_max": 1000000, "output_tokens": 50111, "cost_usd": 1.98418944, "measured": "2026-11-21T12:49:08+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "個別連絡の仕組み（floor/messages）", "say": "個別連絡を実装した。ドラフトPRまで出したよ", "waiting_for": "", "updated": "2026-11-21T14:57:54+09:00", "usage": {"context_used": 387476, "context_max": 1000000, "output_tokens": 155916, "cost_usd": 7.65, "measured": "2026-11-21T14:57:54+09:00"}}]}</script>
 <script>
 "use strict";
 /* ===== 設定 ===== */
@@ -300,6 +308,13 @@ function ageText(ms){const h=Math.floor(ms/3600000); return h<1?"1時間以内":
 /* 使用量：各メンバーが自分の状態ファイルに書いた usage（自己申告）。無ければ「未計測」。推測では出さない */
 function usageOf(s){const u=s&&s.usage; return (u&&typeof u.context_used==="number"&&typeof u.context_max==="number"&&u.context_max>0)?u:null}
 const fmtNum=n=>n==null?"—":n>=1e8?(n/1e8).toFixed(1).replace(/\.0$/,"")+"億":n>=1e4?(n/1e4).toFixed(1).replace(/\.0$/,"")+"万":String(Math.round(n));
+/* 個別連絡：floor/messages/<ID>.json（みーが置く）と floor/messages/replies/<ID>.json（本人が書く返事）。msg_id が合う返事だけ「返事済み」 */
+function dmOf(id){
+  const m=DATA.messages&&DATA.messages[id], r=DATA.msgReplies&&DATA.msgReplies[id];
+  const msg=(m&&m.id&&m.to===id)?m:null;
+  const reply=(msg&&r&&r.msg_id===msg.id)?r:null;
+  return {msg,reply};
+}
 function people(){
   const out = DATA.members.members.map(m=>({...m, st:stOf(m.id), guest:false}));
   const known = new Set(out.map(m=>m.id));
@@ -389,9 +404,10 @@ function deskHTML(p){
   return `<div class="desk p-${pose} ${pose==="work"?"work":""} ${art?"":"nodesk"}" data-desk="${esc(p.id)}" tabindex="0" role="button" aria-label="${esc(label(p))}" style="--c:${c};--dl:${dl}">
     <div class="stage">${stage}
       ${art&&pose==="sleep"?`<div class="zz"><i>z</i><i>Z</i></div>`:""}
-      <div class="deskf"><div class="plate ${lv?"warn":""}">${lv?"⚠ ":""}${esc(label(p))}${p.guest?"（ゲスト）":""}</div></div>${underHTML(p,s,lv)}
+      <div class="deskf"><div class="plate ${lv?"warn":""}">${lv?"⚠ ":""}${esc(label(p))}${p.guest?"（ゲスト）":""}</div></div>${underHTML(p,s,lv)}${(()=>{const d=dmOf(p.id);return d.msg&&!d.reply?`<div class="mail" title="連絡あり・未返信">✉</div>`:""})()}
     </div>
-    <div class="bubble ${OPEN===p.id?"open":""}">${say}${w?`<br><span class="wt">${esc(w)}</span>`:""}<br><button data-detail="${esc(p.id)}">詳細</button></div>
+    <div class="bubble ${OPEN===p.id?"open":""}">${say}${w?`<br><span class="wt">${esc(w)}</span>`:""}${(()=>{const d=dmOf(p.id); if(!d.msg) return ""; const t=x=>esc(String(x||"").slice(0,40)+(String(x||"").length>40?"…":""));
+      return `<div class="dmline">📩 ${esc(d.msg.from_name||"")}：${t(d.msg.text)}<br>${d.reply?`↩ 返事：${t(d.reply.text)}`:`<b class="red">未返信 ${ageText(Date.now()-Date.parse(d.msg.sent))}経過</b>`}</div>`})()}<br><button data-detail="${esc(p.id)}">詳細</button></div>
   </div>`;
 }
 function renderFloor(){
@@ -505,6 +521,14 @@ const dlg=document.getElementById("dlg");
 const memoKey=id=>"floor-v3-memo:"+id;
 function loadMemo(id){try{return JSON.parse(localStorage.getItem(memoKey(id))||"null")}catch(e){return null}}
 function saveMemo(id,text){try{ if(text.trim()) localStorage.setItem(memoKey(id),JSON.stringify({text,at:new Date().toISOString()})); else localStorage.removeItem(memoKey(id)); return true}catch(e){return false}}
+function dmBlock(p){
+  const d=dmOf(p.id);
+  if(!d.msg) return `<h4>連絡</h4><div class="nomeasure">連絡はまだありません</div>`;
+  return `<h4>連絡と返事</h4><div class="dm">
+    <div class="dmb"><small>${esc(d.msg.from_name||d.msg.from||"")} ・ ${fmtTime(d.msg.sent)}</small>${esc(d.msg.text)}</div>
+    ${d.reply?`<div class="dmb reply"><small>${esc(label(p))}の返事 ・ ${fmtTime(d.reply.updated)}</small>${esc(d.reply.text)}</div>`
+             :`<div class="dmb none">未返信（${ageText(Date.now()-Date.parse(d.msg.sent))}経過）</div>`}</div>`;
+}
 function usageBlock(s){
   const u=usageOf(s);
   if(!u) return `<h4>使用量</h4><div class="nomeasure">未計測（自己申告がありません）</div>`;
@@ -531,10 +555,12 @@ function openDetail(id){
    </dl>
    ${usageBlock(s)}
    ${id==="mii"?`<h4>裏方の定期ジョブ（${MII_JOBS.length}件）</h4><ul class="jobs">${MII_JOBS.map(j=>`<li><b>${esc(j[0])}</b>${esc(j[1])}</li>`).join("")}</ul>`:""}
-   <h4>書き込み欄</h4>
-   <textarea id="memo" placeholder="${esc(label(p))}へのメモ">${esc(memo?memo.text:"")}</textarea>
+   ${dmBlock(p)}
+   <h4>この子に連絡を書く</h4>
+   <div class="btns" style="margin:0 0 4px"><label style="font-size:12px;font-weight:700">送る人 <select id="dmfrom" style="border:2px solid #111;border-radius:4px;padding:2px 4px;font:inherit;font-size:13px;background:#fff;color:#111"><option value="chairman">すぎちゃん</option><option value="mii">みー</option></select></label></div>
+   <textarea id="memo" placeholder="${esc(label(p))}への連絡・質問を書く">${esc(memo?memo.text:"")}</textarea>
    <div class="btns">
-     <button class="btn" id="msave">保存</button>
+     <button class="btn" id="msave">下書き保存</button>
      <button class="btn w" id="mcopy">コピー（みーに渡す用）</button>
      <span class="hint" id="mhint">${memo?"保存済み "+fmtTime(memo.at):"この端末のブラウザに保存されます"}</span>
    </div>
@@ -546,7 +572,11 @@ function openDetail(id){
     dlg.querySelector("#mhint").textContent= ok?"保存した ✔（この端末だけ）":"保存できなかった（ブラウザの設定を確認）";
   };
   dlg.querySelector("#mcopy").onclick=async()=>{
-    const txt=`【${label(p)}へのメモ】\n${dlg.querySelector("#memo").value}`;
+    const t=dlg.querySelector("#memo").value.trim();
+    if(!t){dlg.querySelector("#mhint").textContent="文章が空やで";return}
+    const f=dlg.querySelector("#dmfrom").value, j=jst(), z=n=>String(n).padStart(2,"0");
+    const obj={id:`${j.y}${z(j.mo)}${z(j.d)}-${z(j.h)}${z(j.mi)}-${id}`,to:id,from:f,from_name:f==="mii"?"みー":"すぎちゃん",text:t,sent:`${j.y}-${z(j.mo)}-${z(j.d)}T${z(j.h)}:${z(j.mi)}:${z(j.s)}+09:00`};
+    const txt=`【個別連絡】floor/messages/${id}.json に置く\n`+JSON.stringify(obj,null,2);
     try{await navigator.clipboard.writeText(txt);dlg.querySelector("#mhint").textContent="コピーした ✔"}
     catch(e){const ta=dlg.querySelector("#memo");ta.select();document.execCommand&&document.execCommand("copy");dlg.querySelector("#mhint").textContent="選択したのでコピーしてな"}
   };
@@ -573,7 +603,11 @@ async function loadFrom(base){
   const got=await Promise.all(mem.members.map(m=>jf(`${base}/status/${m.id}.json`)));
   const message=await jf(base+"/megaphone/current.json");
   const replies=(await Promise.all(mem.members.map(m=>jf(`${base}/megaphone/replies/${m.id}.json`)))).filter(Boolean);
-  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean),megaphone:{message,replies}};
+  const mm=await Promise.all(mem.members.map(m=>jf(`${base}/messages/${m.id}.json`)));
+  const rr=await Promise.all(mem.members.map(m=>jf(`${base}/messages/replies/${m.id}.json`)));
+  const messages={}, msgReplies={};
+  mem.members.forEach((m,i)=>{if(mm[i])messages[m.id]=mm[i]; if(rr[i])msgReplies[m.id]=rr[i]});
+  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean),megaphone:{message,replies},messages,msgReplies};
 }
 async function tryLive(){
   const bases = location.protocol==="file:" ? [RAW] : ["..",RAW];

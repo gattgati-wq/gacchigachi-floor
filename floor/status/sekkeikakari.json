@@ -1,16 +1,16 @@
 {
   "id": "sekkeikakari",
   "name": "フロア設計係",
-  "status": "working",
+  "status": "done",
   "task": "個別連絡の仕組み（floor/messages）",
-  "say": "個別宛ての連絡と返事の画面を作ってる",
+  "say": "個別連絡を実装した。ドラフトPRまで出したよ",
   "waiting_for": "",
-  "updated": "2026-11-21T14:56:53+09:00",
+  "updated": "2026-11-21T14:57:54+09:00",
   "usage": {
     "context_used": 387476,
     "context_max": 1000000,
     "output_tokens": 155916,
     "cost_usd": 7.65,
-    "measured": "2026-11-21T14:56:53+09:00"
+    "measured": "2026-11-21T14:57:54+09:00"
   }
 }

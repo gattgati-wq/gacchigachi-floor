@@ -2,15 +2,15 @@
   "id": "koukichi",
   "name": "こー吉",
   "status": "wait_heavy",
-  "task": "予定変更の空き調べ",
-  "say": "PR183のマージ待ち",
+  "task": "変更依頼の自動返信の設計",
+  "say": "外部AI利用の判断待ち",
   "waiting_for": "",
-  "updated": "2026-11-21T12:49:08+09:00",
+  "updated": "2026-11-21T17:27:09+09:00",
   "usage": {
-    "context_used": 181918,
+    "context_used": 226883,
     "context_max": 1000000,
-    "output_tokens": 50111,
-    "cost_usd": 1.98418944,
-    "measured": "2026-11-21T12:49:08+09:00"
+    "output_tokens": 70066,
+    "cost_usd": 4.07979794,
+    "measured": "2026-11-21T17:27:09+09:00"
   }
 }

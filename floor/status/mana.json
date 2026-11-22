@@ -1,11 +1,11 @@
 {
   "id": "mana",
   "name": "まな",
-  "status": "wait_member",
-  "task": "フロアのデザイン案（キキ）待ち",
-  "say": "昼版で確定。キキの案待ち",
-  "waiting_for": "mii",
-  "updated": "2026-11-22T21:14:00+09:00",
+  "status": "done",
+  "task": "フロア新デザインの試作（v4）",
+  "say": "枠とマグネットを組み込んだ。見てもらう待ち",
+  "waiting_for": "",
+  "updated": "2026-11-22T22:10:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

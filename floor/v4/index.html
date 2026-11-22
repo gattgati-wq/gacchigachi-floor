@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ガっチガチ研究所 フロア（試作v4）</title>
+<style>
+/* ===== 舞台：1600×1020（約1.57:1）の1枚絵。窓に合わせて丸ごと拡縮する。位置は全部この座標 ===== */
+:root{--ink:#3a2412;--gold:#c8921e;--gold2:#f0c75a;--paper:#f6e7c4;--paper2:#ead2a0}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
+  font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:var(--ink)}
+#stage{position:absolute;left:0;top:0;width:1600px;height:1020px;transform-origin:0 0;overflow:hidden;background:#120c07}
+.photo{position:absolute;left:544px;top:0;width:1056px;height:1020px;background:url(img/bg.webp) center/cover no-repeat}
+
+/* ----- 仮の枠（キキの枠素材が届いたら画像に差し替える） ----- */
+.frame{position:absolute}
+.frame h2{margin:0}
+
+/* 状態ボード（4列）：枠はキキの画像。見出し（待機中〜完了）は画像に入っている。中の4マスにマグネットを重ねる */
+#board{left:8px;top:8px;width:528px;height:210px;background:url(ui/board.webp) center/100% 100% no-repeat}
+.frame.img{border:0;border-radius:0;box-shadow:none;padding:0}
+#board .cols{position:absolute;inset:0}
+.col{position:absolute;top:33.3%;height:52.6%;overflow:visible}
+.col:nth-child(1){left:5%;width:21%}.col:nth-child(2){left:28.5%;width:20.7%}
+.col:nth-child(3){left:50.8%;width:21.4%}.col:nth-child(4){left:74.2%;width:21.1%}
+.mag{position:absolute;left:3%;width:94%;height:auto;border:0;background:none;padding:0;cursor:pointer;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+.mag img{display:block;width:100%;height:auto}
+.mag span{position:absolute;left:0;right:0;top:0;height:27px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;white-space:nowrap;font-family:inherit}
+.mag i{font-style:normal;margin-left:3px;font-size:11px}
+.more{position:absolute;right:2px;bottom:-4px;font-size:13px;font-weight:800;background:#fff;border:2px solid #5a3a12;border-radius:10px;padding:0 6px;z-index:50}
+
+/* 日時プレート：枠はキキの画像（数字は消してある）。日付と時刻はコードで載せる */
+#plate{left:8px;top:230px;width:528px;height:74px;background:url(ui/plate.webp) center/100% 100% no-repeat;display:block;color:#1a1208;font-weight:800;font-variant-numeric:tabular-nums}
+#plate #pd{position:absolute;left:17.5%;width:35%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:21px;letter-spacing:.02em;white-space:nowrap}
+#plate #pt{position:absolute;left:66%;width:25%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:28px;letter-spacing:.02em}
+#plate .sep{display:none}
+
+/* 拡声器ボード（読むだけ）：枠はキキの画像 */
+#mega{left:8px;top:314px;width:528px;height:696px;background:url(ui/mega.webp) center/100% 100% no-repeat}
+#mega .in{position:absolute;left:9%;right:9%;top:16.5%;bottom:12%;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+#mega h2{font-size:20px;letter-spacing:.14em;margin:0;padding-left:0}
+#mega .msg{background:rgba(255,255,255,.5);border:2px solid #6b4a1a;border-radius:10px;padding:8px 10px;font-size:15px;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:38%;overflow:auto}
+#mega .meta{font-size:13px;opacity:.8}
+#mega .rep{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0}
+#mega .r{font-size:14px;border-left:5px solid #888;padding:1px 7px;background:rgba(255,255,255,.4);border-radius:4px}
+#mega .r.none{opacity:.55;border-left-color:#d62828}
+#mega .note{margin-top:auto;font-size:12px;opacity:.65}
+
+/* 完成品置き場：枠はキキの縦長の枠を、角と辺を固定して横に伸ばして作った画像 */
+#products{left:940px;top:8px;width:650px;height:360px;background:url(ui/products.webp) center/100% 100% no-repeat}
+#products .in{position:absolute;left:9%;right:9%;top:15%;bottom:17%;overflow:hidden}
+#products h2{font-size:21px;letter-spacing:.12em;margin:0 0 10px}
+#products .names{display:flex;flex-wrap:wrap;gap:8px 10px;font-size:19px;font-weight:700}
+#products .names span{background:rgba(255,255,255,.5);border:2px solid #6b4a1a;border-radius:10px;padding:2px 12px}
+#products .none{font-size:16px;opacity:.6}
+
+/* 壁のアイコン（キキ・えみ） */
+.partner{position:absolute;width:155px;height:155px;border:0;background:none;padding:0;cursor:pointer;z-index:5}
+.partner img{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}
+.partner:hover img{filter:drop-shadow(0 4px 6px rgba(0,0,0,.5)) brightness(1.08)}
+
+/* ----- キャラ ----- */
+#chars{position:absolute;inset:0;pointer-events:none}
+.ch{position:absolute;width:160px;height:160px;border:0;background:none;padding:0;cursor:pointer;pointer-events:auto}
+.ch .art{width:100%;height:100%;display:block;transform-origin:50% 92%;filter:drop-shadow(0 6px 5px rgba(0,0,0,.45))}
+.ch.flip .art{scale:-1 1}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.02)}}
+@keyframes shake{0%,100%{transform:translate(0,2px) rotate(-1.4deg)}25%{transform:translate(-1.5px,0) rotate(-1.9deg)}50%{transform:translate(1.5px,2px) rotate(-1.1deg)}75%{transform:translate(-1px,1px) rotate(-1.7deg)}}
+@keyframes yawnmove{0%,60%,100%{transform:scale(1,1)}75%{transform:scale(1.03,1.05) translateY(-2px)}}
+@keyframes hop{0%,100%{transform:translateY(0)}38%{transform:translateY(-14px)}76%{transform:translateY(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.ch.s-normal .art{animation:breathe 6s ease-in-out infinite}
+.ch.s-busy .art{animation:shake .4s linear infinite}
+.ch.s-yawn .art{animation:yawnmove 5s ease-in-out infinite}
+.ch.s-sleep .art{animation:breathe 4.5s ease-in-out infinite}
+.ch.s-wait .art{animation:none}
+.ch.s-done .art{animation:hop 1.1s ease-in-out infinite}
+.bubble{position:absolute;right:-18px;top:2px;background:#ffe066;border:3px solid #6b4a00;border-radius:14px;padding:2px 10px;font-size:17px;font-weight:800;color:#4a3200;white-space:nowrap;animation:bob 2s ease-in-out infinite}
+.bubble:after{content:"";position:absolute;left:14px;bottom:-11px;border:6px solid transparent;border-top-color:#6b4a00;border-bottom:0}
+.check{position:absolute;right:14px;top:6px;width:36px;height:36px;border-radius:50%;background:#5ac26a;border:3px solid #222;color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center}
+.stall{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);background:#d62828;color:#fff;border:2px solid #111;border-radius:6px;padding:0 8px;font-size:15px;font-weight:800;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.ch .art,.bubble{animation:none!important}}
+
+/* ----- 詳細ウインドウ ----- */
+#dlg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);z-index:100}
+#dlg.open{display:flex}
+#dlg .box{width:min(440px,92vw);background:var(--paper);border:5px solid var(--gold);border-radius:16px;padding:16px 18px;box-shadow:0 10px 30px rgba(0,0,0,.6);font-size:15px}
+#dlg h3{margin:0 0 8px;font-size:20px}
+#dlg dl{display:grid;grid-template-columns:6.5em 1fr;gap:6px 8px;margin:0}
+#dlg dt{font-weight:700}#dlg dd{margin:0;word-break:break-word}
+#dlg .acts{margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
+#dlg button,#dlg a.go{font:inherit;font-weight:800;border:2px solid #5a3a12;border-radius:10px;background:#fff;padding:6px 14px;cursor:pointer;color:var(--ink);text-decoration:none}
+#dlg a.go{background:var(--gold2)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;border-radius:10px;padding:8px 16px;font-size:14px;display:none;z-index:120}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="photo"></div>
+
+  <section class="frame img" id="board" aria-label="状態ボード"><div class="cols" id="cols"></div></section>
+  <section class="frame img" id="plate" aria-label="日時"><span id="pd"></span><span id="pt"></span></section>
+  <section class="frame img" id="mega" aria-label="拡声器"></section>
+  <section class="frame img" id="products" aria-label="完成品置き場"><div class="in"><h2>完成品置き場</h2><div id="plist"></div></div></section>
+
+  <button class="partner" id="p-kiki" style="left:974px;top:386px" aria-label="キキ"><img src="img/icon-kiki.webp" alt="キキ"></button>
+  <button class="partner" id="p-emi" style="left:1252px;top:386px" aria-label="えみ"><img src="img/icon-emi.webp" alt="えみ"></button>
+
+  <div id="chars"></div>
+</div>
+
+<div id="dlg" role="dialog" aria-modal="true"><div class="box" id="dbox"></div></div>
+<div id="toast"></div>
+
+<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T01:15:09+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザインの試作（v4）", "say": "試作v4を作った。見てもらう待ち", "waiting_for": "", "updated": "2026-11-22T21:30:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script>
+/* ===== 設定（ここを直せば動く） ===== */
+const STAGE_W=1600, STAGE_H=1020;
+/* 席：舞台の座標（キャラの中心）。レイアウト例（すぎちゃんのIllustrator）の位置に合わせた */
+const SEAT={
+  koukichi:[881,626], bucho:[742,765], sekkeikakari:[1005,750], mii:[649,912], hptantou:[920,889],
+  ganechigamen:[1183,649], ganechikun:[1469,626], oyakata:[1484,882], chii:[1360,800]
+};
+/* メンバー色（名前マグネットの仮の色。キキのマグネットが届いたら画像に差し替え） */
+const COLORS={mii:"#ff9ec4",koukichi:"#7cc4ff",oyakata:"#e53935",sekkeikakari:"#b9a2ff",hptantou:"#86e08f",
+  ganechigamen:"#ffe36b",chii:"#5fd9d0",bucho:"#ff9a3c",ganechikun:"#c8a27a",mana:"#4356A6"};
+/* 名前マグネット：キキの10色（ガネチくん＝タン・まな＝藍色は、みー作）。文字色は、濃い色の上は白 */
+const MAG={oyakata:["red","#fff"],mii:["pink","#2a1208"],bucho:["orange","#2a1208"],ganechigamen:["yellow","#2a1208"],hptantou:["green","#fff"],
+  chii:["teal","#fff"],koukichi:["sky","#fff"],sekkeikakari:["lavender","#2a1208"],ganechikun:["tan","#2a1208"],mana:["indigo","#fff"]};
+const TWO_FRAME={oyakata:true}; /* 仕事・焦りが2コマの子 */
+/* 時間のしきい値（まなの仮案。すぎちゃんの回答待ち） */
+const STALL_L1=6*3600e3, STALL_L2=24*3600e3; /* 作業中・待ちで更新なし：注意／停止 */
+const YAWN_MS=24*3600e3, SLEEP_MS=72*3600e3;  /* 待機：24時間でヒマ（あくび）／72時間で長らくヒマ（寝てる） */
+const NO_SLEEP=new Set(["mana"]);              /* 統括は寝ない */
+const PARTNERS={kiki:{name:"キキ",link:""},emi:{name:"えみ",link:""}}; /* リンク先は members.json の partners で上書き（https のみ） */
+const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ===== 舞台の拡縮 ===== */
+function fit(){
+  const s=Math.min(innerWidth/STAGE_W, innerHeight/STAGE_H);
+  const st=document.getElementById("stage");
+  st.style.transform=`scale(${s})`;
+  st.style.left=((innerWidth-STAGE_W*s)/2)+"px"; st.style.top=((innerHeight-STAGE_H*s)/2)+"px";
+}
+addEventListener("resize",fit); fit();
+
+/* ===== データ ===== */
+let DATA=JSON.parse(document.getElementById("floor-data").textContent);
+let SOURCE="埋め込み";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const inkOn=c=>{const h=String(c).replace("#","");const [r,g,b]=[0,2,4].map(i=>parseInt(h.slice(i,i+2),16)/255).map(v=>v<=.03928?v/12.92:((v+.055)/1.055)**2.4);return (.2126*r+.7152*g+.0722*b)<.18?"#fff":"#111"};
+const members=()=>(DATA.members&&DATA.members.members)||[];
+const stOf=id=>(DATA.status||[]).find(s=>s.id===id);
+const ageMs=s=>Date.now()-Date.parse(s.updated);
+function stallLevel(s){
+  if(!s||!s.updated) return 0;
+  if(!["working","wait_light","wait_heavy","wait_member"].includes(s.status)) return 0;
+  const a=ageMs(s); return a>=STALL_L2?2:a>=STALL_L1?1:0;
+}
+const colKey=s=>!s?"idle":s.status==="working"?"working":s.status==="done"?"done":s.status==="idle"?"idle":"wait";
+const ageText=ms=>{const h=Math.floor(ms/3600e3);return h<1?"1時間以内":h<24?`${h}時間`:`${Math.floor(h/24)}日`};
+const STATUS_LABEL={working:"作業中",wait_light:"許可待ち（軽）",wait_heavy:"許可待ち（重）",wait_member:"人待ち",idle:"待機",done:"完了"};
+/* 状態→絵（すぎちゃん決定）：仕事の絵＝普通／焦り＝依頼作業中／あくび＝ヒマ／寝てる＝長らくヒマ・止まってる */
+function look(id,s){
+  if(NO_SLEEP.has(id)) return {pose:"normal",cls:"s-normal"};
+  if(!s||!s.updated) return {pose:"sleep",cls:"s-sleep"};
+  const lv=stallLevel(s); if(lv) return {pose:"sleep",cls:"s-sleep",stall:lv};
+  if(s.status==="working") return {pose:"busy",cls:"s-busy"};
+  if(["wait_light","wait_heavy","wait_member"].includes(s.status)) return {pose:"normal",cls:"s-wait",bubble:true};
+  if(s.status==="idle"){const a=ageMs(s);return a>=SLEEP_MS?{pose:"sleep",cls:"s-sleep"}:a>=YAWN_MS?{pose:"yawn",cls:"s-yawn"}:{pose:"normal",cls:"s-normal"};}
+  if(s.status==="done") return {pose:"normal",cls:"s-done",check:true};
+  return {pose:"normal",cls:"s-normal"};
+}
+
+/* ===== 日時プレート（日本時間・毎秒更新。動きを減らす設定でも止めない） ===== */
+function tick(){
+  const f=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",weekday:"short"});
+  const o={}; f.formatToParts(new Date()).forEach(p=>o[p.type]=p.value);
+  const w={Sun:"日",Mon:"月",Tue:"火",Wed:"水",Thu:"木",Fri:"金",Sat:"土"}[o.weekday];
+  document.getElementById("pd").textContent=`${o.year}.${o.month}.${o.day} (${w})`;
+  document.getElementById("pt").textContent=`${o.hour}:${o.minute}:${o.second}`;
+}
+tick(); setInterval(tick,1000);
+
+/* ===== 状態ボード ===== */
+const COLS=[{k:"idle",t:"待機中"},{k:"working",t:"作業中"},{k:"wait",t:"承認待ち"},{k:"done",t:"完了"}];
+function renderBoard(){
+  const ms=members();
+  document.getElementById("cols").innerHTML=COLS.map(c=>{
+    const items=ms.filter(m=>colKey(stOf(m.id))===c.k).sort((a,b)=>(stallLevel(stOf(b.id))-stallLevel(stOf(a.id))));
+    const MAX=4, shown=items.slice(0,MAX), more=items.length-shown.length;
+    const mags=shown.map((m,i)=>{const [img,ink]=MAG[m.id]||["lavender","#111"], lv=stallLevel(stOf(m.id));
+      return `<button class="mag" data-detail="${esc(m.id)}" style="top:${i*25}%;z-index:${i+1}"><img src="ui/mag-${img}.webp" alt=""><span style="color:${ink}">${esc(m.name)}${lv?`<i>⚠</i>`:""}</span></button>`}).join("");
+    return `<div class="col">${mags}${more>0?`<span class="more">＋${more}</span>`:""}</div>`;
+  }).join("");
+}
+
+/* ===== 拡声器ボード（試作：読むだけ。書く欄は未移植） ===== */
+function renderMega(){
+  const mg=DATA.megaphone||{}, m=mg.message, rs=mg.replies||[], ms=members();
+  const got=new Set(rs.filter(r=>m&&r.msg_id===m.id).map(r=>r.id));
+  const target=ms.filter(x=>!m||x.id!==m.from);
+  const nOk=target.filter(x=>got.has(x.id)).length;
+  document.getElementById("mega").innerHTML=`<div class="in">
+    <h2>拡声器</h2>
+    <div class="msg">${m?esc(m.text):"連絡はまだありません"}</div>
+    <div class="meta">${m?`${esc(m.from_name||m.from)} ／ 返事 ${nOk}/${target.length}`:""}</div>
+    <div class="rep">${m?target.map(x=>{const r=rs.find(y=>y.id===x.id&&y.msg_id===m.id);
+      return `<div class="r ${r?"":"none"}" style="${r?`border-left-color:${COLORS[x.id]||"#888"}`:""}"><b>${esc(x.name)}</b>：${r?esc(r.text):"（未返信）"}</div>`}).join(""):""}</div>
+    <div class="note">試作：読むだけ。連絡を書く欄は、あとで移す。</div></div>`;
+}
+
+/* ===== 完成品置き場（名前だけ。みーが products.json に書く） ===== */
+function renderProducts(list){
+  document.getElementById("plist").innerHTML=list&&list.length
+    ? `<div class="names">${list.map(n=>`<span>${esc(n)}</span>`).join("")}</div>`
+    : `<div class="none">まだ置いてありません</div>`;
+}
+
+/* ===== キャラ ===== */
+const FRAME={}; /* 2コマの子の現在のコマ */
+function renderChars(){
+  const box=document.getElementById("chars");
+  const html=members().filter(m=>SEAT[m.id]).map(m=>{
+    const [cx,cy]=SEAT[m.id], s=stOf(m.id), L=look(m.id,s);
+    const f=TWO_FRAME[m.id]&&(L.pose==="normal"||L.pose==="busy")&&FRAME[m.id]?"2":"";
+    return `<button class="ch ${L.cls}" data-detail="${esc(m.id)}" style="left:${cx-80}px;top:${cy-80}px;z-index:${cy}" aria-label="${esc(m.name)}">
+      <img class="art" data-id="${esc(m.id)}" data-pose="${L.pose}" src="img/${esc(m.id)}-${L.pose}${f}.webp" alt="">
+      ${L.bubble?`<span class="bubble">許可まち</span>`:""}${L.check?`<span class="check">✓</span>`:""}
+      ${L.stall?`<span class="stall">⚠${ageText(ageMs(s))}</span>`:""}</button>`;
+  }).join("");
+  box.querySelectorAll(".ch:not(.mana)").forEach(e=>e.remove());
+  box.insertAdjacentHTML("afterbegin",html);
+}
+/* 2コマの子（親方）：コマを切り替える */
+if(!REDUCED) setInterval(()=>{
+  document.querySelectorAll('img.art').forEach(img=>{
+    const id=img.dataset.id; if(!TWO_FRAME[id]) return;
+    const p=img.dataset.pose; if(p!=="normal"&&p!=="busy") return;
+    FRAME[id]=!FRAME[id]; img.src=`img/${id}-${p}${FRAME[id]?"2":""}.webp`;
+  });
+},450);
+
+/* ===== まな：フロアを往復して歩く（統括は聞き回る） ===== */
+const MANA={x:760,y:928,dir:1,mode:"walk",t:0,frame:0};
+const MANA_MIN=700, MANA_MAX=1440, MANA_SPEED=70;
+(function buildMana(){
+  const b=document.createElement("button"); b.className="ch mana s-normal"; b.dataset.detail="mana"; b.setAttribute("aria-label","まな");
+  b.innerHTML=`<img class="art" id="manaImg" src="img/mana-walk1.webp" alt="">`;
+  document.getElementById("chars").appendChild(b); MANA.el=b; MANA.img=b.querySelector("img");
+  paintMana();
+})();
+function paintMana(){
+  const e=MANA.el;
+  e.style.left=(MANA.x-80)+"px"; e.style.top=(MANA.y-80)+"px"; e.style.zIndex=Math.round(MANA.y);
+  /* ③④は左向き。右へ行く時は反転 */
+  e.classList.toggle("flip", MANA.mode==="walk" && MANA.dir>0);
+  const name = MANA.mode==="wave" ? "wave" : (MANA.frame? "walk2":"walk1");
+  const src=`img/mana-${name}.webp`;
+  if(MANA.img.getAttribute("src")!==src) MANA.img.setAttribute("src",src);
+  e.querySelector(".art").style.animation = MANA.mode==="wave" ? "breathe 3s ease-in-out infinite" : "none";
+}
+let last=performance.now();
+function loop(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  if(!REDUCED){
+    if(MANA.mode==="walk"){
+      MANA.x+=MANA.dir*MANA_SPEED*dt; MANA.t+=dt; MANA.frame=Math.floor(MANA.t/.28)%2;
+      if(MANA.x>=MANA_MAX){MANA.x=MANA_MAX;MANA.mode="wave";MANA.t=0;MANA.dir=-1}
+      else if(MANA.x<=MANA_MIN){MANA.x=MANA_MIN;MANA.mode="wave";MANA.t=0;MANA.dir=1}
+    }else{ MANA.t+=dt; if(MANA.t>2.2){MANA.mode="walk";MANA.t=0} } /* 端で手を振って、折り返す */
+  }else{ MANA.mode="wave"; MANA.x=1050; }
+  paintMana(); requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ===== 詳細ウインドウ（「会いに行く」リンク：members.json の link／https のみ） ===== */
+const okLink=u=>typeof u==="string"&&/^https:\/\//i.test(u);
+function openDetail(id){
+  const m=members().find(x=>x.id===id); if(!m) return;
+  const s=stOf(id), lv=stallLevel(s);
+  const link=m.link;
+  document.getElementById("dbox").innerHTML=`<h3>${esc(m.name)}（${esc(m.title||m.role||"")}）</h3>
+   <dl><dt>状態</dt><dd>${s?esc(STATUS_LABEL[s.status]||s.status):"状態ファイルなし"}${lv?`　⚠${ageText(ageMs(s))}止まってる`:""}</dd>
+   <dt>タスク</dt><dd>${esc(s&&s.task||"—")}</dd><dt>ひとこと</dt><dd>${esc(s&&s.say||"—")}</dd>
+   <dt>何待ち</dt><dd>${s&&s.waiting_for?esc(s.waiting_for):"—"}</dd>
+   <dt>最終更新</dt><dd>${s&&s.updated?esc(s.updated.replace("T"," ").slice(0,16)):"—"}</dd></dl>
+   <div class="acts">${okLink(link)?`<a class="go" href="${esc(link)}" target="_blank" rel="noopener noreferrer">会いに行く</a>`:""}<button id="dclose">閉じる</button></div>`;
+  document.getElementById("dlg").classList.add("open");
+  document.getElementById("dclose").focus();
+}
+const closeDlg=()=>document.getElementById("dlg").classList.remove("open");
+document.getElementById("dlg").addEventListener("click",e=>{if(e.target.id==="dlg"||e.target.id==="dclose")closeDlg()});
+addEventListener("keydown",e=>{if(e.key==="Escape")closeDlg()});
+document.addEventListener("click",e=>{const d=e.target.closest("[data-detail]"); if(d) openDetail(d.dataset.detail)});
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",2200)}
+for(const k of ["kiki","emi"]) document.getElementById("p-"+k).addEventListener("click",()=>{
+  const l=((DATA.members||{}).partners||{})[k]||PARTNERS[k].link;
+  okLink(l)?window.open(l,"_blank","noopener,noreferrer"):toast(`${PARTNERS[k].name}のリンク先は、まだ設定されていません`);
+});
+
+/* ===== ライブ読み込み（開いた時＋毎分。同じ場所→GitHubのmain→埋め込み） ===== */
+const RAW="https://raw.githubusercontent.com/gattgati-wq/gacchigachi-floor/main/floor";
+const jf=u=>fetch(u,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);
+async function loadFrom(base){
+  const mem=await (await fetch(base+"/members.json",{cache:"no-store"})).json();
+  const got=await Promise.all(mem.members.map(m=>jf(`${base}/status/${m.id}.json`)));
+  const message=await jf(base+"/megaphone/current.json");
+  const replies=(await Promise.all(mem.members.map(m=>jf(`${base}/megaphone/replies/${m.id}.json`)))).filter(Boolean);
+  const prod=await jf(base+"/products.json");
+  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean),megaphone:{message,replies},products:(prod&&prod.products)||[]};
+}
+async function tryLive(){
+  const bases=location.protocol==="file:"?[RAW]:["..",RAW];
+  for(const b of bases){ try{DATA=await loadFrom(b);SOURCE=b===RAW?"ライブ（GitHub main）":"ライブ";draw();return}catch(e){} }
+  SOURCE="埋め込み（古い可能性あり）"; draw();
+}
+function draw(){renderBoard();renderChars();renderMega();renderProducts(DATA.products);window.__floor={source:SOURCE,members:members().length}}
+draw(); tryLive(); setInterval(tryLive,60000);
+</script>
+</body>
+</html>

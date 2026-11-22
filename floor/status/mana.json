@@ -2,10 +2,10 @@
   "id": "mana",
   "name": "まな",
   "status": "wait_heavy",
-  "task": "HomeKit計画：iPhone先行＋準備",
-  "say": "iPhone版できた。置き場所の判断待ち",
+  "task": "iPhone簡易版の公開準備",
+  "say": "公開の準備OK。Pagesの設定待ち",
   "waiting_for": "",
-  "updated": "2026-11-22T18:51:00+09:00",
+  "updated": "2026-11-22T18:55:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

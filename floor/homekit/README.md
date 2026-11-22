@@ -22,15 +22,18 @@
 | 5 | notice-draft.md | まなが下書き → すぎちゃんが決定 | 下書き済み（未公開） |
 | 6 | m1-checklist.md | まなが下書き → 親方が確認 | 下書き済み |
 | 7 | apple-music-research.md | 調査役（使い捨て） | 完了（確度は低め） |
-| 先行 | iphone/index.html | まな | 作成済み・未公開（下記） |
+| 先行 | docs/index.html（リポジトリ直下の docs/） | まな | 公開準備済み（Pagesの設定待ち。下記） |
 
 ## 順番の変更（すぎちゃん 2026-11-22）
 - **iPhone版だけ先行**。他は準備まで。
 - 親方は時計のファーム調査が元々の担当。**親方の担当分（M1の設定・HA導入・機器取り込み）は、M1到着後にすぎちゃんが様子を見て判断**。
 - iPhone版先行は、M1・親方なしの簡易版：今のHomeKitシーンを、iPhoneの「ショートカット」経由でそのまま呼ぶ。HA版ができたら、`iphone/index.html` の設定の行だけ入れ替える。
 
-## iPhone簡易版（iphone/index.html）
+## iPhone簡易版（docs/index.html）
 - ボタン5つ（2列・1画面・スワイプ無し）。押すと、iPhoneの「ショートカット」アプリのショートカットを呼ぶ（`shortcuts://run-shortcut?name=…`）。
 - すぎちゃんの手元で要る作業：ショートカットを5つ作る（名前は画面のボタン名と同じ。中身は「ホーム → シーンを実行」で、今あるHomeKitのシーンを選ぶ）。
 - ショートカットの名前が違うと動かん。名前はHTML上部の設定で直せる。
-- 公開（置き場所）は未決定＝すぎちゃんの許可待ち。
+- 置き場所：GitHub Pages（すぎちゃん決定・公開OK）。Pagesは `docs/` フォルダだけを公開する設定にする（リポジトリ全体は出さん）。
+- 設定（すぎちゃんの手元）：リポジトリの Settings → Pages → Source を「Deploy from a branch」、Branch を「main」、フォルダを「/docs」にして Save。
+- 公開されるURLは、設定後に Pages の画面に出る（普通は `https://gattgati-wq.github.io/gacchigachi-floor/`。知らんけど）。
+- iPhone側の元データ（`iphone/` の中の下書き）は、`docs/index.html` が正。

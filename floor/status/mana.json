@@ -2,10 +2,10 @@
   "id": "mana",
   "name": "まな",
   "status": "wait_member",
-  "task": "iPhoneパネルの横長ボタンを訂正",
-  "say": "1つ目だけ横長にした。マージ待ち",
+  "task": "iPhoneパネルの呼び出し先を実名に直す",
+  "say": "呼び出し先を直した。マージ待ち",
   "waiting_for": "mii",
-  "updated": "2026-11-22T19:24:00+09:00",
+  "updated": "2026-11-22T20:42:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

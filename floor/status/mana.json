@@ -1,11 +1,11 @@
 {
   "id": "mana",
   "name": "まな",
-  "status": "done",
-  "task": "みーからの初連絡の実行",
-  "say": "初連絡の3件、終わったよ",
+  "status": "wait_heavy",
+  "task": "HomeKit自作コントロール計画の設計",
+  "say": "訂正を反映。順番の判断待ち",
   "waiting_for": "",
-  "updated": "2026-11-22T15:46:00+09:00",
+  "updated": "2026-11-22T18:46:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

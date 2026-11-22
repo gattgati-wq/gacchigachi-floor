@@ -6,12 +6,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ガッチ">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1c1b1a">
+<meta name="theme-color" content="#0e6137">
 <title>ガッチ パネル</title>
 <style>
   :root{
-    --bg:#1c1b1a; --ink:#f3efe8; --sub:#9a948a;
-    --b1:#3a3733; --b1p:#55504a;
+    /* 色は予約システムのCSSから（みーが取得） */
+    --bg:#0e6137;      /* 背景：予約システムのグリーン */
+    --btn:#d9ab52;     /* ボタン：予約システムの黄土色 */
+    --btn-on:#c4963f;  /* 押した時（まなが決めた少し濃い黄土色） */
+    --brown:#573a29;   /* ボタンの文字と枠：予約システムの茶色 */
+    --ink:#f6efe0; --sub:#cfe3d6;
     --gap:14px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -23,13 +27,13 @@
   .grid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;
     grid-template-rows:repeat(3,1fr);gap:var(--gap)}
   .grid a{display:flex;align-items:center;justify-content:center;text-align:center;
-    background:var(--b1);color:var(--ink);text-decoration:none;
-    border-radius:20px;font-size:clamp(20px,6vw,26px);font-weight:600;letter-spacing:.04em;
-    border-left:6px solid var(--c);
-    transition:transform .08s,background .08s;user-select:none;-webkit-user-select:none}
-  .grid a:active,.grid a.on{background:var(--b1p);transform:scale(.97)}
+    background:var(--btn);color:var(--brown);text-decoration:none;
+    border:3px solid var(--brown);box-shadow:none;
+    border-radius:12px;font-size:clamp(20px,6vw,26px);font-weight:700;letter-spacing:.04em;
+    user-select:none;-webkit-user-select:none}
+  .grid a:active,.grid a.on{background:var(--btn-on)}
   .grid a.wide{grid-column:1 / -1}
-  .err{height:18px;margin-top:10px;font-size:12px;color:#e8a08a;text-align:center;visibility:hidden}
+  .err{height:18px;margin-top:10px;font-size:12px;color:#fff3d6;text-align:center;visibility:hidden}
   .err.show{visibility:visible}
 </style>
 </head>
@@ -43,20 +47,18 @@
 /* ===== 設定：ここだけ直せば動く =====
    name   … 画面のボタン名（scenes.md の呼び名と同じ）
    shortcut … iPhoneの「ショートカット」アプリに作った名前（動作は「ホーム → シーンを実行」）
-   color  … 左の細い色線
    将来、HA版に差し替える時は、この配列の href だけ入れ替える。 */
 const SCENES = [
-  { name:"仕事だよ",   shortcut:"仕事だよ",   color:"#d9a441" },
-  { name:"おはよう",   shortcut:"おはよう",   color:"#8fb9a8" },
-  { name:"おやすみ",   shortcut:"おやすみ",   color:"#7a8cc2" },
-  { name:"明るくして", shortcut:"明るくして", color:"#e8d28a" },
-  { name:"作業モード", shortcut:"作業モード", color:"#c98a6b", wide:true },
+  { name:"仕事だよ",   shortcut:"仕事だよ" },
+  { name:"おはよう",   shortcut:"おはよう" },
+  { name:"おやすみ",   shortcut:"おやすみ" },
+  { name:"明るくして", shortcut:"明るくして" },
+  { name:"作業モード", shortcut:"作業モード", wide:true },
 ];
 const grid = document.getElementById("grid");
 for (const s of SCENES) {
   const a = document.createElement("a");
   a.textContent = s.name;
-  a.style.setProperty("--c", s.color);
   if (s.wide) a.className = "wide";
   a.href = "shortcuts://run-shortcut?name=" + encodeURIComponent(s.shortcut);
   a.addEventListener("click", () => {

@@ -32,7 +32,6 @@
     border-radius:12px;font-size:clamp(20px,6vw,26px);font-weight:700;letter-spacing:.04em;
     user-select:none;-webkit-user-select:none}
   .grid a:active,.grid a.on{background:var(--btn-on)}
-  .grid a.wide{grid-column:1 / -1}
   .err{height:18px;margin-top:10px;font-size:12px;color:#fff3d6;text-align:center;visibility:hidden}
   .err.show{visibility:visible}
 </style>
@@ -53,13 +52,12 @@ const SCENES = [
   { name:"おはよう",   shortcut:"おはよう" },
   { name:"おやすみ",   shortcut:"おやすみ" },
   { name:"明るくして", shortcut:"明るくして" },
-  { name:"作業モード", shortcut:"作業モード", wide:true },
+  { name:"作業モード", shortcut:"作業モード" },
 ];
 const grid = document.getElementById("grid");
 for (const s of SCENES) {
   const a = document.createElement("a");
   a.textContent = s.name;
-  if (s.wide) a.className = "wide";
   a.href = "shortcuts://run-shortcut?name=" + encodeURIComponent(s.shortcut);
   a.addEventListener("click", () => {
     a.classList.add("on");

@@ -28,7 +28,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .mag img{display:block;width:100%;height:auto}
 .mag span{position:absolute;left:0;right:0;top:0;height:27px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;white-space:nowrap;font-family:inherit}
 .mag i{font-style:normal;margin-left:3px;font-size:11px}
-.more{position:absolute;right:2px;bottom:-4px;font-size:13px;font-weight:800;background:#fff;border:2px solid #5a3a12;border-radius:10px;padding:0 6px;z-index:50}
+.more{position:absolute;right:2px;bottom:-15px;font-size:13px;font-weight:800;background:#fff;border:2px solid #5a3a12;border-radius:10px;padding:0 6px;z-index:50}
 
 /* 日時プレート：枠はキキの画像（数字は消してある）。日付と時刻はコードで載せる */
 #plate{left:8px;top:230px;width:528px;height:74px;background:url(ui/plate.webp) center/100% 100% no-repeat;display:block;color:#1a1208;font-weight:800;font-variant-numeric:tabular-nums}
@@ -45,7 +45,15 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 #mega .rep{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0}
 #mega .r{font-size:14px;border-left:5px solid #888;padding:1px 7px;background:rgba(255,255,255,.4);border-radius:4px}
 #mega .r.none{opacity:.55;border-left-color:#d62828}
-#mega .note{margin-top:auto;font-size:12px;opacity:.65}
+#mega .write{margin-top:auto;border:2px solid #6b4a1a;border-radius:10px;background:rgba(255,255,255,.55);padding:6px 8px;display:flex;flex-direction:column;gap:5px}
+#mega .write label{font-size:13px;font-weight:700}
+#mega select,#mega textarea{font:inherit;font-size:14px;border:2px solid #6b4a1a;border-radius:6px;background:#fff;color:#2a1208;padding:2px 5px}
+#mega textarea{resize:none;height:54px}
+#mega .wb{display:flex;align-items:center;gap:8px}
+#mega .wb button{font:inherit;font-size:13px;font-weight:800;border:2px solid #6b4a1a;border-radius:8px;background:#f0c75a;color:#2a1208;padding:2px 10px;cursor:pointer}
+#mega .wb span{font-size:12px;opacity:.75}
+.tag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:linear-gradient(180deg,#fff6dc,#ecd197);border:2px solid #b8861f;border-radius:8px;padding:0 8px;font-size:13px;font-weight:800;color:#3a2412;white-space:nowrap;box-shadow:0 2px 3px rgba(0,0,0,.4);pointer-events:none}
+.ch.mana .tag{bottom:-6px}
 
 /* 完成品置き場：枠はキキの縦長の枠を、角と辺を固定して横に伸ばして作った画像 */
 #products{left:940px;top:8px;width:650px;height:360px;background:url(ui/products.webp) center/100% 100% no-repeat}
@@ -113,7 +121,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 <div id="dlg" role="dialog" aria-modal="true"><div class="box" id="dbox"></div></div>
 <div id="toast"></div>
 
-<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T01:15:09+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザインの試作（v4）", "say": "試作v4を作った。見てもらう待ち", "waiting_for": "", "updated": "2026-11-22T21:30:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T01:51:05+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザインの試作（v4）", "say": "枠とマグネットを組み込んだ。見てもらう待ち", "waiting_for": "", "updated": "2026-11-22T22:10:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
 <script>
 /* ===== 設定（ここを直せば動く） ===== */
 const STAGE_W=1600, STAGE_H=1020;
@@ -202,14 +210,27 @@ function renderMega(){
   const got=new Set(rs.filter(r=>m&&r.msg_id===m.id).map(r=>r.id));
   const target=ms.filter(x=>!m||x.id!==m.from);
   const nOk=target.filter(x=>got.has(x.id)).length;
-  document.getElementById("mega").innerHTML=`<div class="in">
-    <h2>拡声器</h2>
+  document.getElementById("mview").innerHTML=`
     <div class="msg">${m?esc(m.text):"連絡はまだありません"}</div>
     <div class="meta">${m?`${esc(m.from_name||m.from)} ／ 返事 ${nOk}/${target.length}`:""}</div>
     <div class="rep">${m?target.map(x=>{const r=rs.find(y=>y.id===x.id&&y.msg_id===m.id);
-      return `<div class="r ${r?"":"none"}" style="${r?`border-left-color:${COLORS[x.id]||"#888"}`:""}"><b>${esc(x.name)}</b>：${r?esc(r.text):"（未返信）"}</div>`}).join(""):""}</div>
-    <div class="note">試作：読むだけ。連絡を書く欄は、あとで移す。</div></div>`;
+      return `<div class="r ${r?"":"none"}" style="${r?`border-left-color:${COLORS[x.id]||"#888"}`:""}"><b>${esc(x.name)}</b>：${r?esc(r.text):"（未返信）"}</div>`}).join(""):""}</div>`;
 }
+/* 書く欄は一度だけ作る（毎分の再描画で入力が消えんように）。共有保存はできんので、コピーしてみーに渡す */
+(function buildWrite(){
+  document.getElementById("mega").innerHTML=`<div class="in"><h2>拡声器</h2><div id="mview" style="display:flex;flex-direction:column;gap:8px;min-height:0;flex:1 1 auto;overflow:hidden"></div>
+   <div class="write"><label>送る人 <select id="mfrom"><option value="chairman">すぎちゃん</option><option value="mii">みー</option></select></label>
+   <textarea id="mtext" placeholder="全員への連絡・質問を書く"></textarea>
+   <div class="wb"><button id="mcp">コピー（みーに渡す用）</button><span id="mmsg">共有保存はできんので、みーが置く</span></div></div></div>`;
+  document.getElementById("mcp").onclick=async()=>{
+    const t=document.getElementById("mtext").value.trim(), f=document.getElementById("mfrom").value, msg=document.getElementById("mmsg");
+    if(!t){msg.textContent="文章が空やで";return}
+    const o=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));
+    const obj={id:`${o.year}${o.month}${o.day}-${o.hour}${o.minute}`,from:f,from_name:f==="mii"?"みー":"すぎちゃん",text:t,sent:`${o.year}-${o.month}-${o.day}T${o.hour}:${o.minute}:${o.second}+09:00`};
+    const txt="【拡声器】floor/megaphone/current.json に置く\n"+JSON.stringify(obj,null,2);
+    try{await navigator.clipboard.writeText(txt);msg.textContent="コピーした ✔ みーに渡してな"}catch(e){msg.textContent="コピーできんかった（ブラウザの設定を確認）"}
+  };
+})();
 
 /* ===== 完成品置き場（名前だけ。みーが products.json に書く） ===== */
 function renderProducts(list){
@@ -228,7 +249,7 @@ function renderChars(){
     return `<button class="ch ${L.cls}" data-detail="${esc(m.id)}" style="left:${cx-80}px;top:${cy-80}px;z-index:${cy}" aria-label="${esc(m.name)}">
       <img class="art" data-id="${esc(m.id)}" data-pose="${L.pose}" src="img/${esc(m.id)}-${L.pose}${f}.webp" alt="">
       ${L.bubble?`<span class="bubble">許可まち</span>`:""}${L.check?`<span class="check">✓</span>`:""}
-      ${L.stall?`<span class="stall">⚠${ageText(ageMs(s))}</span>`:""}</button>`;
+      ${L.stall?`<span class="stall">⚠${ageText(ageMs(s))}</span>`:""}<span class="tag">${esc(m.title||m.role||m.name)}</span></button>`;
   }).join("");
   box.querySelectorAll(".ch:not(.mana)").forEach(e=>e.remove());
   box.insertAdjacentHTML("afterbegin",html);
@@ -247,7 +268,7 @@ const MANA={x:760,y:928,dir:1,mode:"walk",t:0,frame:0};
 const MANA_MIN=700, MANA_MAX=1440, MANA_SPEED=70;
 (function buildMana(){
   const b=document.createElement("button"); b.className="ch mana s-normal"; b.dataset.detail="mana"; b.setAttribute("aria-label","まな");
-  b.innerHTML=`<img class="art" id="manaImg" src="img/mana-walk1.webp" alt="">`;
+  b.innerHTML=`<img class="art" id="manaImg" src="img/mana-walk1.webp" alt=""><span class="tag">${esc((members().find(x=>x.id==="mana")||{}).title||"まな")}</span>`;
   document.getElementById("chars").appendChild(b); MANA.el=b; MANA.img=b.querySelector("img");
   paintMana();
 })();

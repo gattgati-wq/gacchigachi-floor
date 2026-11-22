@@ -19,7 +19,13 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 
 /* 状態ボード（4列）：枠はキキの画像。見出し（待機中〜完了）は画像に入っている。中の4マスにマグネットを重ねる */
 #board{left:8px;top:8px;width:452px;height:180px;background:url(ui/board.webp) center/100% 100% no-repeat}
-.frame.img{border:0;border-radius:0;box-shadow:none;padding:0}
+.frame.img{border:0;border-radius:0;box-shadow:none;padding:0;transform-origin:0 0;transform:scale(var(--ps,1));touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
+.frame.img.pdrag{cursor:grabbing;z-index:9500!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55))}
+.frame.img textarea{-webkit-user-select:text;user-select:text;cursor:text}
+.rz{position:absolute;right:7px;bottom:7px;width:26px;height:26px;border-radius:7px;background:rgba(255,246,220,.9);border:2px solid #b8861f;color:#7a4a00;font-size:16px;line-height:22px;text-align:center;cursor:nwse-resize;opacity:.0;transition:opacity .15s;z-index:20;touch-action:none}
+.frame.img:hover .rz,.rz.show{opacity:.95}
+@media (hover:none){.rz{opacity:.75}}
+.partner{touch-action:none}
 #board .cols{position:absolute;inset:0}
 .col{position:absolute;top:33.3%;height:52.6%;overflow:visible}
 .col:nth-child(1){left:5%;width:21%}.col:nth-child(2){left:28.5%;width:20.7%}
@@ -155,7 +161,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 <div id="dlg" role="dialog" aria-modal="true"><div class="box" id="dbox"></div></div>
 <div id="toast"></div>
 
-<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T07:20:28+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザイン v4 の仕上げ", "say": "v4を仕上げた。切り替えの判断待ち", "waiting_for": "", "updated": "2026-11-22T23:00:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T07:24:32+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザイン v4 の仕上げ", "say": "v4を仕上げた。切り替えの判断待ち", "waiting_for": "", "updated": "2026-11-22T23:00:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
 <script>
 /* ===== 設定（ここを直せば動く） ===== */
 const STAGE_W=1600, STAGE_H=1020;
@@ -179,7 +185,12 @@ const NO_SLEEP=new Set(["mana"]);              /* 統括は寝ない */
 const PARTNERS={kiki:{name:"キキ",link:""},emi:{name:"えみ",link:""}}; /* リンク先は members.json の partners で上書き（https のみ） */
 /* ドラッグで動かした位置：この端末のブラウザだけに覚える（共有はされない）。保存できん環境でも動く */
 let POS={}; try{POS=JSON.parse(localStorage.getItem("floor_v4_pos")||"{}")||{}}catch(e){POS={}}
-const savePos=()=>{try{localStorage.setItem("floor_v4_pos",JSON.stringify(POS))}catch(e){}; document.getElementById("reset").style.display=Object.keys(POS).length?"block":"none"};
+/* ボード類も、キャラと同じく、ドラッグで動かせて、大小も変えられる。位置と大きさは、この端末のブラウザだけに覚える */
+let PANEL={}; try{PANEL=JSON.parse(localStorage.getItem("floor_v4_panels")||"{}")||{}}catch(e){PANEL={}}
+const PANELS={ board:{sel:"#board",w:452,h:180,x:8,y:8}, plate:{sel:"#plate",w:480,h:68,x:659,y:12},
+               mega:{sel:"#mega",w:452,h:812,x:8,y:200}, products:{sel:"#products",w:254,h:1004,x:1338,y:8},
+               kiki:{sel:"#p-kiki",w:155,h:155,x:742,y:130,fixed:true}, emi:{sel:"#p-emi",w:155,h:155,x:960,y:130,fixed:true} };
+const savePos=()=>{try{localStorage.setItem("floor_v4_pos",JSON.stringify(POS));localStorage.setItem("floor_v4_panels",JSON.stringify(PANEL))}catch(e){}; document.getElementById("reset").style.display=(Object.keys(POS).length||Object.keys(PANEL).length)?"block":"none"};
 const DRAG={active:false};
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -476,10 +487,54 @@ document.getElementById("chars").addEventListener("pointerdown",e=>{
   addEventListener("pointermove",mv); addEventListener("pointerup",up); addEventListener("pointercancel",up);
 });
 document.getElementById("chars").addEventListener("dragstart",e=>e.preventDefault());
-document.getElementById("reset").addEventListener("click",()=>{POS={};savePos();renderChars()});
+document.getElementById("reset").addEventListener("click",()=>{POS={};PANEL={};savePos();renderChars();applyPanels()});
+/* ----- ボード類：配置と大きさ ----- */
+function applyPanels(){
+  for(const [id,d] of Object.entries(PANELS)){
+    const el=document.querySelector(d.sel); if(!el) continue;
+    const st=PANEL[id]||{}, sc=st.s||1, x=st.x??d.x, y=st.y??d.y;
+    el.style.left=x+"px"; el.style.top=y+"px"; el.style.setProperty("--ps",sc);
+    if(d.fixed) el.style.transform=`scale(${sc})`, el.style.transformOrigin="0 0";
+  }
+}
+let PZ=0;
+const clampPanel=(d,x,y,sc)=>{ const W=d.w*sc,H=d.h*sc; return [Math.max(0,Math.min(STAGE_W-W,x)),Math.max(0,Math.min(STAGE_H-H,y))] };
+for(const [id,d] of Object.entries(PANELS)){
+  const el=document.querySelector(d.sel); if(!el) continue;
+  if(!d.fixed){ const rz=document.createElement("span"); rz.className="rz"; rz.title="ドラッグで大きさを変える"; rz.textContent="◢"; el.appendChild(rz); }
+  el.addEventListener("pointerdown",e=>{
+    if(e.button>0) return;
+    const onRz=e.target.closest(".rz");
+    if(!onRz&&e.target.closest("textarea,select,input,a,label,#mcp,#dclose")) return;   /* 入力欄・ボタンは、そのまま使う */
+    el.style.zIndex=String(2+(++PZ));   /* さわったボードを、いちばん手前に（キャラよりは奥） */
+    const st0=PANEL[id]||{}, sc0=st0.s||1, x0=st0.x??d.x, y0=st0.y??d.y, rect=document.getElementById("stage").getBoundingClientRect();
+    const px=(e.clientX-rect.left)/SCALE, py=(e.clientY-rect.top)/SCALE, offX=px-x0, offY=py-y0;
+    let moved=false, cur={x:x0,y:y0,s:sc0};
+    if(onRz) e.preventDefault();
+    const mv=ev=>{
+      const mx=(ev.clientX-rect.left)/SCALE, my=(ev.clientY-rect.top)/SCALE;
+      if(!moved&&Math.hypot(ev.clientX-e.clientX,ev.clientY-e.clientY)<6) return;
+      if(!moved){moved=true;DRAG.active=true;el.classList.add("pdrag")}
+      if(onRz){   /* 縦横の比は固定して、大小だけ変える（絵が歪まんように） */
+        let sc=Math.max(.4,Math.min(2.2,(mx-x0)/d.w)); sc=Math.min(sc,(STAGE_W-x0)/d.w,(STAGE_H-y0)/d.h); sc=Math.max(.4,sc);
+        cur={x:x0,y:y0,s:+sc.toFixed(3)};
+      }else{
+        const [x,y]=clampPanel(d,mx-offX,my-offY,sc0); cur={x:Math.round(x),y:Math.round(y),s:sc0};
+      }
+      PANEL[id]=cur; applyPanels();
+    };
+    const up=()=>{
+      removeEventListener("pointermove",mv);removeEventListener("pointerup",up);removeEventListener("pointercancel",up);
+      if(moved){el.classList.remove("pdrag");DRAG.active=false;justDragged=true;setTimeout(()=>justDragged=false,80);savePos()}
+    };
+    addEventListener("pointermove",mv);addEventListener("pointerup",up);addEventListener("pointercancel",up);
+  });
+}
+applyPanels();
 savePos();
 function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",2200)}
 for(const k of ["kiki","emi"]) document.getElementById("p-"+k).addEventListener("click",()=>{
+  if(justDragged) return;
   const l=((DATA.members||{}).partners||{})[k]||PARTNERS[k].link;
   okLink(l)?window.open(l,"_blank","noopener,noreferrer"):toast(`${PARTNERS[k].name}のリンク先は、まだ設定されていません`);
 });

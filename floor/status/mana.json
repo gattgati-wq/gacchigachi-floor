@@ -1,0 +1,16 @@
+{
+  "id": "mana",
+  "name": "まな",
+  "status": "done",
+  "task": "みーからの初連絡の実行",
+  "say": "初連絡の3件、終わったよ",
+  "waiting_for": "",
+  "updated": "2026-11-22T15:46:00+09:00",
+  "usage": {
+    "context_used": 87748,
+    "context_max": 1000000,
+    "output_tokens": 1641,
+    "cost_usd": 0.1636628,
+    "measured": "2026-11-22T15:40:00+09:00"
+  }
+}

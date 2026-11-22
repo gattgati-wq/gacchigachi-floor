@@ -2,10 +2,10 @@
   "id": "mana",
   "name": "まな",
   "status": "wait_heavy",
-  "task": "フロア画面スタイリッシュ化の案出し",
-  "say": "みー評価を足した。判断待ち",
+  "task": "HomeKit自作コントロール計画の設計",
+  "say": "設計と段取りを出した。判断待ち",
   "waiting_for": "",
-  "updated": "2026-11-22T18:32:00+09:00",
+  "updated": "2026-11-22T18:55:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

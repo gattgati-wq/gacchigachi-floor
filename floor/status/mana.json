@@ -2,10 +2,10 @@
   "id": "mana",
   "name": "まな",
   "status": "wait_member",
-  "task": "iPhoneパネルの表示名変更",
-  "say": "表示名を変えた。マージ待ち",
+  "task": "iPhoneパネルの見出しを消す",
+  "say": "見出しを消した。マージ待ち",
   "waiting_for": "mii",
-  "updated": "2026-11-22T19:16:00+09:00",
+  "updated": "2026-11-22T19:20:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

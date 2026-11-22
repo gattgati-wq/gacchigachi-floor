@@ -1,11 +1,11 @@
 {
   "id": "mana",
   "name": "まな",
-  "status": "wait_heavy",
-  "task": "Pages公開の記録を訂正",
-  "say": "記録を直した。場所の判断待ち",
-  "waiting_for": "",
-  "updated": "2026-11-22T18:59:00+09:00",
+  "status": "wait_member",
+  "task": "iPhoneパネルの色の反映",
+  "say": "色を反映した。マージ待ち",
+  "waiting_for": "mii",
+  "updated": "2026-11-22T19:04:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

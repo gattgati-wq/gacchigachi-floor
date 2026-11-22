@@ -20,3 +20,8 @@
 1. `img/<メンバーID>-<ポーズ>.webp` を5枚（normal／work／panic／yawn／sleep）置く（例：`img/mana-normal.webp`）
 2. members.json のその子に `"art": true` を足す
 コードの書き換えは要らない。
+
+### まなの素材（キキ作・藍色 #4356A6）
+- `mana-normal`（01）／`mana-work`（02）／`mana-yawn`（03）／`mana-sleep`（04）の4枚＋`mana-done`（05 完了ポーズ）。
+- 「焦ってる（panic）」は届いていないので、`mana-normal` で代用して表示する（画像が無いポーズは normal に自動で切り替わる）。
+- 完了の子は、members.json に `"art_done": true` があれば `<ID>-done.webp` を使う（無ければ normal）。

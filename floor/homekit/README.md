@@ -22,7 +22,7 @@
 | 5 | notice-draft.md | まなが下書き → すぎちゃんが決定 | 下書き済み（未公開） |
 | 6 | m1-checklist.md | まなが下書き → 親方が確認 | 下書き済み |
 | 7 | apple-music-research.md | 調査役（使い捨て） | 完了（確度は低め） |
-| 先行 | docs/index.html（リポジトリ直下の docs/） | まな | 公開準備済み（Pagesの設定待ち。下記） |
+| 先行 | iPhone簡易版（現在 docs/index.html。置き場所は要対応） | まな | 公開済み（みーが表示確認） |
 
 ## 順番の変更（すぎちゃん 2026-11-22）
 - **iPhone版だけ先行**。他は準備まで。
@@ -33,7 +33,9 @@
 - ボタン5つ（2列・1画面・スワイプ無し）。押すと、iPhoneの「ショートカット」アプリのショートカットを呼ぶ（`shortcuts://run-shortcut?name=…`）。
 - すぎちゃんの手元で要る作業：ショートカットを5つ作る（名前は画面のボタン名と同じ。中身は「ホーム → シーンを実行」で、今あるHomeKitのシーンを選ぶ）。
 - ショートカットの名前が違うと動かん。名前はHTML上部の設定で直せる。
-- 置き場所：GitHub Pages（すぎちゃん決定・公開OK）。Pagesは `docs/` フォルダだけを公開する設定にする（リポジトリ全体は出さん）。
-- 設定（すぎちゃんの手元）：リポジトリの Settings → Pages → Source を「Deploy from a branch」、Branch を「main」、フォルダを「/docs」にして Save。
-- 公開されるURLは、設定後に Pages の画面に出る（普通は `https://gattgati-wq.github.io/gacchigachi-floor/`。知らんけど）。
-- iPhone側の元データ（`iphone/` の中の下書き）は、`docs/index.html` が正。
+- 置き場所：GitHub Pages（すぎちゃん決定・公開OK）。
+- **Pagesは既に main のルート（リポジトリ全体）を公開元にしている**（みーが確認）。Settings → Pages の変更は**不要。変えたらフロア画面が壊れる。触らんこと**。
+- 公開URL（みーが表示確認済み）：`https://gattgati-wq.github.io/gacchigachi-floor/floor/homekit/iphone/`
+- **リポジトリの中身は全部、公開サイトとして読める**。お客さんの情報・予約者メモ・玄関の写真は、このリポジトリに絶対入れん。
+- ※ 要対応：PR #18 で `iphone/index.html` を `docs/index.html` に移したため、上の確認済みURLの場所にファイルが無い状態。詳しくは `floor/inbox/to-mi.md` の訂正を見ること。
+

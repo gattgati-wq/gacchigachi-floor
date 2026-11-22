@@ -1,11 +1,11 @@
 {
   "id": "sekkeikakari",
   "name": "フロア設計係",
-  "status": "working",
-  "task": "フロアにまなを追加",
-  "say": "まなの席と名札を用意中",
-  "waiting_for": "",
-  "updated": "2026-11-22T17:37:00+09:00",
+  "status": "wait_light",
+  "task": "まな追加（PR）",
+  "say": "まな追加のPRを出した。みーの確認待ち",
+  "waiting_for": "mii",
+  "updated": "2026-11-22T17:37:50+09:00",
   "usage": {
     "context_used": 343618,
     "context_max": 1000000,

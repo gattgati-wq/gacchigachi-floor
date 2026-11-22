@@ -44,14 +44,14 @@
 <script>
 /* ===== 設定：ここだけ直せば動く =====
    name   … 画面に書く言葉（表示名。見た目だけ。すぎちゃん指定。wide:true は横いっぱい）
-   shortcut … 呼び出すショートカットの名前＝元のシーン名。**変えたら動かんくなる**（動作は「ホーム → シーンを実行」）
+   shortcut … 呼び出すショートカットの名前（iPhoneに実際に作られた名前。シーンと同名は付けられんかった）。**1文字でも違うと動かん**（動作は「ホーム → シーンを実行」）
    将来、HA版に差し替える時は、この配列の href だけ入れ替える。 */
 const SCENES = [
-  { name:"ガっチガチ研究所", shortcut:"仕事だよ", wide:true },
-  { name:"休憩中",   shortcut:"おはよう" },
-  { name:"閉店ガラガラ",   shortcut:"おやすみ" },
-  { name:"明るくして", shortcut:"明るくして" },
-  { name:"作業中だよ", shortcut:"作業モード" },
+  { name:"ガっチガチ研究所", shortcut:"しごとだよ", wide:true },
+  { name:"休憩中",   shortcut:"おはよう！" },
+  { name:"閉店ガラガラ",   shortcut:"おやすみ！" },
+  { name:"明るくして", shortcut:"あかるくして" },
+  { name:"作業中だよ", shortcut:"さぎょうモード" },
 ];
 const grid = document.getElementById("grid");
 for (const s of SCENES) {

@@ -1,11 +1,11 @@
 {
   "id": "sekkeikakari",
   "name": "フロア設計係",
-  "status": "done",
-  "task": "フロアv3 容量表示（自己申告）",
-  "say": "容量表示を実装。使用量は自分で書いたよ",
+  "status": "working",
+  "task": "フロアにまなを追加",
+  "say": "まなの席と名札を用意中",
   "waiting_for": "",
-  "updated": "2026-11-21T12:43:09+09:00",
+  "updated": "2026-11-22T17:37:00+09:00",
   "usage": {
     "context_used": 343618,
     "context_max": 1000000,

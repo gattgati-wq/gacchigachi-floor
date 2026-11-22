@@ -73,6 +73,15 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .ch{position:absolute;width:140px;height:140px;border:0;background:none;padding:0;cursor:pointer;pointer-events:auto}
 .ch .art{width:100%;height:100%;display:block;transform-origin:50% 92%;filter:drop-shadow(0 6px 5px rgba(0,0,0,.45))}
 .ch.flip .art{scale:-1 1}
+.ch img{-webkit-user-drag:none;user-drag:none}
+.ch{touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
+.ch.dragging{cursor:grabbing;transition:none}
+.ch.dragging .art{animation:none!important;transform:scale(1.08) translateY(-6px);filter:drop-shadow(0 14px 8px rgba(0,0,0,.5))}
+@keyframes poke{0%{transform:scale(1,1)}25%{transform:scale(1.12,.86) translateY(4px)}55%{transform:scale(.94,1.12) translateY(-22px)}80%{transform:scale(1.04,.96) translateY(0)}100%{transform:scale(1,1)}}
+.ch.react .art{animation:poke .6s ease-out 1!important}
+.say{position:absolute;left:50%;top:-14px;transform:translateX(-50%);background:#fff;border:3px solid #3a2412;border-radius:14px;padding:1px 10px;font-size:16px;font-weight:800;color:#3a2412;white-space:nowrap;z-index:2;pointer-events:none;box-shadow:0 3px 5px rgba(0,0,0,.4)}
+.say:after{content:"";position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);border:6px solid transparent;border-top-color:#3a2412;border-bottom:0}
+#reset{position:absolute;left:478px;top:988px;z-index:9000;display:none;font:inherit;font-size:13px;font-weight:800;border:2px solid #b8861f;border-radius:10px;background:rgba(255,246,220,.92);color:#3a2412;padding:2px 10px;cursor:pointer}
 @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.02)}}
 @keyframes shake{0%,100%{transform:translate(0,2px) rotate(-1.4deg)}25%{transform:translate(-1.5px,0) rotate(-1.9deg)}50%{transform:translate(1.5px,2px) rotate(-1.1deg)}75%{transform:translate(-1px,1px) rotate(-1.7deg)}}
 @keyframes yawnmove{0%,60%,100%{transform:scale(1,1)}75%{transform:scale(1.03,1.05) translateY(-2px)}}
@@ -88,7 +97,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .bubble:after{content:"";position:absolute;left:14px;bottom:-11px;border:6px solid transparent;border-top-color:#6b4a00;border-bottom:0}
 .check{position:absolute;right:14px;top:6px;width:36px;height:36px;border-radius:50%;background:#5ac26a;border:3px solid #222;color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center}
 .stall{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);background:#d62828;color:#fff;border:2px solid #111;border-radius:6px;padding:0 8px;font-size:15px;font-weight:800;white-space:nowrap}
-@media (prefers-reduced-motion:reduce){.ch .art,.bubble{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.ch .art,.bubble,.ch.react .art{animation:none!important}}
 
 /* ----- 詳細ウインドウ ----- */
 #dlg{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);z-index:100}
@@ -116,12 +125,13 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
   <button class="partner" id="p-emi" style="left:960px;top:130px" aria-label="えみ"><img src="img/icon-emi.webp" alt="えみ"></button>
 
   <div id="chars"></div>
+  <button id="reset" title="動かしたキャラを、もとの席に戻す">配置を戻す</button>
 </div>
 
 <div id="dlg" role="dialog" aria-modal="true"><div class="box" id="dbox"></div></div>
 <div id="toast"></div>
 
-<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T06:55:02+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザイン v4 の仕上げ", "say": "v4を仕上げた。切り替えの判断待ち", "waiting_for": "", "updated": "2026-11-22T23:00:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T06:57:34+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザイン v4 の仕上げ", "say": "v4を仕上げた。切り替えの判断待ち", "waiting_for": "", "updated": "2026-11-22T23:00:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
 <script>
 /* ===== 設定（ここを直せば動く） ===== */
 const STAGE_W=1600, STAGE_H=1020;
@@ -143,11 +153,16 @@ const STALL_L1=6*3600e3, STALL_L2=24*3600e3; /* 作業中・待ちで更新な�
 const YAWN_MS=24*3600e3, SLEEP_MS=72*3600e3;  /* 待機：24時間でヒマ（あくび）／72時間で長らくヒマ（寝てる） */
 const NO_SLEEP=new Set(["mana"]);              /* 統括は寝ない */
 const PARTNERS={kiki:{name:"キキ",link:""},emi:{name:"えみ",link:""}}; /* リンク先は members.json の partners で上書き（https のみ） */
+/* ドラッグで動かした位置：この端末のブラウザだけに覚える（共有はされない）。保存できん環境でも動く */
+let POS={}; try{POS=JSON.parse(localStorage.getItem("floor_v4_pos")||"{}")||{}}catch(e){POS={}}
+const savePos=()=>{try{localStorage.setItem("floor_v4_pos",JSON.stringify(POS))}catch(e){}; document.getElementById("reset").style.display=Object.keys(POS).length?"block":"none"};
+const DRAG={active:false};
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ===== 舞台の拡縮 ===== */
+let SCALE=1;
 function fit(){
-  const s=Math.min(innerWidth/STAGE_W, innerHeight/STAGE_H);
+  const s=Math.min(innerWidth/STAGE_W, innerHeight/STAGE_H); SCALE=s;
   const st=document.getElementById("stage");
   st.style.transform=`scale(${s})`;
   st.style.left=((innerWidth-STAGE_W*s)/2)+"px"; st.style.top=((innerHeight-STAGE_H*s)/2)+"px";
@@ -245,10 +260,10 @@ const FRAME={}; /* 2コマの子の現在のコマ */
 function renderChars(){
   const box=document.getElementById("chars");
   const html=members().filter(m=>SEAT[m.id]).map(m=>{
-    const [cx,cy]=SEAT[m.id], s=stOf(m.id), L=look(m.id,s);
+    const [cx,cy]=POS[m.id]||SEAT[m.id], s=stOf(m.id), L=look(m.id,s);
     const f=TWO_FRAME[m.id]&&(L.pose==="normal"||L.pose==="busy")&&FRAME[m.id]?"2":"";
-    return `<button class="ch ${L.cls}" data-detail="${esc(m.id)}" style="left:${cx-70}px;top:${cy-70}px;z-index:${cy}" aria-label="${esc(m.name)}">
-      <img class="art" data-id="${esc(m.id)}" data-pose="${L.pose}" src="img/${esc(m.id)}-${L.pose}${f}.webp" alt="">
+    return `<button class="ch ${L.cls}" data-detail="${esc(m.id)}" data-pose="${L.pose}" style="left:${cx-70}px;top:${cy-70}px;z-index:${cy}" aria-label="${esc(m.name)}">
+      <img class="art" draggable="false" data-id="${esc(m.id)}" data-pose="${L.pose}" src="img/${esc(m.id)}-${L.pose}${f}.webp" alt="">
       ${L.bubble?`<span class="bubble">許可まち</span>`:""}${L.check?`<span class="check">✓</span>`:""}
       ${L.stall?`<span class="stall">⚠${ageText(ageMs(s))}</span>`:""}<span class="tag">${esc(m.title||m.role||m.name)}</span></button>`;
   }).join("");
@@ -269,13 +284,13 @@ const MANA={x:860,y:915,dir:1,mode:"walk",t:0,frame:0};
 const MANA_MIN=760, MANA_MAX=1260, MANA_SPEED=70;
 (function buildMana(){
   const b=document.createElement("button"); b.className="ch mana s-normal"; b.dataset.detail="mana"; b.setAttribute("aria-label","まな");
-  b.innerHTML=`<img class="art" id="manaImg" src="img/mana-walk1.webp" alt=""><span class="tag">${esc((members().find(x=>x.id==="mana")||{}).title||"まな")}</span>`;
+  b.innerHTML=`<img class="art" draggable="false" id="manaImg" src="img/mana-walk1.webp" alt=""><span class="tag">${esc((members().find(x=>x.id==="mana")||{}).title||"まな")}</span>`;
   document.getElementById("chars").appendChild(b); MANA.el=b; MANA.img=b.querySelector("img");
   paintMana();
 })();
 function paintMana(){
   const e=MANA.el;
-  e.style.left=(MANA.x-70)+"px"; e.style.top=(MANA.y-70)+"px"; e.style.zIndex=Math.round(MANA.y);
+  e.style.left=(MANA.x-70)+"px"; e.style.top=(MANA.y-70)+"px"; e.style.zIndex=MANA.dragging?9000:Math.round(MANA.y);
   /* ③④は左向き。右へ行く時は反転 */
   e.classList.toggle("flip", MANA.mode==="walk" && MANA.dir>0);
   const name = MANA.mode==="wave" ? "wave" : (MANA.frame? "walk2":"walk1");
@@ -286,13 +301,14 @@ function paintMana(){
 let last=performance.now();
 function loop(now){
   const dt=Math.min(.1,(now-last)/1000); last=now;
-  if(!REDUCED){
+  if(MANA.dragging){ MANA.mode="wave"; }  /* つかまれてる間は、手を振って待つ */
+  else if(!REDUCED){
     if(MANA.mode==="walk"){
       MANA.x+=MANA.dir*MANA_SPEED*dt; MANA.t+=dt; MANA.frame=Math.floor(MANA.t/.28)%2;
-      if(MANA.x>=MANA_MAX){MANA.x=MANA_MAX;MANA.mode="wave";MANA.t=0;MANA.dir=-1}
-      else if(MANA.x<=MANA_MIN){MANA.x=MANA_MIN;MANA.mode="wave";MANA.t=0;MANA.dir=1}
+      if(MANA.dir>0&&MANA.x>=MANA_MAX){MANA.mode="wave";MANA.t=0;MANA.dir=-1}
+      else if(MANA.dir<0&&MANA.x<=MANA_MIN){MANA.mode="wave";MANA.t=0;MANA.dir=1}
     }else{ MANA.t+=dt; if(MANA.t>2.2){MANA.mode="walk";MANA.t=0} } /* 端で手を振って、折り返す */
-  }else{ MANA.mode="wave"; MANA.x=1100; }
+  }else if(!MANA.placed){ MANA.mode="wave"; MANA.x=1100; MANA.placed=true; }
   paintMana(); requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
@@ -315,7 +331,53 @@ function openDetail(id){
 const closeDlg=()=>document.getElementById("dlg").classList.remove("open");
 document.getElementById("dlg").addEventListener("click",e=>{if(e.target.id==="dlg"||e.target.id==="dclose")closeDlg()});
 addEventListener("keydown",e=>{if(e.key==="Escape")closeDlg()});
-document.addEventListener("click",e=>{const d=e.target.closest("[data-detail]"); if(d) openDetail(d.dataset.detail)});
+let justDragged=false;
+const SAY={sleep:"…ん？ 起きた〜",yawn:"ふぁ〜…呼んだ？",normal:"はーい",busy:"いま忙しい！",wait:"返事待ってるで",done:"やったで！"};
+function react(el){
+  const id=el.dataset.detail, img=el.querySelector(".art"), cls=el.className;
+  const kind=/s-sleep/.test(cls)?"sleep":/s-yawn/.test(cls)?"yawn":/s-busy/.test(cls)?"busy":/s-wait/.test(cls)?"wait":/s-done/.test(cls)?"done":"normal";
+  el.classList.remove("react"); void el.offsetWidth; el.classList.add("react");
+  /* 寝てる・あくびの子は、仕事の絵に切り替えて起きる（しばらくして元に戻る） */
+  const prev=img.getAttribute("src");
+  if((kind==="sleep"||kind==="yawn")&&id!=="mana"){ img.setAttribute("src",`img/${id}-normal.webp`); setTimeout(()=>{ if(img.isConnected) img.setAttribute("src",prev) },2600); }
+  el.querySelectorAll(".say").forEach(x=>x.remove());
+  const b=document.createElement("span"); b.className="say"; b.textContent=SAY[kind]; el.appendChild(b);
+  setTimeout(()=>{b.remove();el.classList.remove("react")},2200);
+}
+document.addEventListener("click",e=>{
+  if(justDragged) return;
+  const ch=e.target.closest(".ch[data-detail]");
+  if(ch){ react(ch); const id=ch.dataset.detail; setTimeout(()=>openDetail(id),520); return; }
+  const d=e.target.closest("[data-detail]"); if(d) openDetail(d.dataset.detail);
+});
+/* ドラッグ＆ドロップ：キャラを好きな場所へ。少し動かしたら、ドラッグとみなす（動かさんクリックは、反応＋詳細） */
+document.getElementById("chars").addEventListener("pointerdown",e=>{
+  const el=e.target.closest(".ch"); if(!el||e.button>0) return;
+  const id=el.dataset.detail, st=document.getElementById("stage").getBoundingClientRect();
+  const isMana=id==="mana";
+  const cx0=isMana?MANA.x:(POS[id]||SEAT[id]||[0,0])[0], cy0=isMana?MANA.y:(POS[id]||SEAT[id]||[0,0])[1];
+  const sx=e.clientX, sy=e.clientY, offX=(e.clientX-st.left)/SCALE-cx0, offY=(e.clientY-st.top)/SCALE-cy0;
+  let moved=false;
+  const mv=ev=>{
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<6) return;
+    if(!moved){moved=true;DRAG.active=true;el.classList.add("dragging");el.querySelectorAll(".say").forEach(x=>x.remove());if(isMana)MANA.dragging=true}
+    const x=Math.max(70,Math.min(STAGE_W-70,(ev.clientX-st.left)/SCALE-offX)), y=Math.max(70,Math.min(STAGE_H-30,(ev.clientY-st.top)/SCALE-offY));
+    el.style.left=(x-70)+"px"; el.style.top=(y-70)+"px"; el.style.zIndex=9000; el._p=[Math.round(x),Math.round(y)];
+    if(isMana){MANA.x=x;MANA.y=y}
+  };
+  const up=()=>{
+    removeEventListener("pointermove",mv); removeEventListener("pointerup",up); removeEventListener("pointercancel",up);
+    if(moved){
+      el.classList.remove("dragging"); DRAG.active=false; justDragged=true; setTimeout(()=>justDragged=false,80);
+      if(isMana){MANA.dragging=false; el.style.zIndex=Math.round(MANA.y)}
+      else if(el._p){POS[id]=el._p; el.style.zIndex=el._p[1]; savePos()}
+    }
+  };
+  addEventListener("pointermove",mv); addEventListener("pointerup",up); addEventListener("pointercancel",up);
+});
+document.getElementById("chars").addEventListener("dragstart",e=>e.preventDefault());
+document.getElementById("reset").addEventListener("click",()=>{POS={};savePos();renderChars()});
+savePos();
 function toast(t){const e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",2200)}
 for(const k of ["kiki","emi"]) document.getElementById("p-"+k).addEventListener("click",()=>{
   const l=((DATA.members||{}).partners||{})[k]||PARTNERS[k].link;
@@ -338,7 +400,7 @@ async function tryLive(){
   for(const b of bases){ try{DATA=await loadFrom(b);SOURCE=b===RAW?"ライブ（GitHub main）":"ライブ";draw();return}catch(e){} }
   SOURCE="埋め込み（古い可能性あり）"; draw();
 }
-function draw(){renderBoard();renderChars();renderMega();renderProducts(DATA.products);window.__floor={source:SOURCE,members:members().length}}
+function draw(){renderBoard();if(!DRAG.active)renderChars();renderMega();renderProducts(DATA.products);window.__floor={source:SOURCE,members:members().length}}
 draw(); tryLive(); setInterval(tryLive,60000);
 </script>
 </body>

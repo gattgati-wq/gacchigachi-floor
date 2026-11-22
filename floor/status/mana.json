@@ -1,11 +1,11 @@
 {
   "id": "mana",
   "name": "まな",
-  "status": "done",
-  "task": "みーからの初連絡の実行",
-  "say": "初連絡の3件、終わったよ",
+  "status": "wait_heavy",
+  "task": "フロア画面スタイリッシュ化の案出し",
+  "say": "案を3つ出した。すぎちゃんの判断待ち",
   "waiting_for": "",
-  "updated": "2026-11-22T15:46:00+09:00",
+  "updated": "2026-11-22T18:12:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

@@ -31,6 +31,7 @@
     border-radius:12px;font-size:clamp(20px,6vw,26px);font-weight:700;letter-spacing:.04em;
     white-space:pre-line;user-select:none;-webkit-user-select:none}
   .grid a:active,.grid a.on{background:var(--btn-on)}
+  .grid a.wide{grid-column:1 / -1}
   .err{height:18px;margin-top:10px;font-size:12px;color:#fff3d6;text-align:center;visibility:hidden}
   .err.show{visibility:visible}
 </style>
@@ -42,11 +43,11 @@
 </main>
 <script>
 /* ===== 設定：ここだけ直せば動く =====
-   name   … 画面に書く言葉（表示名。見た目だけ。すぎちゃん指定。\n は表示上の改行）
+   name   … 画面に書く言葉（表示名。見た目だけ。すぎちゃん指定。wide:true は横いっぱい）
    shortcut … 呼び出すショートカットの名前＝元のシーン名。**変えたら動かんくなる**（動作は「ホーム → シーンを実行」）
    将来、HA版に差し替える時は、この配列の href だけ入れ替える。 */
 const SCENES = [
-  { name:"ガっチガチ\n研究所", shortcut:"仕事だよ" },
+  { name:"ガっチガチ研究所", shortcut:"仕事だよ", wide:true },
   { name:"休憩中",   shortcut:"おはよう" },
   { name:"閉店ガラガラ",   shortcut:"おやすみ" },
   { name:"明るくして", shortcut:"明るくして" },
@@ -56,6 +57,7 @@ const grid = document.getElementById("grid");
 for (const s of SCENES) {
   const a = document.createElement("a");
   a.textContent = s.name;
+  if (s.wide) a.className = "wide";
   a.href = "shortcuts://run-shortcut?name=" + encodeURIComponent(s.shortcut);
   a.addEventListener("click", () => {
     a.classList.add("on");

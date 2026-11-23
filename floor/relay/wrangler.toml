@@ -1,0 +1,11 @@
+# Cloudflare Worker の設定（鍵は、ここに書かん。Secret で入れる。README を見て）
+name = "gacchigachi-floor-relay"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://gattgati-wq.github.io"
+REPO = "gattgati-wq/gacchigachi-floor"
+# GH_TOKEN と SUGI_PASS は、ここに書かない（Secret）：
+#   npx wrangler secret put GH_TOKEN
+#   npx wrangler secret put SUGI_PASS

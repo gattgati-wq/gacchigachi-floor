@@ -3,7 +3,7 @@
     {
       "name": "予約システム（完成形）",
       "url": "",
-      "note": "URL確認中"
+      "note": "URL確認中（管理画面のみ。公開に載せるかはすぎちゃん判断待ち）"
     },
     {
       "name": "フロアv4",
@@ -11,23 +11,22 @@
     },
     {
       "name": "iPhoneシーンパネル（HomeKit）",
-      "url": "",
-      "note": "URL確認中"
+      "url": "https://gattgati-wq.github.io/gacchigachi-floor/docs/"
     },
     {
       "name": "HP制作アプリ",
-      "url": "",
-      "note": "URL確認中"
+      "url": "https://gacchigachi-hp-app.gattgati.workers.dev",
+      "note": "ルートは鍵つき設計で403が正常"
     },
     {
       "name": "店内ディスプレイのアンプ画面",
       "url": "",
-      "note": "URL確認中"
+      "note": "URLなし（すぎちゃん決定 2026-11-19：公開にしない・俺専用）"
     },
     {
       "name": "T900の文字盤（ちぃ作）",
       "url": "",
-      "note": "URL確認中"
+      "note": "URL確認中（Webの物は無い見込み。判断待ち）"
     },
     {
       "name": "フロアv3（旧版）",

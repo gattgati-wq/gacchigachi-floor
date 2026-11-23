@@ -43,7 +43,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .mag img{display:block;width:100%;height:100%}
 /* 文字は、マグネットの真ん中（縦も横も）。大きさは、マグネットの幅と、文字数に合わせる（長い名前は小さく） */
 .mag span{position:absolute;left:0;right:0;top:0;height:var(--step);padding:0 7%;display:flex;align-items:center;justify-content:center;font-size:clamp(6px,min(15cqw,calc(82cqw/var(--n,4)),calc(var(--step) * .62)),17px);line-height:1;font-weight:800;white-space:nowrap;font-family:inherit}
-.mag.last span{height:var(--h);padding-bottom:5%}
+.mag.last span{height:var(--h);padding-bottom:5%;font-size:clamp(6px,min(15cqw,calc(82cqw/var(--n,4)),calc(max(var(--step),calc(var(--h) * .72)) * .62)),17px)}
 .mag i{font-style:normal;margin-left:3px;font-size:.85em}
 .more{position:absolute;right:2px;bottom:-15px;font-size:13px;font-weight:800;background:#fff;border:2px solid #5a3a12;border-radius:10px;padding:0 6px;z-index:50}
 

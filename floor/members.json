@@ -23,7 +23,8 @@
       "role": "実行（Mac側）",
       "seat": "ops",
       "title": "Mac実行",
-      "group": "時計"
+      "group": "時計",
+      "nolink": "ターミナルで動いてるので、リンクは無し"
     },
     {
       "id": "sekkeikakari",

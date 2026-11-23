@@ -22,7 +22,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .frame h2{margin:0}
 
 /* 状態ボード（4列）：枠はキキの画像。見出し（待機中〜完了）は画像に入っている。中の4マスにマグネットを重ねる */
-#board{left:8px;top:8px;width:452px;height:180px;background:url(ui/board.webp) center/100% 100% no-repeat}
+#board{left:8px;top:8px;width:720px;height:286px;background:url(ui/board.webp) center/100% 100% no-repeat}
 .frame.img{border:0;border-radius:0;box-shadow:none;padding:0;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
 .frame.img.pdrag{cursor:grabbing;z-index:9500!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.55))}
 .frame.img textarea{-webkit-user-select:text;user-select:text;cursor:text}
@@ -32,14 +32,19 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .partner{touch-action:none;-webkit-user-select:none;user-select:none}
 .partner img{-webkit-user-drag:none;user-drag:none;pointer-events:none}
 #board .cols{position:absolute;inset:0}
-.col{position:absolute;top:33.3%;height:52.6%;overflow:visible}
+.col{position:absolute;top:33.3%;height:52.6%;overflow:visible;container-type:size}
 .col:nth-child(1){left:5%;width:21%}.col:nth-child(2){left:28.5%;width:20.7%}
 .col:nth-child(3){left:50.8%;width:21.4%}.col:nth-child(4){left:74.2%;width:21.1%}
-.mag{position:absolute;left:3%;width:94%;height:auto;border:0;background:none;padding:0;cursor:pointer;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));container-type:inline-size}
-.mag img{display:block;width:100%;height:auto}
+.mag{/* 1列に最大6個。高さは、列の高さ÷個数に合わせて縮む（絵の比 2.36:1 のまま）。個数が少ない時は、いつもの大きさ */
+  --h:min(calc(94cqw / 2.36), calc(100cqh / var(--cnt,4) * 1.9));
+  --step:min(calc(var(--k,0) * (100cqh - var(--h))), calc(var(--h) * .72));
+  position:absolute;left:50%;transform:translateX(-50%);width:calc(var(--h) * 2.36);height:var(--h);top:calc(var(--i,0) * var(--step));
+  border:0;background:none;padding:0;cursor:pointer;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));container-type:inline-size}
+.mag img{display:block;width:100%;height:100%}
 /* 文字は、マグネットの真ん中（縦も横も）。大きさは、マグネットの幅と、文字数に合わせる（長い名前は小さく） */
-.mag span{position:absolute;inset:0;padding:0 7% 5% 7%;display:flex;align-items:center;justify-content:center;font-size:clamp(9px,min(15cqw,calc(82cqw/var(--n,4))),17px);line-height:1;font-weight:800;white-space:nowrap;font-family:inherit}
-.mag i{font-style:normal;margin-left:3px;font-size:11px}
+.mag span{position:absolute;left:0;right:0;top:0;height:var(--step);padding:0 7%;display:flex;align-items:center;justify-content:center;font-size:clamp(6px,min(15cqw,calc(82cqw/var(--n,4)),calc(var(--step) * .62)),17px);line-height:1;font-weight:800;white-space:nowrap;font-family:inherit}
+.mag.last span{height:var(--h);padding-bottom:5%}
+.mag i{font-style:normal;margin-left:3px;font-size:.85em}
 .more{position:absolute;right:2px;bottom:-15px;font-size:13px;font-weight:800;background:#fff;border:2px solid #5a3a12;border-radius:10px;padding:0 6px;z-index:50}
 
 /* 日時プレート：枠はキキの画像（数字は消してある）。日付と時刻はコードで載せる */
@@ -169,7 +174,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 <div id="dlg" role="dialog" aria-modal="true"><div class="box" id="dbox"></div></div>
 <div id="toast"></div>
 
-<script id="floor-data" type="application/json">{"products": [], "collected_at": "2026-11-23T10:46:47+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム", "link": "https://claude.ai/code/session_016pCuCDPQNFVh84Wyzs43en"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア", "links": [{"label": "フロア設計係", "url": "https://claude.ai/chat/8a3f29d7-60d7-4350-b606-653897aca49d"}, {"label": "フロア担当", "url": "https://claude.ai/code/session_016pCuCGkTz3bLmWY5V8V8Jc"}]}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ", "link": "https://claude.ai/chat/6185d902-beb7-4da0-aa78-e9f354b5f7e3"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役", "link": "https://claude.ai/chat/e58d7f85-6956-4e0a-ae61-7799f7c6ff83"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE", "link": "https://claude.ai/chat/ee24fae8-4d7f-4a41-80e0-f492f0f3a670"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true, "link": "https://claude.ai/code/session_016pCuCGdighQHtpz9M1aJuq"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}, "partners": {"kiki": "https://chatgpt.com/", "emi": "https://gemini.google.com/"}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "拡声器の撤去", "say": "拡声器をやめた。フロアから撤去した", "waiting_for": "", "updated": "2026-11-23T10:50:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script id="floor-data" type="application/json">{"products": [], "collected_at": "2026-11-23T11:01:36+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム", "link": "https://claude.ai/code/session_016pCuCDPQNFVh84Wyzs43en"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア", "links": [{"label": "フロア設計係", "url": "https://claude.ai/chat/8a3f29d7-60d7-4350-b606-653897aca49d"}, {"label": "フロア担当", "url": "https://claude.ai/code/session_016pCuCGkTz3bLmWY5V8V8Jc"}]}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ", "link": "https://claude.ai/chat/6185d902-beb7-4da0-aa78-e9f354b5f7e3"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役", "link": "https://claude.ai/chat/e58d7f85-6956-4e0a-ae61-7799f7c6ff83"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE", "link": "https://claude.ai/chat/ee24fae8-4d7f-4a41-80e0-f492f0f3a670"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true, "link": "https://claude.ai/code/session_016pCuCGdighQHtpz9M1aJuq"}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}, "partners": {"kiki": "https://chatgpt.com/", "emi": "https://gemini.google.com/"}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "拡声器の撤去", "say": "拡声器をやめた。フロアから撤去した", "waiting_for": "", "updated": "2026-11-23T10:50:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
 <script>
 /* ===== 設定（ここを直せば動く） ===== */
 /* 舞台：設計の基準は 1600×1020。窓の形に合わせて、**窓いっぱい**に広げる（黒い帯を出さん）。
@@ -231,11 +236,11 @@ const CS_SHOWN={};   /* いま画面に出してる倍率（変わった時に�
 let POS={}; try{POS=JSON.parse(localStorage.getItem("floor_v4_pos")||"{}")||{}}catch(e){POS={}}
 /* ボード類も、キャラと同じく、ドラッグで動かせて、大小も変えられる。位置と大きさは、この端末のブラウザだけに覚える */
 let PANEL={}; try{PANEL=JSON.parse(localStorage.getItem("floor_v4_panels")||"{}")||{}}catch(e){PANEL={}}
-const PANELS={ board:{sel:"#board",w:452,h:180,x:8,y:8}, plate:{sel:"#plate",w:480,h:68,x:()=>MID_L+(midW()-(480+10+176))/2,y:12},
+const PANELS={ board:{sel:"#board",w:720,h:286,x:8,y:8}, plate:{sel:"#plate",w:480,h:68,x:()=>Math.max(8+720+14,MID_L+(midW()-480)/2),y:12},
                products:{sel:"#products",w:254,h:1004,x:()=>STAGE_W-262,y:8},
                /* 丸アイコンの初期位置：ガネーシャ様の顔に、かぶらん所。右の白いカーテン（絵の x≒790）に、縦に2つ */
-               kiki:{sel:"#p-kiki",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+150*g.k-77},fixed:true},
-               emi:{sel:"#p-emi",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+330*g.k-77},fixed:true} };
+               kiki:{sel:"#p-kiki",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+215*g.k-77},fixed:true},
+               emi:{sel:"#p-emi",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+395*g.k-77},fixed:true} };
 const defXY=d=>[typeof d.x==="function"?d.x():d.x, typeof d.y==="function"?d.y():d.y];
 const savePos=()=>{try{localStorage.setItem("floor_v4_pos",JSON.stringify(POS));localStorage.setItem("floor_v4_panels",JSON.stringify(PANEL));localStorage.setItem("floor_v4_cs",JSON.stringify(CSCALE))}catch(e){}; document.getElementById("reset").style.display=(Object.keys(POS).length||Object.keys(PANEL).length||Object.keys(CSCALE).length)?"block":"none"};
 const DRAG={active:false};
@@ -303,9 +308,9 @@ function renderBoard(){
   const ms=members();
   document.getElementById("cols").innerHTML=COLS.map(c=>{
     const items=ms.filter(m=>colKey(stOf(m.id))===c.k).sort((a,b)=>(stallLevel(stOf(b.id))-stallLevel(stOf(a.id))));
-    const MAX=4, shown=items.slice(0,MAX), more=items.length-shown.length;
+    const MAX=6, shown=items.slice(0,MAX), more=items.length-shown.length, cnt=shown.length, kk=cnt>1?1/(cnt-1):0;
     const mags=shown.map((m,i)=>{const [img,ink]=MAG[m.id]||["lavender","#111"], lv=stallLevel(stOf(m.id));
-      return `<button class="mag" data-detail="${esc(m.id)}" style="top:${i*25}%;z-index:${i+1}"><img src="ui/mag-${img}.webp" alt=""><span style="color:${ink};--n:${Math.max(3,wlen(label(m))+(lv?1:0))}">${esc(label(m))}${lv?`<i>⚠</i>`:""}</span></button>`}).join("");
+      return `<button class="mag${i===cnt-1?" last":""}" data-detail="${esc(m.id)}" style="--cnt:${cnt};--i:${i};--k:${kk};z-index:${i+1}"><img src="ui/mag-${img}.webp" alt=""><span style="color:${ink};--n:${Math.max(3,wlen(label(m))+(lv?1:0))}">${esc(label(m))}${lv?`<i>⚠</i>`:""}</span></button>`}).join("");
     return `<div class="col">${mags}${more>0?`<span class="more">＋${more}</span>`:""}</div>`;
   }).join("");
 }
@@ -713,7 +718,7 @@ function paintManaDoing(){ const el=MANA.el; if(!el) return; let d=el.querySelec
   if(!t){ if(d) d.remove(); return } if(!d){ d=document.createElement("span"); d.className="doing"; el.appendChild(d) } d.textContent=t }
 function draw(){paintManaDoing();renderBoard();if(!DRAG.active)renderChars();renderProducts(DATA.products);window.__floor={source:SOURCE,members:members().length}}
 function placeRefresh(){ const pl=document.getElementById("plate"), rb=document.getElementById("rbox"); if(!pl||!rb) return;
-  const r=panelRect("plate"); rb.style.left=Math.min(STAGE_W-190,r.x+r.w+10)+"px"; rb.style.top=Math.max(4,r.y+2)+"px"; }
+  const r=panelRect("plate"); rb.style.left=Math.max(4,Math.min(STAGE_W-190,r.x+(r.w-176)/2))+"px"; rb.style.top=(r.y+r.h+3)+"px"; }   /* 更新ボタンは、日時プレートの真下 */
 /* 窓の大きさが変わった時：舞台を広げ直す */
 function relayout(){
   applyPanels(); placeRefresh();

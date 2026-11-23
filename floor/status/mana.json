@@ -1,11 +1,11 @@
 {
   "id": "mana",
   "name": "まな",
-  "status": "done",
-  "task": "フロア新デザイン v4 の仕上げ",
-  "say": "v4を仕上げた。切り替えの判断待ち",
-  "waiting_for": "",
-  "updated": "2026-11-22T23:00:00+09:00",
+  "status": "wait_member",
+  "task": "送信の中継役（Worker）のURL待ち",
+  "say": "部長が設定中。URLが届くまで待つ",
+  "waiting_for": "mii",
+  "updated": "2026-11-23T10:30:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

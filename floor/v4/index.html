@@ -98,10 +98,9 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 .ch.faking .art{animation:typing calc(.34s*var(--k,1)) linear infinite!important}
 .say.soft{background:#fffdf3;font-size:15px;font-weight:700;border-width:2px;border-radius:12px;padding:1px 9px}
 .say.soft:after{border-top-color:#3a2412}
-#dlg .dmsg{margin-top:12px;border-top:2px dashed rgba(90,58,18,.4);padding-top:8px;display:flex;flex-direction:column;gap:5px}
-#dlg .dmsg label{font-weight:800;font-size:14px}
-#dlg .dmsg textarea{font:inherit;font-size:14px;border:2px solid #6b4a1a;border-radius:6px;background:#fff;color:#2a1208;padding:3px 6px;resize:none;height:56px}
-#dlg .dmsg .dmm{font-size:12px;opacity:.75}
+#dlg .dnow{margin:8px 0;padding:8px 10px;border:2px solid #6b4a1a;border-radius:8px;background:rgba(255,236,170,.75);font-size:15px;font-weight:700;line-height:1.5}
+#dlg .dnow small{display:block;font-size:11px;font-weight:800;opacity:.7}
+#dlg .dmm{font-size:12px;opacity:.75}
 .say{position:absolute;left:50%;top:-14px;transform:translateX(-50%);background:#fff;border:3px solid #3a2412;border-radius:14px;padding:1px 10px;font-size:16px;font-weight:800;color:#3a2412;white-space:nowrap;z-index:2;pointer-events:none;box-shadow:0 3px 5px rgba(0,0,0,.4)}
 .say:after{content:"";position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);border:6px solid transparent;border-top-color:#3a2412;border-bottom:0}
 #rbox{position:absolute;left:1152px;top:14px;width:176px;z-index:9100;display:flex;flex-direction:column;align-items:center;gap:3px}
@@ -317,18 +316,6 @@ function renderBoard(){
 
 /* ===== 送る：GitHub の「新しい連絡（issue）」を、文を入れた状態で開く。すぎちゃんが緑の「Submit」を押すと、まなが読める場所に届く。
    みーを運び屋にせん。トークンを画面に持たせん（公開ページやから）。GitHubにログインしてる端末なら、ほぼワンタップ ===== */
-const REPO_NEW_ISSUE="https://github.com/gattgati-wq/gacchigachi-floor/issues/new";
-function openIssue(kind,toName,text){
-  const t=text.trim(), first=t.replace(/\s+/g," ").slice(0,28), title=`【${kind}】${toName&&!t.startsWith(toName)?toName+"へ：":""}${first}${t.length>28?"…":""}`;
-  const now=new Date(), j=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}).formatToParts(now).map(p=>[p.type,p.value]));
-  const body=`${t}\n\n---\nfrom: すぎちゃん\nsent: ${j.year}-${j.month}-${j.day} ${j.hour}:${j.minute}（フロア画面から）`;
-  const url=`${REPO_NEW_ISSUE}?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
-  if(url.length>7000) return {ok:false,reason:"long"};
-  const w=window.open(url,"_blank","noopener,noreferrer"); return {ok:!!w,url};
-}
-const sentMsg=r=>"GitHubの画面が開いた → 緑の「Submit new issue」を押してな（これで届く）";
-/* 送る（個別の連絡）：GitHub の画面を開く形だけ。拡声器（全員への一斉連絡）と、裏で送る中継役は、やめた（2026-11-23） */
-const sendMessage=(kind,toName,text)=>openIssue(kind,toName,text);
 
 /* ===== 完成品置き場（名前だけ。みーが products.json に書く） ===== */
 function renderProducts(list){
@@ -490,27 +477,29 @@ function goButtons(m){
   if(!arr.length) return `<span class="dmm">（ページのリンクは、まだ設定されてへん）</span>`;
   return arr.map(x=>`<a class="go" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${x.label?esc(x.label)+"に":""}会いに行く</a>`).join("");
 }
+function nowSummary(s,lv){
+  if(!s) return "状態ファイルがまだない（何してるかは分からん）";
+  if(s.summary) return s.summary;
+  const task=s.task||"", say=s.say||"";
+  if(lv) return `⚠ ${ageText(ageMs(s))}更新がない。最後は「${task||say||"—"}」`;
+  switch(s.status){
+    case "working": return task?`${task} をやってる最中`:"作業中";
+    case "idle": return task?`待機中。最後にやったのは「${task}」`:"待機中。次の仕事を待ってる";
+    case "done": return task?`「${task}」は完了`:"完了";
+    default: return s.waiting_for?`${s.waiting_for} 待ち${task?`（${task}）`:""}`:(task||say||"—");
+  }
+}
 function openDetail(id){
   const m=members().find(x=>x.id===id); if(!m) return;
   const s=stOf(id), lv=stallLevel(s);
   const link=m.link;
   document.getElementById("dbox").innerHTML=`<h3>${esc(m.name)}（${esc(m.title||m.role||"")}）</h3>
+   <div class="dnow"><small>いま</small>${esc(nowSummary(s,lv))}</div>
    <dl><dt>状態</dt><dd>${s?esc(STATUS_LABEL[s.status]||s.status):"状態ファイルなし"}${lv?`　⚠${ageText(ageMs(s))}止まってる`:""}</dd>
    <dt>タスク</dt><dd>${esc(s&&s.task||"—")}</dd><dt>ひとこと</dt><dd>${esc(s&&s.say||"—")}</dd>
    <dt>何待ち</dt><dd>${s&&s.waiting_for?esc(s.waiting_for):"—"}</dd>
    <dt>最終更新</dt><dd>${s&&s.updated?esc(s.updated.replace("T"," ").slice(0,16)):"—"}</dd></dl>
-   <div class="dmsg"><label>${esc(m.name)}に連絡する</label><textarea id="dtext" placeholder="${esc(m.name)}への連絡・質問を書く"></textarea>
-     <div class="wb"><button id="dcp" type="button">送信</button> <span class="dmm" id="dmm">押すと、GitHubの画面が開く。そこで「Submit」で、まなに届く</span></div></div>
    <div class="acts">${goButtons(m)}<button id="dclose">閉じる</button></div>`;
-  document.getElementById("dcp").onclick=async()=>{
-    const t=document.getElementById("dtext").value.trim(), mm=document.getElementById("dmm");
-    if(!t){mm.textContent="文章が空やで";return}
-    mm.textContent="送ってる…";
-    const r=await sendMessage("個別",m.name,t);
-    if(r.ok){ mm.textContent=sentMsg(r); }
-    else if(r.reason==="long") mm.textContent="文が長すぎる（約2000字まで）";
-    else {try{await navigator.clipboard.writeText(t)}catch(e){} mm.textContent="新しい画面が開けんかった（ポップアップを許可してな）。文はコピーした";}
-  };
   document.getElementById("dlg").classList.add("open");
   document.getElementById("dclose").focus({preventScroll:true});
 }

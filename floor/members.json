@@ -10,7 +10,7 @@
     },
     {
       "id": "koukichi",
-      "name": "こー吉",
+      "name": "ガネチ",
       "role": "開発",
       "seat": "dev",
       "title": "予約システム",
@@ -22,7 +22,7 @@
       "name": "親方",
       "role": "実行（Mac側）",
       "seat": "ops",
-      "title": "Mac実行",
+      "title": "親方",
       "group": "時計",
       "nolink": "ターミナルで動いてるので、リンクは無し"
     },
@@ -58,15 +58,15 @@
       "name": "ガネチ画面",
       "role": "店内ディスプレイ",
       "seat": "gamen",
-      "title": "店内ディスプレイ",
+      "title": "ガネチ画面",
       "group": "店内ディスプレイ"
     },
     {
       "id": "chii",
-      "name": "ちぃ",
+      "name": "ガチコ",
       "role": "文字盤",
       "seat": "watch",
-      "title": "文字盤",
+      "title": "待受",
       "group": "時計"
     },
     {

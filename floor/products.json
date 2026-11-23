@@ -1,1 +1,37 @@
-{"products": []}
+{
+  "products": [
+    {
+      "name": "予約システム（完成形）",
+      "url": "",
+      "note": "URL確認中"
+    },
+    {
+      "name": "フロアv4",
+      "url": "https://gattgati-wq.github.io/gacchigachi-floor/floor/v4/"
+    },
+    {
+      "name": "iPhoneシーンパネル（HomeKit）",
+      "url": "",
+      "note": "URL確認中"
+    },
+    {
+      "name": "HP制作アプリ",
+      "url": "",
+      "note": "URL確認中"
+    },
+    {
+      "name": "店内ディスプレイのアンプ画面",
+      "url": "",
+      "note": "URL確認中"
+    },
+    {
+      "name": "T900の文字盤（ちぃ作）",
+      "url": "",
+      "note": "URL確認中"
+    },
+    {
+      "name": "フロアv3（旧版）",
+      "url": "https://gattgati-wq.github.io/gacchigachi-floor/floor/v3/"
+    }
+  ]
+}

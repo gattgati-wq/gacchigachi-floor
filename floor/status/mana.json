@@ -1,11 +1,11 @@
 {
   "id": "mana",
   "name": "まな",
-  "status": "wait_member",
-  "task": "送信の中継役（Worker）のURL待ち",
-  "say": "部長が設定中。URLが届くまで待つ",
-  "waiting_for": "mii",
-  "updated": "2026-11-23T10:30:00+09:00",
+  "status": "done",
+  "task": "拡声器の撤去",
+  "say": "拡声器をやめた。フロアから撤去した",
+  "waiting_for": "",
+  "updated": "2026-11-23T10:50:00+09:00",
   "usage": {
     "context_used": 87748,
     "context_max": 1000000,

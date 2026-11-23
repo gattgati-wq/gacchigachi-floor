@@ -1,15 +1,112 @@
 {
   "members": [
-    {"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"},
-    {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"},
-    {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"},
-    {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"},
-    {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"},
-    {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"},
-    {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"},
-    {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"},
-    {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"},
-    {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}
+    {
+      "id": "mii",
+      "name": "みー",
+      "role": "社長代理",
+      "seat": "center",
+      "title": "社長代理",
+      "group": "フロア"
+    },
+    {
+      "id": "koukichi",
+      "name": "こー吉",
+      "role": "開発",
+      "seat": "dev",
+      "title": "予約システム",
+      "group": "予約システム",
+      "link": "https://claude.ai/code/session_016pCuCDPQNFVh84Wyzs43en"
+    },
+    {
+      "id": "oyakata",
+      "name": "親方",
+      "role": "実行（Mac側）",
+      "seat": "ops",
+      "title": "Mac実行",
+      "group": "時計"
+    },
+    {
+      "id": "sekkeikakari",
+      "name": "フロア設計係",
+      "role": "設計",
+      "seat": "design",
+      "title": "フロア",
+      "group": "フロア",
+      "links": [
+        {
+          "label": "フロア設計係",
+          "url": "https://claude.ai/chat/8a3f29d7-60d7-4350-b606-653897aca49d"
+        },
+        {
+          "label": "フロア担当",
+          "url": "https://claude.ai/code/session_016pCuCGkTz3bLmWY5V8V8Jc"
+        }
+      ]
+    },
+    {
+      "id": "hptantou",
+      "name": "HP担当",
+      "role": "HP制作アプリ",
+      "seat": "hp",
+      "title": "HP",
+      "group": "ホームページ",
+      "link": "https://claude.ai/chat/6185d902-beb7-4da0-aa78-e9f354b5f7e3"
+    },
+    {
+      "id": "ganechigamen",
+      "name": "ガネチ画面",
+      "role": "店内ディスプレイ",
+      "seat": "gamen",
+      "title": "店内ディスプレイ",
+      "group": "店内ディスプレイ"
+    },
+    {
+      "id": "chii",
+      "name": "ちぃ",
+      "role": "文字盤",
+      "seat": "watch",
+      "title": "文字盤",
+      "group": "時計"
+    },
+    {
+      "id": "bucho",
+      "name": "部長",
+      "role": "相談役",
+      "seat": "bucho",
+      "title": "部長",
+      "group": "相談役",
+      "link": "https://claude.ai/chat/e58d7f85-6956-4e0a-ae61-7799f7c6ff83"
+    },
+    {
+      "id": "ganechikun",
+      "name": "ガネチくん",
+      "role": "LINE",
+      "seat": "ganechikun",
+      "title": "LINE",
+      "group": "LINE",
+      "link": "https://claude.ai/chat/ee24fae8-4d7f-4a41-80e0-f492f0f3a670"
+    },
+    {
+      "id": "mana",
+      "name": "まな",
+      "role": "統括（部長クローン）",
+      "seat": "mana",
+      "title": "まな 営業",
+      "group": "統括",
+      "group_order": 0,
+      "art": true,
+      "art_done": true,
+      "link": "https://claude.ai/code/session_016pCuCGdighQHtpz9M1aJuq"
+    }
   ],
-  "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}
+  "chairman": {
+    "name": "すぎちゃん",
+    "role": "会長",
+    "seat": "chairman_room",
+    "character": false
+  },
+  "partners": {
+    "kiki": "https://chatgpt.com/",
+    "emi": "https://gemini.google.com/"
+  }
 }

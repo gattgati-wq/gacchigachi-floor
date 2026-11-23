@@ -10,8 +10,12 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
   font-family:-apple-system,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:var(--ink)}
-#stage{position:absolute;left:0;top:0;width:1600px;height:1020px;transform-origin:0 0;overflow:hidden;background:#120c07 url(img/bg-full.webp) 50% 60%/cover no-repeat}
+#stage{position:absolute;left:0;top:0;width:1600px;height:1020px;transform-origin:0 0;overflow:hidden;background:#120c07}
 .photo{display:none}
+/* 背景：ぼかした同じ絵を、舞台いっぱいに敷いて（ボードの裏や、端の埋め）、その上に、くっきりした絵を、**高さにも収めて**置く。ガネーシャ様の顔を切らんため */
+#bgfill{position:absolute;inset:-40px;background:url(img/bg-full.webp) 50% 30%/cover no-repeat;filter:blur(22px) brightness(.85) saturate(1.1);pointer-events:none}
+#bgmain{position:absolute;background:url(img/bg-full.webp) 0 0/100% 100% no-repeat;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 5%,#000 95%,transparent 100%)}
 
 /* ----- 仮の枠（キキの枠素材が届いたら画像に差し替える） ----- */
 .frame{position:absolute}
@@ -161,6 +165,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 </head>
 <body>
 <div id="stage">
+  <div id="bgfill"></div><div id="bgmain"></div>
   <div class="photo"></div>
 
   <section class="frame img" id="board" aria-label="状態ボード"><div class="cols" id="cols"></div></section>
@@ -179,7 +184,7 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 <div id="dlg" role="dialog" aria-modal="true"><div class="box" id="dbox"></div></div>
 <div id="toast"></div>
 
-<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T09:38:25+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザイン v4 の仕上げ", "say": "v4を仕上げた。切り替えの判断待ち", "waiting_for": "", "updated": "2026-11-22T23:00:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
+<script id="floor-data" type="application/json">{"products": [], "megaphone": {"message": {"id": "20261122-1540", "from": "mana", "from_name": "まな", "text": "統括役の「まな」が着任したで。みーとの連絡用に受け箱（floor/inbox/）の運用を始めた。連絡はみー⇔まなで直接やるから、すぎちゃんを運び屋にせんでええ。こー吉へ：外部AI利用は「使わない」で決着済み（みー方式、2026-11-21決定）。合図メールも本番で確認済みやから、状態ファイルの「判断待ち」は古い。自分で書き直してな。", "sent": "2026-11-22T15:40:00+09:00"}, "replies": []}, "collected_at": "2026-11-23T09:40:44+09:00", "members": {"members": [{"id": "mii", "name": "みー", "role": "社長代理", "seat": "center", "title": "社長代理", "group": "フロア"}, {"id": "koukichi", "name": "こー吉", "role": "開発", "seat": "dev", "title": "予約システム", "group": "予約システム"}, {"id": "oyakata", "name": "親方", "role": "実行（Mac側）", "seat": "ops", "title": "Mac実行", "group": "時計"}, {"id": "sekkeikakari", "name": "フロア設計係", "role": "設計", "seat": "design", "title": "フロア", "group": "フロア"}, {"id": "hptantou", "name": "HP担当", "role": "HP制作アプリ", "seat": "hp", "title": "HP", "group": "ホームページ"}, {"id": "ganechigamen", "name": "ガネチ画面", "role": "店内ディスプレイ", "seat": "gamen", "title": "店内ディスプレイ", "group": "店内ディスプレイ"}, {"id": "chii", "name": "ちぃ", "role": "文字盤", "seat": "watch", "title": "文字盤", "group": "時計"}, {"id": "bucho", "name": "部長", "role": "相談役", "seat": "bucho", "title": "部長", "group": "相談役"}, {"id": "ganechikun", "name": "ガネチくん", "role": "LINE", "seat": "ganechikun", "title": "LINE", "group": "LINE"}, {"id": "mana", "name": "まな", "role": "統括（部長クローン）", "seat": "mana", "title": "まな 営業", "group": "統括", "group_order": 0, "art": true, "art_done": true}], "chairman": {"name": "すぎちゃん", "role": "会長", "seat": "chairman_room", "character": false}}, "status": [{"id": "bucho", "name": "部長", "status": "idle", "task": "", "say": "アーカイブで待機中。呼ばれたら起きるで", "waiting_for": "", "updated": "2026-11-20T21:06:21+09:00"}, {"id": "chii", "name": "ちぃ", "status": "done", "task": "T900の文字盤", "say": "時計（文字盤）は終わったよ", "waiting_for": "", "updated": "2026-11-21T05:26:00+09:00"}, {"id": "ganechigamen", "name": "ガネチ画面", "status": "idle", "task": "", "say": "ガネチ画面、着任しました！待機中です", "waiting_for": "", "updated": "2026-11-20T20:08:08+09:00"}, {"id": "ganechikun", "name": "ガネチくん", "status": "done", "task": "青色申告：2026年売上入力", "say": "青色申告は終わったよ（別のチャットで完了）", "waiting_for": "", "updated": "2026-11-21T05:51:00+09:00"}, {"id": "hptantou", "name": "HP担当", "status": "idle", "task": "", "say": "HPアプリ待機中。みーの返事待ち", "waiting_for": "", "updated": "2026-11-20T19:45:07+09:00", "usage": {"context_used_tokens": 115700, "context_max_tokens": 1000000, "output_tokens": 2852, "cost_usd": 0.342012, "measured_at": "2026-11-21T12:50:00+09:00"}}, {"id": "koukichi", "name": "こー吉", "status": "wait_heavy", "task": "変更依頼の自動返信の設計", "say": "外部AI利用の判断待ち", "waiting_for": "", "updated": "2026-11-21T17:27:09+09:00", "usage": {"context_used": 226883, "context_max": 1000000, "output_tokens": 70066, "cost_usd": 4.07979794, "measured": "2026-11-21T17:27:09+09:00"}}, {"id": "mana", "name": "まな", "status": "done", "task": "フロア新デザイン v4 の仕上げ", "say": "v4を仕上げた。切り替えの判断待ち", "waiting_for": "", "updated": "2026-11-22T23:00:00+09:00", "usage": {"context_used": 87748, "context_max": 1000000, "output_tokens": 1641, "cost_usd": 0.1636628, "measured": "2026-11-22T15:40:00+09:00"}}, {"id": "mii", "name": "みー", "status": "done", "task": "時計の呼び鈴Gの開通", "say": "G開通したよ", "waiting_for": "", "updated": "2026-11-20T19:37:16+09:00"}, {"id": "oyakata", "name": "親方", "status": "working", "task": "T900 ファーム取り出し調査", "say": "読み出し方法を調査中（書き込みなし）", "waiting_for": "", "updated": "2026-11-20T18:06:13+09:00"}, {"id": "sekkeikakari", "name": "フロア設計係", "status": "done", "task": "フロアにまなを追加", "say": "まな追加、マージ済み", "waiting_for": "", "updated": "2026-11-22T17:51:43+09:00", "usage": {"context_used": 343618, "context_max": 1000000, "output_tokens": 135820, "cost_usd": 5.86, "measured": "2026-11-21T12:43:09+09:00"}}]}</script>
 <script>
 /* ===== 設定（ここを直せば動く） ===== */
 /* 舞台：設計の基準は 1600×1020。窓の形に合わせて、**窓いっぱい**に広げる（黒い帯を出さん）。
@@ -190,9 +195,18 @@ const midW=()=>STAGE_W-MID_L-RIGHT_W;
 const mx=x=>MID_L+(x-MID_L)/(DESIGN_W-MID_L-RIGHT_W)*midW();   /* 設計の x を、広がった舞台の x に */
 /* 背景の写真（1125×844）を、舞台いっぱい（cover）に敷く。床の位置を計算して、席の高さを床に合わせる */
 /* 床の上端は、写真の y≒560（漫画版の背景）。背景を差し替えたら、ここを直す（実写版 bg-photo.webp は y≒520） */
-const FLOOR_Y=560;
-function floorLine(){ const k=Math.max(STAGE_W/1125,STAGE_H/844); return FLOOR_Y*k+(STAGE_H-844*k)*BG_POSY }
-const BG_POSY=.6;   /* 背景の縦の位置（0=上を見せる／1=下を見せる）。.6＝床を広めに見せる */
+const FLOOR_Y=560, BG_W=1125, BG_H=844, FACE_SAFE=24;
+/* 背景の絵の収め方：高さに収める（頭の上を切らん）。真ん中の窓（左のボードと右の完成品置き場の間）の幅も、埋める。
+   どうしても縦が足りん（細長い窓）時だけ、下を切る（上は、顔の冠の手前＝約24pxまでしか切らん）。左右の足りん所は、ぼかした絵で埋める */
+function bgGeom(){
+  const mW=midW(); const k=Math.max(STAGE_H/BG_H, mW/BG_W);
+  const over=BG_H*k-STAGE_H;                                  /* はみ出す高さ（0以上） */
+  const posY=over>0?Math.min(.6,FACE_SAFE*k/over):0;          /* 上を切る割合：顔が切れん範囲に、おさえる */
+  return {k, off:-over*posY, w:BG_W*k, h:BG_H*k, left:MID_L+mW/2-BG_W*k/2};
+}
+function layoutBg(){ const g=bgGeom(), e=document.getElementById("bgmain"); if(!e) return;
+  e.style.left=g.left+"px"; e.style.top=g.off+"px"; e.style.width=g.w+"px"; e.style.height=g.h+"px"; }
+function floorLine(){ const g=bgGeom(); return FLOOR_Y*g.k+g.off }
 const my=y=>{ const f=floorLine()+45, b=STAGE_H-85; return f+(y-690)/270*(Math.max(f+40,b)-f) };
 const seatXY=id=>[mx(SEAT[id][0]),my(SEAT[id][1])];
 /* 席：舞台の座標（キャラの中心）。レイアウト例（すぎちゃんのIllustrator）の位置に合わせた */
@@ -230,7 +244,9 @@ let POS={}; try{POS=JSON.parse(localStorage.getItem("floor_v4_pos")||"{}")||{}}c
 let PANEL={}; try{PANEL=JSON.parse(localStorage.getItem("floor_v4_panels")||"{}")||{}}catch(e){PANEL={}}
 const PANELS={ board:{sel:"#board",w:452,h:180,x:8,y:8}, plate:{sel:"#plate",w:480,h:68,x:()=>MID_L+(midW()-(480+10+176))/2,y:12},
                mega:{sel:"#mega",w:452,h:812,x:8,y:200}, products:{sel:"#products",w:254,h:1004,x:()=>STAGE_W-262,y:8},
-               kiki:{sel:"#p-kiki",w:155,h:155,x:()=>mx(742),y:130,fixed:true}, emi:{sel:"#p-emi",w:155,h:155,x:()=>mx(960),y:130,fixed:true} };
+               /* 丸アイコンの初期位置：ガネーシャ様の顔に、かぶらん所。右の白いカーテン（絵の x≒790）に、縦に2つ */
+               kiki:{sel:"#p-kiki",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+150*g.k-77},fixed:true},
+               emi:{sel:"#p-emi",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+330*g.k-77},fixed:true} };
 const defXY=d=>[typeof d.x==="function"?d.x():d.x, typeof d.y==="function"?d.y():d.y];
 const savePos=()=>{try{localStorage.setItem("floor_v4_pos",JSON.stringify(POS));localStorage.setItem("floor_v4_panels",JSON.stringify(PANEL));localStorage.setItem("floor_v4_cs",JSON.stringify(CSCALE))}catch(e){}; document.getElementById("reset").style.display=(Object.keys(POS).length||Object.keys(PANEL).length||Object.keys(CSCALE).length)?"block":"none"};
 const DRAG={active:false};
@@ -244,6 +260,7 @@ function fit(){
   const st=document.getElementById("stage");
   st.style.width=STAGE_W+"px"; st.style.height=STAGE_H+"px";
   st.style.transform=`scale(${s})`; st.style.left="0px"; st.style.top="0px";
+  layoutBg();
   if(window.__ready) relayout();
 }
 addEventListener("resize",fit); fit();

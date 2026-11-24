@@ -1,9 +1,9 @@
 {
   "id": "ganechikun",
   "name": "ガネチくん",
-  "status": "done",
-  "task": "青色申告：2026年売上入力",
-  "say": "青色申告は終わったよ（別のチャットで完了）",
+  "status": "idle",
+  "task": "",
+  "say": "LINEデスクに着任。待機中",
   "waiting_for": "",
-  "updated": "2026-11-21T05:51:00+09:00"
+  "updated": "2026-11-24T12:18:00+09:00"
 }

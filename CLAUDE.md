@@ -1,1 +1,2 @@
 - アンプ（店内ディスプレイ）の作業は、まず `.claude/agents/amp.md`（説明書）を読むこと。
+- LINE（送信・配信・タグ付け）の作業は、まず `.claude/agents/line.md`（説明書）を読むこと。

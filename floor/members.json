@@ -55,10 +55,10 @@
     },
     {
       "id": "ganechigamen",
-      "name": "ガネチ画面",
+      "name": "アンプ",
       "role": "店内ディスプレイ",
       "seat": "gamen",
-      "title": "ガネチ画面",
+      "title": "アンプ",
       "group": "店内ディスプレイ",
       "link": "https://claude.ai/code/session_016pCuCGrqDyYEKHg56CoDCg"
     },

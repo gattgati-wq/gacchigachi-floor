@@ -72,12 +72,12 @@
     },
     {
       "id": "bucho",
-      "name": "部長",
+      "name": "監査",
       "role": "相談役",
       "seat": "bucho",
-      "title": "部長",
+      "title": "監査",
       "group": "相談役",
-      "link": "https://claude.ai/chat/e58d7f85-6956-4e0a-ae61-7799f7c6ff83"
+      "link": "https://claude.ai/code/session_016pCuCHaUjjdFeqMWcVk9mE"
     },
     {
       "id": "ganechikun",

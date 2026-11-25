@@ -1,16 +1,17 @@
 {
   "id": "sekkeikakari",
   "name": "フロア設計係",
-  "status": "done",
-  "task": "フロアにまなを追加",
-  "say": "まな追加、マージ済み",
+  "status": "wait_light",
+  "task": "フロアの引継ぎ書（説明書）の下書き",
+  "say": "引継ぎ書を書いた。push許可待ち",
   "waiting_for": "",
-  "updated": "2026-11-22T17:51:43+09:00",
+  "updated": "2026-11-26T06:08:13+09:00",
+  "summary": "フロア担当の引継ぎ書の下書き（.claude/agents/floor.md）を書き終えた。新しいブランチへの push の許可が出れば、下書きPRにする。",
   "usage": {
-    "context_used": 343618,
+    "context_used": 459254,
     "context_max": 1000000,
-    "output_tokens": 135820,
-    "cost_usd": 5.86,
-    "measured": "2026-11-21T12:43:09+09:00"
+    "output_tokens": 183461,
+    "cost_usd": 14.02,
+    "measured": "2026-11-26T06:08:13+09:00"
   }
 }

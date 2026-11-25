@@ -1,17 +1,17 @@
 {
   "id": "ganechigamen",
   "name": "ガネチ画面",
-  "status": "idle",
-  "task": "",
-  "say": "アンプ着任。待機中。テーマ1の段取り待ち",
-  "waiting_for": "",
-  "updated": "2026-11-24T11:11:00+09:00",
+  "status": "wait_member",
+  "task": "テーマ2：Apple Music操作＋HomeKit搭載の設計",
+  "say": "設計案を出した。みーの返事待ち",
+  "waiting_for": "mii",
+  "updated": "2026-11-26T00:25:05+09:00",
   "usage": {
-    "context_used": 98675,
+    "context_used": 150978,
     "context_max": 1000000,
-    "output_tokens": 3107,
-    "cost_usd": 0.2591071,
-    "measured": "2026-11-24T11:11:00+09:00"
+    "output_tokens": 23921,
+    "cost_usd": 1.0458882,
+    "measured": "2026-11-26T00:25:05+09:00"
   },
-  "summary": "店内ディスプレイ（アンプ）の新担当。説明書を読んでテストに答え済み。改善目標1（テーマ1）は、みーとまなの段取り待ちで待機中。"
+  "summary": "テーマ2（Apple Musicの操作とHomeKit搭載）の設計案を出した。画面側で先にやる範囲と、M1待ちの範囲を切り分け済み。選曲の形の判断待ち。"
 }

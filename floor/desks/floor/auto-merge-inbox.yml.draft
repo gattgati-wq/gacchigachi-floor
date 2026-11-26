@@ -1,0 +1,49 @@
+# 下書き v2（未テスト）。まだ有効ではない。ここは `.github/workflows/` ではない。
+# 監査レビュー（2026-11-26）を反映：pull_request_target／GH_REPO／--match-head-commit／追記だけ／大きさ（行数・バイト）。
+# 有効にするのは、監査の再確認 → みーが「手で」マージ（このファイル自体の変更は、自動マージしない）。
+name: auto-merge-reports
+on:
+  pull_request_target:        # 元の側のymlで動く（PR自身にこのファイルを書き換えられん）。PRの中身はチェックアウトしない
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  merge:
+    # 同じリポジトリのブランチだけ（フォーク除外）
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: 許可した場所・形だけか確かめて、確認したsha付きでマージ
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          sha=$(gh pr view "$PR" --json headRefOid --jq .headRefOid)
+          # 変更ファイルの一覧（パス・種類・追加行数・削除行数）
+          gh pr view "$PR" --json files --jq '.files[] | [.path, .changeType, (.additions|tostring), (.deletions|tostring)] | @tsv' > /tmp/files.tsv
+          [ -s /tmp/files.tsv ] || { echo "変更なし"; exit 0; }
+          total=0
+          while IFS=$'\t' read -r path ctype add del; do
+            case "$path" in
+              floor/inbox/reports/*)
+                # 子の報告：新しいファイルの追加だけ（既存の変更・削除・名前変更は対象外）
+                [ "$ctype" = "ADDED" ] || { echo "報告は追加だけ：$path($ctype)"; exit 0; } ;;
+              floor/status/sekkeikakari.json)
+                # 子自身のstatusの更新だけ
+                [ "$ctype" = "MODIFIED" ] || { echo "statusは更新だけ：$ctype"; exit 0; } ;;
+              *) echo "対象外：$path"; exit 0 ;;
+            esac
+            # 追記だけ：削除行が多いものは止める（statusは数行の書き換えがあるので、少しだけ許す）
+            [ "$del" -le 10 ] || { echo "削除行が多い：$path($del)"; exit 0; }
+            [ "$add" -le 200 ] || { echo "追加行が多い：$path($add)"; exit 0; }
+            total=$((total + add))
+          done < /tmp/files.tsv
+          [ "$total" -le 300 ] || { echo "追加行の合計が多い($total)"; exit 0; }
+          n=$(wc -l < /tmp/files.tsv)
+          [ "$n" -le 5 ] || { echo "ファイル数が多い($n)"; exit 0; }
+          # 確認したshaのままの時だけ、マージ（確認とマージの間の追加pushを防ぐ）
+          gh pr merge "$PR" --squash --match-head-commit "$sha"
+          # ※バイト数の上限・鍵っぽい文字の検査は、GitHubのsecret scanning（push protection）をONにして補う（設定は、みーの手）

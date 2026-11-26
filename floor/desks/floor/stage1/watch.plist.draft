@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 段1の見張り（下書き）。リポジトリの外に、親方が手で置く。__BASE__ を、専用フォルダの絶対パスに直す -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.gacchigachi.floor-watch</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>__BASE__/watch.sh</string>
+  </array>
+  <key>StartInterval</key><integer>300</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>__BASE__/launchd.out</string>
+  <key>StandardErrorPath</key><string>__BASE__/launchd.err</string>
+</dict>
+</plist>

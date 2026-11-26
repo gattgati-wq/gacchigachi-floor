@@ -1,0 +1,97 @@
+#!/bin/bash
+# 段1の見張り（下書き・AIなし）。監査のチェック表（STAGE1-CHECK.md）に沿う。
+# ・リポジトリの「外」に、親方が手で置く（pullで中身が変わらん場所）。
+# ・やること：git fetch → 「新しい指示が来たか」を、ログに出すだけ。AIは起こさん。
+# ・本文は、シェルの変数にも、引数にも、ログにも入れん（sha・パス・行数・バイト数・時刻だけ）。
+# ・fetch先は、ここに固定（リポジトリの文から取らん）。鍵は使わん（公開リポの fetch だけ）。
+# 使い方：watch.sh --init（人が1回だけ。位置を作る）／ watch.sh（launchd が数分おきに動かす）
+set -u
+BASE="__BASE__"                                   # 例：/Users/<専用ユーザー>/floor-watch（リポジトリの外）
+REPO_URL="https://github.com/gattgati-wq/gacchigachi-floor.git"   # 固定
+BRANCH="main"
+WATCH_PATH="floor/inbox/to-floor.md"              # 見る場所（固定。他のパスは無視）
+MIRROR="$BASE/mirror.git"                         # 作業ツリーの無い、ミラー専用の置き場
+POS="$BASE/last_sha"                              # 「前回の位置」（コミットsha）
+STOP="$BASE/STOP"                                 # あれば、何もせず終わる（人が消すまで）
+LOCK="$BASE/lock.d"
+LOG="$BASE/watch.log"
+FAILS="$BASE/fail_count"
+NEXT="$BASE/next_try"
+LOG_MAX=1048576                                   # ログの上限（1MB）。超えたら回す
+FETCH_SECS=60                                     # fetchの時間上限（秒）
+
+now() { date '+%Y-%m-%d %H:%M:%S'; }
+log() { printf '%s %s\n' "$(now)" "$1" >> "$LOG"; }   # 渡すのは、sha・パス・数・時刻だけ
+
+[ -d "$BASE" ] || { echo "BASE がない" >&2; exit 2; }
+[ -e "$STOP" ] && exit 0                          # STOP：何もしない
+
+# ログの大きさの上限（回す。3世代）
+if [ -f "$LOG" ] && [ "$(wc -c < "$LOG")" -gt "$LOG_MAX" ]; then
+  rm -f "$LOG.3"; [ -f "$LOG.2" ] && mv "$LOG.2" "$LOG.3"; [ -f "$LOG.1" ] && mv "$LOG.1" "$LOG.2"; mv "$LOG" "$LOG.1"
+fi
+
+# 二重起動しない（mkdir式のロック）。取り残しは、奪わず、目立つ印を残して終わる
+if ! mkdir "$LOCK" 2>/dev/null; then log "ロック中（取り残しの疑い）：何もしない"; exit 0; fi
+trap 'rmdir "$LOCK" 2>/dev/null' EXIT
+
+# バックオフ：失敗が続いたら、間隔を空ける
+if [ -f "$NEXT" ] && [ "$(date +%s)" -lt "$(cat "$NEXT")" ]; then exit 0; fi
+
+# ミラーを用意（初回だけ）
+if [ ! -d "$MIRROR" ]; then git init --bare --quiet "$MIRROR" || { log "ミラー作成に失敗"; exit 1; }; fi
+
+# fetch（時間上限つき。perl の alarm で打ち切る＝macOS に timeout が無いため）
+if ! perl -e 'alarm shift; exec @ARGV' "$FETCH_SECS" \
+     git -C "$MIRROR" -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 \
+     fetch --quiet --no-tags "$REPO_URL" "+refs/heads/$BRANCH:refs/heads/watch" 2>/dev/null; then
+  n=$(( $(cat "$FAILS" 2>/dev/null || echo 0) + 1 )); echo "$n" > "$FAILS"
+  wait_s=$(( 300 * (2 ** (n > 6 ? 6 : n)) )); [ "$wait_s" -gt 3600 ] && wait_s=3600   # 最大1時間
+  echo $(( $(date +%s) + wait_s )) > "$NEXT"
+  log "fetch失敗（連続 $n 回）：次は ${wait_s} 秒後"; exit 0
+fi
+rm -f "$FAILS" "$NEXT"                            # 復帰：通常に戻る
+
+NEW="$(git -C "$MIRROR" rev-parse --verify --quiet refs/heads/watch)" || { log "ブランチが見つからん：停止"; : > "$STOP"; exit 0; }
+
+if [ "${1:-}" = "--init" ]; then                  # 人が1回だけ。位置を、今のmainに合わせる
+  printf '%s\n' "$NEW" > "$POS"; log "位置を作った：$NEW"; exit 0
+fi
+
+# 位置ファイルが無い：全履歴を新規扱いにせず、止めて人が決める
+[ -f "$POS" ] || { log "位置ファイルが無い：停止（人が --init で決める）"; : > "$STOP"; exit 0; }
+OLD="$(cat "$POS")"
+case "$OLD" in ([0-9a-f]*) ;; (*) log "位置ファイルが変：停止"; : > "$STOP"; exit 0 ;; esac
+
+[ "$OLD" = "$NEW" ] && { log "何もなし"; exit 0; }
+
+# 前回の位置が今のmainの祖先でない（force-push・履歴書き換え・ブランチ消失）：処理せず停止。位置は直さん
+if ! git -C "$MIRROR" merge-base --is-ancestor "$OLD" "$NEW" 2>/dev/null; then
+  log "異常：前回の位置が祖先でない（force-pushの疑い）。停止。位置は動かさん"; : > "$STOP"; exit 0
+fi
+
+# 見る場所（WATCH_PATH）に変更があったか
+if ! git -C "$MIRROR" diff --quiet "$OLD" "$NEW" -- "$WATCH_PATH"; then
+  new_exists=0; git -C "$MIRROR" cat-file -e "$NEW:$WATCH_PATH" 2>/dev/null && new_exists=1
+  old_exists=0; git -C "$MIRROR" cat-file -e "$OLD:$WATCH_PATH" 2>/dev/null && old_exists=1
+  if [ "$new_exists" = 0 ]; then
+    log "異常：$WATCH_PATH が消えた（削除）。中身は読まん"
+  elif [ "$old_exists" = 0 ]; then
+    lines=$(git -C "$MIRROR" show "$NEW:$WATCH_PATH" | wc -l); bytes=$(git -C "$MIRROR" show "$NEW:$WATCH_PATH" | wc -c)
+    log "検知：$WATCH_PATH が新しく作られた（$lines 行・$bytes バイト）sha=$NEW"
+  else
+    osz=$(git -C "$MIRROR" show "$OLD:$WATCH_PATH" | wc -c); nsz=$(git -C "$MIRROR" show "$NEW:$WATCH_PATH" | wc -c)
+    # 追記だけか：古いファイルが、新しいファイルの先頭と、ぴったり同じ（本文は変数に入れん。cmpに任せる）
+    if [ "$nsz" -gt "$osz" ] && cmp -s -n "$osz" <(git -C "$MIRROR" show "$OLD:$WATCH_PATH") <(git -C "$MIRROR" show "$NEW:$WATCH_PATH"); then
+      add=$(git -C "$MIRROR" diff --numstat "$OLD" "$NEW" -- "$WATCH_PATH" | cut -f1)
+      log "検知：$WATCH_PATH に追記（$add 行・$(( nsz - osz )) バイト）sha=$NEW"
+    else
+      log "異常：$WATCH_PATH の途中が書き換わった／縮んだ。中身は読まん sha=$NEW"
+    fi
+  fi
+else
+  log "変化はあるが、見る場所（$WATCH_PATH）ではない：無視 sha=$NEW"
+fi
+
+printf '%s\n' "$NEW" > "$POS"                     # ログを書いた後に、位置を更新
+exit 0

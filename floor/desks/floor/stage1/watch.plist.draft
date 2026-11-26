@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 段1の見張り（下書き）。リポジトリの外に、親方が手で置く。__BASE__ を、専用フォルダの絶対パスに直す -->
+<!-- 段1の見張り（下書き v2）。リポジトリの外に、親方が手で置く。__BASE__ を、専用フォルダの絶対パスに直す。
+     注意：BASE は Desktop・Documents・Downloads の配下に置かん。LaunchAgent はログイン中だけ動くはず（再起動後の自動ログイン or LaunchDaemon は、親方が決める）。launchd.out/err は上限なし -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>

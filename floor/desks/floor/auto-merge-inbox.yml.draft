@@ -1,0 +1,38 @@
+# 下書き（未テスト）。まだ有効ではない。ここは `.github/workflows/` ではない。
+# 監査の確認と、みーのマージ（手で）が済んでから、`.github/workflows/auto-merge-inbox.yml` に置く。
+name: auto-merge-inbox
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  merge:
+    # 同じリポジトリのブランチだけ（フォークは除外）。ドラフトは対象外（ドラフトは、自動マージできん）
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - name: 変更ファイルが、全部、許可した場所の中か確かめて、マージ
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          files=$(gh pr diff "$PR" --name-only)
+          [ -n "$files" ] || { echo "変更なし"; exit 0; }
+          # 1つでも許可の外があれば、自動マージしない
+          while IFS= read -r f; do
+            case "$f" in
+              floor/inbox/*|floor/status/*) ;;
+              *) echo "対象外：$f"; exit 0 ;;
+            esac
+          done <<< "$files"
+          # 削除・名前の変更は、自動マージしない
+          if gh pr view "$PR" --json files --jq '.files[] | select(.changeType != "MODIFIED" and .changeType != "ADDED") | .path' | grep -q .; then
+            echo "削除/名前の変更あり"; exit 0
+          fi
+          # 大きさの上限（例：変更ファイル数）
+          n=$(echo "$files" | wc -l)
+          [ "$n" -le 10 ] || { echo "ファイル数が多い"; exit 0; }
+          gh pr merge "$PR" --squash

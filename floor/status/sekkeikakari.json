@@ -2,15 +2,16 @@
   "id": "sekkeikakari",
   "name": "フロア設計係",
   "status": "done",
-  "task": "フロアにまなを追加",
-  "say": "まな追加、マージ済み",
+  "task": "フロアの引継ぎ書（説明書）の下書き",
+  "say": "引継ぎ書を直した（名札・リンク・表示名）",
   "waiting_for": "",
-  "updated": "2026-11-22T17:51:43+09:00",
+  "updated": "2026-11-26T14:46:21+09:00",
+  "summary": "まなの指摘3点（名札は呼び方＝持ち場／リンクの現況／表示名）を members.json で確かめて、引継ぎ書に反映した。PR #83 を更新。",
   "usage": {
-    "context_used": 343618,
+    "context_used": 526985,
     "context_max": 1000000,
-    "output_tokens": 135820,
-    "cost_usd": 5.86,
-    "measured": "2026-11-21T12:43:09+09:00"
+    "output_tokens": 204974,
+    "cost_usd": 17.06,
+    "measured": "2026-11-26T10:16:22+09:00"
   }
 }

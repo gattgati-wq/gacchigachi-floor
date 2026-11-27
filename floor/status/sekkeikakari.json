@@ -6,5 +6,12 @@
   "say": "引継ぎ書の古い行を直した（PR #4）",
   "waiting_for": "",
   "updated": "2026-11-27T17:01:27+09:00",
-  "summary": "まなの指摘（PR #4 は閉鎖済み）をGitHubで確かめて、説明書を直した。受け箱の to-floor.md を入口の表に足した（宛先は不明と明記）。"
+  "summary": "まなの指摘（PR #4 は閉鎖済み）をGitHubで確かめて、説明書を直した。受け箱の to-floor.md を入口の表に足した（宛先は不明と明記）。",
+  "usage": {
+    "context_used": 570691,
+    "context_max": 1000000,
+    "output_tokens": 219796,
+    "cost_usd": 26.95,
+    "measured": "2026-11-27T17:01:39+09:00"
+  }
 }

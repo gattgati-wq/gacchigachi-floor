@@ -12,13 +12,13 @@ BASE="__BASE__"                                   # 例：/Users/<専用ユー�
 REPO_URL="https://github.com/gattgati-wq/gacchigachi-floor.git"   # 固定
 BRANCH="main"
 WATCH_PATH="floor/inbox/to-floor.md"              # 見る場所（固定。他のパスは無視）
-MIRROR="$BASE/mirror.git"                         # 作業ツリーの無い、ミラー専用の置き場
-POS="$BASE/last_sha"                              # 「前回の位置」（コミットsha・40桁）
-STOP="$BASE/STOP"                                 # あれば、何もせず終わる（人が消すまで）。中身は理由（固定語だけ）
-LOCK="$BASE/lock.d"
-LOG="$BASE/watch.log"
-FAILS="$BASE/fail_count"
-NEXT="$BASE/next_try"
+MIRROR="${BASE}/mirror.git"                         # 作業ツリーの無い、ミラー専用の置き場
+POS="${BASE}/last_sha"                              # 「前回の位置」（コミットsha・40桁）
+STOP="${BASE}/STOP"                                 # あれば、何もせず終わる（人が消すまで）。中身は理由（固定語だけ）
+LOCK="${BASE}/lock.d"
+LOG="${BASE}/watch.log"
+FAILS="${BASE}/fail_count"
+NEXT="${BASE}/next_try"
 LOG_MAX=1048576                                   # ログの上限（1MB）
 FILE_MAX=1048576                                  # 見る場所のファイルの上限（1MB）
 LOCK_STALE_MIN=15                                 # 直し4：これより古いロックは、回収する（生きてる持ち主の時間上限60秒より、十分長い）
@@ -26,101 +26,109 @@ FETCH_SECS=60                                     # fetchの時間上限（秒�
 INIT=0; [ "${1:-}" = "--init" ] && { INIT=1; FETCH_SECS=600; }   # 直し3：初回（--init）だけ長く
 
 now() { date '+%Y-%m-%d %H:%M:%S'; }
-log() { printf '%s %s\n' "$(now)" "$1" >> "$LOG"; }   # 渡すのは、sha・パス・数・時刻だけ
-say() { [ "$INIT" = 1 ] && printf '%s\n' "$1" >&2; return 0; }   # 直し6：手で --init した時だけ、理由を画面に出す
-stop_with() { printf '%s\n' "$1" > "$STOP"; log "停止：$1"; say "停止しました：$1（原因を直して、STOPを消してから、--init）"; exit 0; }
+log() { printf '%s %s\n' "$(now)" "$1" >> "${LOG}"; }   # 渡すのは、sha・パス・数・時刻だけ
+notify() {   # 異常・停止の通知：固定文だけ（本文・値は渡さん）。Macの画面（osascript）＋ ALERT ファイル（時刻と固定文だけ）
+  printf '%s %s\n' "$(now)" "$1" >> "${BASE}/ALERT" 2>/dev/null
+  osascript -e "display notification \"$1\" with title \"floor-watch\"" >/dev/null 2>&1 || true
+}
+say() { [ "${INIT}" = 1 ] && printf '%s\n' "$1" >&2; return 0; }   # 直し6：手で --init した時だけ、理由を画面に出す
+stop_with() { printf '%s\n' "$1" > "${STOP}"; log "停止：$1"; notify "停止しました（見張り）。理由はログとSTOPの中"; say "停止しました：$1（原因を直して、STOPを消してから、--init）"; exit 0; }
 
-[ -d "$BASE" ] || { echo "BASE がない" >&2; exit 2; }
-if [ -e "$STOP" ]; then say "STOPがあるので、何もしません。先にSTOPを消してから --init"; exit 0; fi   # STOP：何もしない
+[ -d "${BASE}" ] || { echo "BASE がない" >&2; exit 2; }
+if [ -e "${STOP}" ]; then say "STOPがあるので、何もしません。先にSTOPを消してから --init"; exit 0; fi   # STOP：何もしない
 
 # 二重起動しない（mkdir式のロック）。古い取り残し（15分超）は回収して、ログに1行
-if ! mkdir "$LOCK" 2>/dev/null; then
-  if [ -n "$(find "$LOCK" -maxdepth 0 -mmin +"$LOCK_STALE_MIN" 2>/dev/null)" ]; then
-    rmdir "$LOCK" 2>/dev/null && log "古いロック（${LOCK_STALE_MIN}分超）を回収した"
-    mkdir "$LOCK" 2>/dev/null || { log "ロック中：何もしない"; say "ロック中です"; exit 0; }
+if ! mkdir "${LOCK}" 2>/dev/null; then
+  if [ -n "$(find "${LOCK}" -maxdepth 0 -mmin +"${LOCK_STALE_MIN}" 2>/dev/null)" ]; then
+    rmdir "${LOCK}" 2>/dev/null && { log "古いロック（${LOCK_STALE_MIN}分超）を回収した"; notify "古いロックを回収しました（見張りが一度止まった可能性）"; }
+    mkdir "${LOCK}" 2>/dev/null || { log "ロック中：何もしない"; say "ロック中です"; exit 0; }
   else
     log "ロック中：何もしない"; say "ロック中です（動いている最中かも。15分たっても残れば、自動で回収）"; exit 0
   fi
 fi
-trap 'rmdir "$LOCK" 2>/dev/null' EXIT
+trap 'rmdir "${LOCK}" 2>/dev/null' EXIT
 
 # ログの大きさの上限（ロックを取った後に回す。3世代）
-if [ -f "$LOG" ] && [ "$(wc -c < "$LOG")" -gt "$LOG_MAX" ]; then
-  rm -f "$LOG.3"; [ -f "$LOG.2" ] && mv "$LOG.2" "$LOG.3"; [ -f "$LOG.1" ] && mv "$LOG.1" "$LOG.2"; mv "$LOG" "$LOG.1"
+if [ -f "${LOG}" ] && [ "$(wc -c < "${LOG}")" -gt "${LOG_MAX}" ]; then
+  rm -f "${LOG}.3"; [ -f "${LOG}.2" ] && mv "${LOG}.2" "${LOG}.3"; [ -f "${LOG}.1" ] && mv "${LOG}.1" "${LOG}.2"; mv "${LOG}" "${LOG}.1"
 fi
 
 # バックオフ：失敗が続いたら、間隔を空ける
-if [ "$INIT" = 0 ] && [ -f "$NEXT" ] && [ "$(date +%s)" -lt "$(cat "$NEXT")" ]; then exit 0; fi
-if [ "$INIT" = 1 ]; then rm -f "$NEXT" "$FAILS"; fi
+if [ "${INIT}" = 0 ] && [ -f "${NEXT}" ] && [ "$(date +%s)" -lt "$(cat "${NEXT}")" ]; then exit 0; fi
+if [ "${INIT}" = 1 ]; then rm -f "${NEXT}" "${FAILS}"; fi
 
 # ミラーを用意（初回だけ）
-if [ ! -d "$MIRROR" ]; then git init --bare --quiet "$MIRROR" || { log "ミラー作成に失敗"; say "ミラー作成に失敗"; exit 1; }; fi
+if [ ! -d "${MIRROR}" ]; then git init --bare --quiet "${MIRROR}" || { log "ミラー作成に失敗"; say "ミラー作成に失敗"; exit 1; }; fi
 
 # fetch（時間上限つき。perl の alarm で打ち切る＝macOS に timeout が無いため）
-if ! perl -e 'alarm shift; exec @ARGV' "$FETCH_SECS" \
-     git -C "$MIRROR" -c credential.helper= -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 \
-     fetch --quiet --no-tags "$REPO_URL" "+refs/heads/$BRANCH:refs/heads/watch" 2>/dev/null; then
-  n=$(( $(cat "$FAILS" 2>/dev/null || echo 0) + 1 )); echo "$n" > "$FAILS"
-  wait_s=$(( 300 * (2 ** (n > 6 ? 6 : n)) )); [ "$wait_s" -gt 3600 ] && wait_s=3600   # 最大1時間
-  echo $(( $(date +%s) + wait_s )) > "$NEXT"
-  log "fetch失敗（連続 $n 回）：次は ${wait_s} 秒後"; say "fetchに失敗しました（ネット・URL・権限を確認）"; exit 0
+if ! perl -e 'alarm shift; exec @ARGV' "${FETCH_SECS}" \
+     git -C "${MIRROR}" -c credential.helper= -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 \
+     fetch --quiet --no-tags "${REPO_URL}" "+refs/heads/${BRANCH}:refs/heads/watch" 2>/dev/null; then
+  n=$(( $(cat "${FAILS}" 2>/dev/null || echo 0) + 1 )); echo "${n}" > "${FAILS}"
+  wait_s=$(( 300 * (2 ** (n > 6 ? 6 : n)) )); [ "${wait_s}" -gt 3600 ] && wait_s=3600   # 最大1時間
+  echo $(( $(date +%s) + wait_s )) > "${NEXT}"
+  log "fetch失敗（連続 ${n} 回）：次は ${wait_s} 秒後"; [ "${n}" -eq 3 ] && notify "fetchが3回続けて失敗しています（ネット・URLを確認）"; say "fetchに失敗しました（ネット・URL・権限を確認）"; exit 0
 fi
-rm -f "$FAILS" "$NEXT"                            # 復帰：通常に戻る
+rm -f "${FAILS}" "${NEXT}"                            # 復帰：通常に戻る
 
-NEW="$(git -C "$MIRROR" rev-parse --verify --quiet refs/heads/watch)" || stop_with "ブランチなし"
+NEW="$(git -C "${MIRROR}" rev-parse --verify --quiet refs/heads/watch)" || stop_with "ブランチなし"
 
-write_pos() { printf '%s\n' "$1" > "$POS.tmp" && mv "$POS.tmp" "$POS"; }   # 原子的に書く（一時ファイル→mv）
+write_pos() { printf '%s\n' "$1" > "${POS}.tmp" && mv "${POS}.tmp" "${POS}"; }   # 原子的に書く（一時ファイル→mv）
 
-if [ "$INIT" = 1 ]; then                          # 人が1回だけ。位置を、今のmainに合わせる
-  write_pos "$NEW"; log "位置を作った：$NEW"; say "位置を作りました：$NEW"; exit 0
+if [ "${INIT}" = 1 ]; then                          # 人が1回だけ。位置を、今のmainに合わせる
+  write_pos "${NEW}"; log "位置を作った：${NEW}"; say "位置を作りました：${NEW}"; exit 0
 fi
 
 # 位置ファイルが無い：全履歴を新規扱いにせず、止めて人が決める
-[ -f "$POS" ] || stop_with "位置なし"
-OLD="$(cat "$POS")"
-case "$OLD" in
+[ -f "${POS}" ] || stop_with "位置なし"
+OLD="$(cat "${POS}")"
+case "${OLD}" in
   (*[!0-9a-f]*|'') stop_with "位置が変" ;;
 esac
 [ "${#OLD}" -eq 40 ] || stop_with "位置が変"       # 40桁の検証
 
-[ "$OLD" = "$NEW" ] && { log "何もなし"; exit 0; }
+[ "${OLD}" = "${NEW}" ] && { log "何もなし"; exit 0; }
 
 # 前回の位置が今のmainの祖先でない（force-push・履歴書き換え・ブランチ消失）：処理せず停止。位置は直さん
-git -C "$MIRROR" merge-base --is-ancestor "$OLD" "$NEW" 2>/dev/null || stop_with "祖先でない"
+git -C "${MIRROR}" merge-base --is-ancestor "${OLD}" "${NEW}" 2>/dev/null || stop_with "祖先でない"
 
 # 見る場所（WATCH_PATH）に変更があったか
-if ! git -C "$MIRROR" diff --quiet "$OLD" "$NEW" -- "$WATCH_PATH"; then
-  new_exists=0; git -C "$MIRROR" cat-file -e "$NEW:$WATCH_PATH" 2>/dev/null && new_exists=1
-  old_exists=0; git -C "$MIRROR" cat-file -e "$OLD:$WATCH_PATH" 2>/dev/null && old_exists=1
-  if [ "$new_exists" = 0 ]; then
-    log "異常：$WATCH_PATH が消えた（削除）。中身は読まん"
+if ! git -C "${MIRROR}" diff --quiet "${OLD}" "${NEW}" -- "${WATCH_PATH}"; then
+  new_exists=0; git -C "${MIRROR}" cat-file -e "${NEW}:${WATCH_PATH}" 2>/dev/null && new_exists=1
+  old_exists=0; git -C "${MIRROR}" cat-file -e "${OLD}:${WATCH_PATH}" 2>/dev/null && old_exists=1
+  if [ "${new_exists}" = 0 ]; then
+    log "異常：${WATCH_PATH} が消えた（削除）。中身は読まん"
+    notify "異常：見る場所に想定外の変更（中身は読んでいません）"
   else
-    mode="$(git -C "$MIRROR" ls-tree "$NEW" -- "$WATCH_PATH" | cut -c1-6)"
-    nsz="$(git -C "$MIRROR" cat-file -s "$NEW:$WATCH_PATH")"                       # サイズは、本文を読まずに取る
-    if [ "$mode" != "100644" ]; then
-      log "異常：$WATCH_PATH が普通のファイルでない（リンク等）。中身は読まん sha=$NEW"
-    elif [ "$nsz" -gt "$FILE_MAX" ]; then
-      log "異常：$WATCH_PATH が大きすぎる（${nsz} バイト）。中身は読まん sha=$NEW"
-    elif [ "$old_exists" = 0 ]; then
-      lines=$(( $(git -C "$MIRROR" show "$NEW:$WATCH_PATH" | wc -l) ))
-      log "検知：$WATCH_PATH が新しく作られた（${lines} 行・${nsz} バイト）sha=$NEW"
+    mode="$(git -C "${MIRROR}" ls-tree "${NEW}" -- "${WATCH_PATH}" | cut -c1-6)"
+    nsz="$(git -C "${MIRROR}" cat-file -s "${NEW}:${WATCH_PATH}")"                       # サイズは、本文を読まずに取る
+    if [ "${mode}" != "100644" ]; then
+      log "異常：${WATCH_PATH} が普通のファイルでない（リンク等）。中身は読まん sha=${NEW}"
+      notify "異常：見る場所に想定外の変更（中身は読んでいません）"
+    elif [ "${nsz}" -gt "${FILE_MAX}" ]; then
+      log "異常：${WATCH_PATH} が大きすぎる（${nsz} バイト）。中身は読まん sha=${NEW}"
+      notify "異常：見る場所に想定外の変更（中身は読んでいません）"
+    elif [ "${old_exists}" = 0 ]; then
+      lines=$(( $(git -C "${MIRROR}" show "${NEW}:${WATCH_PATH}" | wc -l) ))
+      log "検知：${WATCH_PATH} が新しく作られた（${lines} 行・${nsz} バイト）sha=${NEW}"
     else
-      osz="$(git -C "$MIRROR" cat-file -s "$OLD:$WATCH_PATH")"
+      osz="$(git -C "${MIRROR}" cat-file -s "${OLD}:${WATCH_PATH}")"
       # 追記だけか：①古いファイルが、新しいファイルの先頭と、ぴったり同じ（cmpに任せる。本文は変数に入れん）
       #            ②古いファイルの末尾が改行（無いと、既存の最後の行への書き足しも「追記」になってしまう）
-      lastbyte="$(git -C "$MIRROR" show "$OLD:$WATCH_PATH" | tail -c1 | od -An -tx1 | tr -d ' ')"
-      if [ "$nsz" -gt "$osz" ] && [ "$lastbyte" = "0a" ] && \
-         cmp -s <(git -C "$MIRROR" show "$OLD:$WATCH_PATH") <(git -C "$MIRROR" show "$NEW:$WATCH_PATH" | head -c "$osz"); then
-        add=$(( $(git -C "$MIRROR" show "$NEW:$WATCH_PATH" | wc -l) - $(git -C "$MIRROR" show "$OLD:$WATCH_PATH" | wc -l) ))
-        log "検知：$WATCH_PATH に追記（${add} 行・$(( nsz - osz )) バイト）sha=$NEW"
+      lastbyte="$(git -C "${MIRROR}" show "${OLD}:${WATCH_PATH}" | tail -c1 | od -An -tx1 | tr -d ' ')"
+      if [ "${nsz}" -gt "${osz}" ] && [ "${lastbyte}" = "0a" ] && \
+         cmp -s <(git -C "${MIRROR}" show "${OLD}:${WATCH_PATH}") <(git -C "${MIRROR}" show "${NEW}:${WATCH_PATH}" | head -c "${osz}"); then
+        add=$(( $(git -C "${MIRROR}" show "${NEW}:${WATCH_PATH}" | wc -l) - $(git -C "${MIRROR}" show "${OLD}:${WATCH_PATH}" | wc -l) ))
+        log "検知：${WATCH_PATH} に追記（${add} 行・$(( nsz - osz )) バイト）sha=${NEW}"
       else
-        log "異常：$WATCH_PATH の途中が書き換わった／縮んだ／末尾が改行でない。中身は読まん sha=$NEW"
+        log "異常：${WATCH_PATH} の途中が書き換わった／縮んだ／末尾が改行でない。中身は読まん sha=${NEW}"
+        notify "異常：見る場所に想定外の変更（中身は読んでいません）"
       fi
     fi
   fi
 else
-  log "変化はあるが、見る場所（$WATCH_PATH）ではない：無視 sha=$NEW"
+  log "変化はあるが、見る場所（${WATCH_PATH}）ではない：無視 sha=${NEW}"
 fi
 
-write_pos "$NEW"                                  # ログを書いた後に、位置を更新
+write_pos "${NEW}"                                  # ログを書いた後に、位置を更新
 exit 0

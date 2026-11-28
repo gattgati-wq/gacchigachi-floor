@@ -151,6 +151,21 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 #dlg button,#dlg a.go{font:inherit;font-weight:800;border:2px solid #5a3a12;border-radius:10px;background:#fff;padding:6px 14px;cursor:pointer;color:var(--ink);text-decoration:none}
 #dlg a.go{background:var(--gold2)}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;border-radius:10px;padding:8px 16px;font-size:14px;display:none;z-index:120}
+#usage{left:8px;top:302px;width:330px;height:142px;background:var(--paper);border:3px solid var(--gold);border-radius:14px;padding:8px 12px;box-shadow:0 4px 10px rgba(0,0,0,.45);display:flex;flex-direction:column;justify-content:space-between;font-size:13px}
+#usage .usage-title{font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:700;font-size:13px;letter-spacing:1px}
+#usage .usage-grid{display:flex;flex-direction:column;gap:5px}
+#usage .usage-row{display:flex;align-items:center;gap:8px}
+#usage .usage-label{width:58px;flex-shrink:0;font-weight:700}
+#usage .usage-bar{flex:1;height:10px;background:#efe7cf;border:1px solid #c9b489;border-radius:5px;overflow:hidden}
+#usage .usage-fill{height:100%;width:0;background:#5da86f;transition:width .3s}
+#usage .usage-fill.warn{background:#e69b2e}
+#usage .usage-fill.full{background:#c0392b}
+#usage .usage-num{width:56px;flex-shrink:0;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+#usage .usage-sub{justify-content:space-between;font-size:11px;opacity:.75}
+#usage .usage-sub span{width:auto;text-align:left}
+#usage .usage-sub span:last-child{text-align:right}
+#usage.is-missing .usage-bar{background:repeating-linear-gradient(45deg,#efe7cf,#efe7cf 6px,#e2d7b8 6px,#e2d7b8 12px)}
+#usage.is-missing .usage-fill{display:none}
 </style>
 </head>
 <body>
@@ -160,6 +175,29 @@ html,body{margin:0;height:100%;background:#17100a;overflow:hidden;
 
   <section class="frame img" id="board" aria-label="状態ボード"><div class="cols" id="cols"></div></section>
   <section class="frame img" id="plate" aria-label="日時"><span id="pd"></span><span id="pt"></span></section>
+  <section class="frame img" id="usage" aria-label="Claude使用量">
+    <div class="usage-title">Claude使用量</div>
+    <div class="usage-grid">
+      <div class="usage-row">
+        <span class="usage-label">5時間枠</span>
+        <div class="usage-bar"><div class="usage-fill" id="usage5Fill"></div></div>
+        <span class="usage-num" id="usage5Text">—</span>
+      </div>
+      <div class="usage-row">
+        <span class="usage-label">週間枠</span>
+        <div class="usage-bar"><div class="usage-fill" id="usageWeekFill"></div></div>
+        <span class="usage-num" id="usageWeekText">—</span>
+      </div>
+      <div class="usage-row">
+        <span class="usage-label">今月支出</span>
+        <span class="usage-num" id="usageSpendText" style="width:auto">—</span>
+      </div>
+      <div class="usage-row usage-sub">
+        <span id="usageResetText">—</span>
+        <span id="usageUpdatedText">—</span>
+      </div>
+    </div>
+  </section>
   <section class="frame img" id="products" aria-label="完成品置き場"><div class="in"><h2>完成品置き場</h2><div id="plist"></div></div></section>
 
   <div id="rbox"><button id="refresh" type="button" title="今すぐ最新のデータを読み込む（自動でも毎分更新）"><span class="ri">↻</span><b>更新</b></button><div id="rtime"></div></div>
@@ -236,6 +274,7 @@ let POS={}; try{POS=JSON.parse(localStorage.getItem("floor_v4_pos")||"{}")||{}}c
 /* ボード類も、キャラと同じく、ドラッグで動かせて、大小も変えられる。位置と大きさは、この端末のブラウザだけに覚える */
 let PANEL={}; try{PANEL=JSON.parse(localStorage.getItem("floor_v4_panels")||"{}")||{}}catch(e){PANEL={}}
 const PANELS={ board:{sel:"#board",w:720,h:286,x:8,y:8}, plate:{sel:"#plate",w:480,h:68,x:()=>Math.max(8+720+14,MID_L+(midW()-480)/2),y:12},
+               usage:{sel:"#usage",w:330,h:142,x:8,y:302},
                products:{sel:"#products",w:254,h:1004,x:()=>STAGE_W-262,y:8},
                /* 丸アイコンの初期位置：ガネーシャ様の顔に、かぶらん所。右の白いカーテン（絵の x≒790）に、縦に2つ */
                kiki:{sel:"#p-kiki",w:155,h:155,x:()=>{const g=bgGeom();return g.left+790*g.k-77},y:()=>{const g=bgGeom();return g.off+215*g.k-77},fixed:true},
@@ -678,6 +717,33 @@ for(const k of ["kiki","emi"]) document.getElementById("p-"+k).addEventListener(
   okLink(l)?window.open(l,"_blank","noopener,noreferrer"):toast(`${PARTNERS[k].name}のリンク先は、まだ設定されていません`);
 });
 
+/* ===== Claude使用量盤（status/usage.json。無い/読めない時は「データなし」） ===== */
+function renderUsage(u){
+  const el=document.getElementById("usage"); if(!el) return;
+  const box=(s)=>document.getElementById(s);
+  const bar=(obj)=>{
+    if(!obj||!obj.enabled){return {p:0,text:"—",cls:""}}
+    const p=Math.max(0,Math.min(999,Number(obj.usedPercent)||0)), cls=p>=100?"full":p>=80?"warn":"";
+    return {p,text:`${p}%`,cls};
+  };
+  const five=bar(u&&u.session5h), week=bar(u&&u.weekly);
+  el.classList.toggle("is-missing",!u);
+  box("usage5Text").textContent=five.text;
+  const f5=box("usage5Fill"); f5.style.width=Math.min(100,five.p)+"%"; f5.className="usage-fill "+five.cls;
+  box("usageWeekText").textContent=week.text;
+  const fw=box("usageWeekFill"); fw.style.width=Math.min(100,week.p)+"%"; fw.className="usage-fill "+week.cls;
+  const sp=u&&u.spend;
+  box("usageSpendText").textContent=sp?`$${Number(sp.used).toFixed(2)} / $${Number(sp.limit).toFixed(2)}（残 $${Number(sp.balance).toFixed(2)}）`:"データなし";
+  box("usageResetText").textContent=(u&&u.weekly&&u.weekly.resetAt)?`週間リセット ${fmtReset(u.weekly.resetAt,true)}`:"—";
+  box("usageUpdatedText").textContent=(u&&u.updatedAt)?`更新 ${fmtReset(u.updatedAt,false)}`:"データなし";
+}
+function fmtReset(iso,withDate){
+  if(!iso) return "";
+  const d=new Date(iso); if(isNaN(d)) return "";
+  const o={}; new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",hourCycle:"h23",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}).formatToParts(d).forEach(p=>o[p.type]=p.value);
+  return (withDate?`${o.month}/${o.day} `:"")+`${o.hour}:${o.minute}`;
+}
+
 /* ===== ライブ読み込み（開いた時＋毎分。同じ場所→GitHubのmain→埋め込み） ===== */
 const RAW="https://raw.githubusercontent.com/gattgati-wq/gacchigachi-floor/main/floor";
 const jf=u=>fetch(bust(u),{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);
@@ -685,7 +751,8 @@ async function loadFrom(base){
   const mem=await (await fetch(bust(base+"/members.json"),{cache:"no-store"})).json();
   const got=await Promise.all(mem.members.map(m=>jf(`${base}/status/${m.id}.json`)));
   const prod=await jf(base+"/products.json");
-  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean),products:(prod&&prod.products)||[]};
+  const usage=await jf(base+"/status/usage.json");
+  return {collected_at:new Date().toISOString(),members:mem,status:got.filter(Boolean),products:(prod&&prod.products)||[],usage:usage||null};
 }
 const hhmmss=d=>new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",hourCycle:"h23",hour:"2-digit",minute:"2-digit",second:"2-digit"}).format(d);
 let LIVE_OK=false, LOADING=false;
@@ -705,7 +772,7 @@ async function tryLive(){
 }
 function paintManaDoing(){ const el=MANA.el; if(!el) return; let d=el.querySelector(".doing"); const t=doingText("mana");
   if(!t){ if(d) d.remove(); return } if(!d){ d=document.createElement("span"); d.className="doing"; el.appendChild(d) } d.textContent=t }
-function draw(){paintManaDoing();renderBoard();if(!DRAG.active)renderChars();renderProducts(DATA.products);window.__floor={source:SOURCE,members:members().length}}
+function draw(){paintManaDoing();renderBoard();if(!DRAG.active)renderChars();renderProducts(DATA.products);renderUsage(DATA.usage);window.__floor={source:SOURCE,members:members().length}}
 function placeRefresh(){ const pl=document.getElementById("plate"), rb=document.getElementById("rbox"); if(!pl||!rb) return;
   const r=panelRect("plate"); rb.style.left=Math.max(4,Math.min(STAGE_W-190,r.x+(r.w-176)/2))+"px"; rb.style.top=(r.y+r.h+3)+"px"; }   /* 更新ボタンは、日時プレートの真下 */
 /* 窓の大きさが変わった時：舞台を広げ直す */

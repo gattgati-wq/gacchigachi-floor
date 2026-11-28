@@ -1,0 +1,6 @@
+{
+  "updatedAt": "2026-11-28T22:24:00+09:00",
+  "session5h": { "enabled": true, "usedPercent": 100 },
+  "weekly": { "enabled": true, "usedPercent": 100, "resetAt": "2026-12-03T00:00:00+09:00" },
+  "spend": { "used": 40.48, "limit": 40.00, "balance": -0.01 }
+}
